@@ -1,0 +1,13 @@
+# Qt / CMake build directories
+build/
+cmake-build-*/
+
+# Qt Creator
+*.user
+*.user.*
+.qtc_clangd/
+.qtcsettings.cmake
+
+# clangd
+.cache/
+

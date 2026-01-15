@@ -1,6 +1,4 @@
 #include "PPP/Window.h"
-#include "PPP/Graph.h"
-#include "PPP/Image_private.h"
 #include <QApplication>
 #include <QFontMetrics>
 #include <QPainter>
@@ -8,32 +6,34 @@
 #include <QWidget>
 #include "PPP/GUI.h"
 #include "PPP/GUI_private.h"
+#include "PPP/Graph.h"
+#include "PPP/Image_private.h"
 
 namespace Graph_lib {
 
 class PainterPrivate
 {
 public:
-    QPainter* painter;
+    QPainter *painter;
     QPen pen;
     QBrush brush;
     QFont font;
 };
 
-void Painter::draw_rectangle(const Point& p1, int w, int h)
+void Painter::draw_rectangle(const Point &p1, int w, int h)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setBrush(impl->brush);
     impl->painter->drawRect(p1.x, p1.y, w, h);
 }
 
-void Painter::draw_line(const Point& p1, const Point& p2)
+void Painter::draw_line(const Point &p1, const Point &p2)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->drawLine(p1.x, p1.y, p2.x, p2.y);
 }
 
-void Painter::draw_polygon(const Shape& s)
+void Painter::draw_polygon(const Shape &s)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setBrush(impl->brush);
@@ -45,44 +45,40 @@ void Painter::draw_polygon(const Shape& s)
     impl->painter->drawPolygon(points.data(), static_cast<int>(points.size()));
 }
 
-Point Painter::draw_text(const Point& p1, const std::string& text)
+Point Painter::draw_text(const Point &p1, const std::string &text)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setFont(impl->font);
     QFontMetrics font_metrics(impl->font);
-    QRect bounding_rect =
-        font_metrics.tightBoundingRect(
-            QString::fromStdString(text + " "));
+    QRect bounding_rect = font_metrics.tightBoundingRect(QString::fromStdString(text + " "));
     impl->painter->drawText(QPoint(p1.x, p1.y + bounding_rect.height()),
                             QString::fromStdString(text));
     return {p1.x + bounding_rect.width(), p1.y + bounding_rect.height()};
 }
 
-Point Painter::draw_centered_text(const Point& p1, const std::string& text)
+Point Painter::draw_centered_text(const Point &p1, const std::string &text)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setFont(impl->font);
     QFontMetrics font_metrics(impl->font);
-    QRect bounding_rect =
-        font_metrics.tightBoundingRect(
-        QString::fromStdString(text));
-    impl->painter->drawText(QPoint(p1.x - bounding_rect.width()/2,
-                                   p1.y + bounding_rect.height()/2),
+    QRect bounding_rect = font_metrics.tightBoundingRect(QString::fromStdString(text));
+    impl->painter->drawText(QPoint(p1.x - bounding_rect.width() / 2,
+                                   p1.y + bounding_rect.height() / 2),
                             QString::fromStdString(text));
-    return {p1.x + bounding_rect.width()/2, p1.y + bounding_rect.height()/2};
+    return {p1.x + bounding_rect.width() / 2, p1.y + bounding_rect.height() / 2};
 }
 
-void Painter::setup_from_text(const Text& text)
+void Painter::setup_from_text(const Text &text)
 {
     set_color(text.color());
     set_font(text.font());
     set_font_size(text.font_size());
 }
 
-void Painter::draw_text_line(const Point& p1, const Vector_ref<const Text>& texts)
+void Painter::draw_text_line(const Point &p1, const Vector_ref<const Text> &texts)
 {
     Point current_pos = p1;
-    for (auto&& text : texts) {
+    for (auto &&text : texts) {
         setup_from_text(*text);
         Point next_pos = draw_text(current_pos, text->label());
         current_pos.x = next_pos.x;
@@ -90,10 +86,10 @@ void Painter::draw_text_line(const Point& p1, const Vector_ref<const Text>& text
     }
 }
 
-void Painter::draw_text_column(const Point& p1, const Vector_ref<const Text>& texts)
+void Painter::draw_text_column(const Point &p1, const Vector_ref<const Text> &texts)
 {
     Point current_pos = p1;
-    for (auto&& text : texts) {
+    for (auto &&text : texts) {
         setup_from_text(*text);
         Point next_pos = draw_text(current_pos, text->label());
         current_pos.y = next_pos.y;
@@ -101,33 +97,33 @@ void Painter::draw_text_column(const Point& p1, const Vector_ref<const Text>& te
     }
 }
 
-void Painter::draw_ellipse(const Point& p1, int r, int r2)
+void Painter::draw_ellipse(const Point &p1, int r, int r2)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setBrush(impl->brush);
     impl->painter->drawEllipse(QPoint(p1.x, p1.y), r, r2);
 }
 
-void Painter::draw_arc(const Point& p1, int r, int r2, int start_angle, int end_angle)
+void Painter::draw_arc(const Point &p1, int r, int r2, int start_angle, int end_angle)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setBrush(impl->brush);
     impl->painter->drawArc(p1.x, p1.y, r, r2, start_angle, end_angle);
 }
 
-void Painter::draw_pie(const Point& p1, int r, int r2, int start_angle, int end_angle)
+void Painter::draw_pie(const Point &p1, int r, int r2, int start_angle, int end_angle)
 {
     impl->painter->setPen(impl->pen);
     impl->painter->setBrush(impl->brush);
     impl->painter->drawPie(p1.x, p1.y, r, r2, start_angle, end_angle);
 }
 
-void Painter::draw_image(const Point& p1, const Image& img)
+void Painter::draw_image(const Point &p1, const Image &img)
 {
     impl->painter->drawImage(QPoint(p1.x, p1.y), img.get_impl().image);
 }
 
-void Painter::draw_image(const Point& p1, const Point& p2, int w, int h, const Image& img)
+void Painter::draw_image(const Point &p1, const Point &p2, int w, int h, const Image &img)
 {
     impl->painter->drawImage(QPoint(p1.x, p1.y), img.get_impl().image, QRect(p2.x, p2.y, w, h));
 }
@@ -174,7 +170,6 @@ void Painter::set_color(Color color)
     } else {
         impl->pen.setStyle(Qt::NoPen);
     }
-
 }
 
 void Painter::set_fill_color(Color color)
@@ -189,14 +184,13 @@ void Painter::set_fill_color(Color color)
 
 void Painter::set_line_style(Line_style style)
 {
-    static const QMap<Line_style, Qt::PenStyle> line_style_map = {
-        {Line_style::none, Qt::NoPen},
-        {Line_style::solid, Qt::SolidLine},
-        {Line_style::dash, Qt::DashLine},
-        {Line_style::dot, Qt::DotLine},
-        {Line_style::dashdot, Qt::DashDotLine},
-        {Line_style::dashdotdot, Qt::DashDotDotLine}
-    };
+    static const QMap<Line_style, Qt::PenStyle> line_style_map
+        = {{Line_style::none, Qt::NoPen},
+           {Line_style::solid, Qt::SolidLine},
+           {Line_style::dash, Qt::DashLine},
+           {Line_style::dot, Qt::DotLine},
+           {Line_style::dashdot, Qt::DashDotLine},
+           {Line_style::dashdotdot, Qt::DashDotDotLine}};
     impl->pen.setStyle(line_style_map[style]);
     impl->pen.setWidth(style.width());
 }
@@ -208,58 +202,57 @@ void Painter::set_font_size(int s)
 
 void Painter::set_font(Font f)
 {
-    static QMap<Font, QFont> fontMap = {
-        {Font::helvetica, QFont("Helvetica", 14) },
-        {Font::helvetica_bold, QFont("Helvetica", 14, QFont::Bold)},
-        {Font::helvetica_italic, QFont("Helvetica", 14, QFont::Normal, true)},
-        {Font::helvetica_bold_italic, QFont("Helvetica", 14, QFont::Bold, true)},
-        {Font::courier, QFont("Courier", 14) },
-        {Font::courier_bold, QFont("Courier", 14, QFont::Bold)},
-        {Font::courier_italic, QFont("Courier", 14, QFont::Normal, true)},
-        {Font::courier_bold_italic, QFont("Courier", 14, QFont::Bold, true)},
-        {Font::times, QFont("Times", 14) },
-        {Font::times_bold, QFont("Times", 14, QFont::Bold)},
-        {Font::times_italic, QFont("Times", 14, QFont::Normal, true)},
-        {Font::times_bold_italic, QFont("Times", 14, QFont::Bold, true)},
-        {Font::symbol, QFont("Symbol", 14)},
-        {Font::screen, QFont("Screen", 14)},
-        {Font::screen_bold, QFont("Screen", 14, QFont::Bold)},
-        {Font::zapf_dingbats, QFont("Zapf Dingbats", 14)}
-    };
+    static QMap<Font, QFont> fontMap
+        = {{Font::helvetica, QFont("Helvetica", 14)},
+           {Font::helvetica_bold, QFont("Helvetica", 14, QFont::Bold)},
+           {Font::helvetica_italic, QFont("Helvetica", 14, QFont::Normal, true)},
+           {Font::helvetica_bold_italic, QFont("Helvetica", 14, QFont::Bold, true)},
+           {Font::courier, QFont("Courier", 14)},
+           {Font::courier_bold, QFont("Courier", 14, QFont::Bold)},
+           {Font::courier_italic, QFont("Courier", 14, QFont::Normal, true)},
+           {Font::courier_bold_italic, QFont("Courier", 14, QFont::Bold, true)},
+           {Font::times, QFont("Times", 14)},
+           {Font::times_bold, QFont("Times", 14, QFont::Bold)},
+           {Font::times_italic, QFont("Times", 14, QFont::Normal, true)},
+           {Font::times_bold_italic, QFont("Times", 14, QFont::Bold, true)},
+           {Font::symbol, QFont("Symbol", 14)},
+           {Font::screen, QFont("Screen", 14)},
+           {Font::screen_bold, QFont("Screen", 14, QFont::Bold)},
+           {Font::zapf_dingbats, QFont("Zapf Dingbats", 14)}};
     QFont painter_font = fontMap[f];
     impl->font = painter_font;
 }
 
-void ImagePrivate::load(const std::string& s)
+void ImagePrivate::load(const std::string &s)
 {
     image.load(QString::fromStdString(s));
 }
 
 void ImagePrivate::scale(int ww, int hh, bool keep_aspect_ratio)
 {
-    image = image.scaled(QSize(ww, hh), keep_aspect_ratio ? Qt::KeepAspectRatio : Qt::IgnoreAspectRatio);
+    image = image.scaled(QSize(ww, hh),
+                         keep_aspect_ratio ? Qt::KeepAspectRatio : Qt::IgnoreAspectRatio);
 }
 
 class ApplicationPrivate
 {
 public:
-    ApplicationPrivate() : app(argc, nullptr) {}
+    ApplicationPrivate()
+        : app(argc, nullptr)
+    {}
     void gui_main() { app.exec(); }
     void quit() { app.quit(); }
+
 private:
     int argc = 0;
     QApplication app;
 };
 
-Application::Application() : impl(std::make_unique<ApplicationPrivate>())
-{
+Application::Application()
+    : impl(std::make_unique<ApplicationPrivate>())
+{}
 
-}
-
-Application::~Application()
-{
-
-}
+Application::~Application() {}
 
 void Application::gui_main()
 {
@@ -271,21 +264,19 @@ void Application::quit()
     QTimer::singleShot(0, [&] { impl->quit(); });
 }
 
-Painter::Painter(std::unique_ptr<PainterPrivate>&& pp)
+Painter::Painter(std::unique_ptr<PainterPrivate> &&pp)
     : impl(std::move(pp))
-{
-}
+{}
 
 Painter::~Painter() {}
 
-void WindowPrivate::paintEvent(QPaintEvent*/*event*/)
+void WindowPrivate::paintEvent(QPaintEvent * /*event*/)
 {
-    std::unique_ptr<PainterPrivate> priv =
-            std::make_unique<PainterPrivate>();
+    std::unique_ptr<PainterPrivate> priv = std::make_unique<PainterPrivate>();
     QPainter painter(this);
     priv->painter = &painter;
     Painter shape_painter(std::move(priv));
-    for (auto&& shape : shapes) {
+    for (auto &&shape : shapes) {
         shape->draw(shape_painter);
     }
 }
@@ -293,12 +284,11 @@ void WindowPrivate::paintEvent(QPaintEvent*/*event*/)
 void WindowPrivate::end_button_wait()
 {
     invoke_stored_callback = false;
-    QObject::connect(&loop_stopping_timer, &QTimer::timeout,
-                     [this] {nested_loop.quit();});
+    QObject::connect(&loop_stopping_timer, &QTimer::timeout, [this] { nested_loop.quit(); });
     loop_stopping_timer.start(0);
 }
 
-void WindowPrivate::closeEvent(QCloseEvent*/*event*/)
+void WindowPrivate::closeEvent(QCloseEvent * /*event*/)
 {
     accept_waits = false;
     user_timer.stop();
@@ -310,8 +300,7 @@ void WindowPrivate::timer_wait(int milliseconds)
 {
     if (!accept_waits)
         return;
-    auto conn = QObject::connect(&user_timer, &QTimer::timeout,
-                     [this] {nested_loop.quit();});
+    auto conn = QObject::connect(&user_timer, &QTimer::timeout, [this] { nested_loop.quit(); });
     user_timer.start(milliseconds);
     nested_loop.exec();
     QObject::disconnect(conn);
@@ -322,18 +311,17 @@ void WindowPrivate::timer_wait(int milliseconds, std::function<void()> cb)
     if (!accept_waits)
         return;
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = QObject::connect(&user_timer, &QTimer::timeout,
-                     [conn, func = std::move(cb)] {
+    *conn = QObject::connect(&user_timer, &QTimer::timeout, [conn, func = std::move(cb)] {
         QObject::disconnect(*conn);
         func();
     });
     user_timer.start(milliseconds);
 }
 
-void WindowPrivate::wait_for_button(Button* button)
+void WindowPrivate::wait_for_button(Button *button)
 {
     std::function<void()> stored_callback = button->do_it;
-    button->do_it = [&] {nested_loop.exit();};
+    button->do_it = [&] { nested_loop.exit(); };
     invoke_stored_callback = true;
     nested_loop.exec();
     button->do_it = stored_callback;
@@ -341,18 +329,23 @@ void WindowPrivate::wait_for_button(Button* button)
         button->do_it();
 }
 
-
-Window::Window(int ww, int hh, const string& title)
-    : p{0, 0}, w(ww), h(hh), impl(std::make_unique<WindowPrivate>(this))
+Window::Window(int ww, int hh, const string &title)
+    : p{0, 0}
+    , w(ww)
+    , h(hh)
+    , impl(std::make_unique<WindowPrivate>(this))
 {
     impl->setGeometry(0, 0, ww, hh);
     impl->setWindowTitle(QString::fromStdString(title));
     impl->show();
-	init();
+    init();
 }
 
-Window::Window(Point xy, int ww, int hh, const string& title)
-    : p{xy}, w(ww), h(hh), impl(std::make_unique<WindowPrivate>(this))
+Window::Window(Point xy, int ww, int hh, const string &title)
+    : p{xy}
+    , w(ww)
+    , h(hh)
+    , impl(std::make_unique<WindowPrivate>(this))
 {
     impl->setGeometry(xy.x, xy.y, ww, hh);
     impl->setWindowTitle(QString::fromStdString(title));
@@ -360,10 +353,7 @@ Window::Window(Point xy, int ww, int hh, const string& title)
     init();
 }
 
-Window::~Window()
-{
-
-}
+Window::~Window() {}
 
 void Window::set_label(const string &s)
 {
@@ -372,20 +362,20 @@ void Window::set_label(const string &s)
 
 void Window::init()
 {
-   //resizable(this);
-   //show();
-} 
+    //resizable(this);
+    //show();
+}
 
-//---------------------------------------------------- 
+//----------------------------------------------------
 
 void Window::draw()
 {
     impl->repaint();
 }
 
-void Window::attach(Widget& ww)
+void Window::attach(Widget &ww)
 {
-    auto& widget = ww.get_impl().widget;
+    auto &widget = ww.get_impl().widget;
     if (widget) {
         widget->setParent(impl.get());
         widget->move(ww.loc.x, ww.loc.y);
@@ -396,26 +386,26 @@ void Window::attach(Widget& ww)
     ww.attach(*this);
 }
 
-void Window::detach(Widget& ww)
+void Window::detach(Widget &ww)
 {
-    auto& widget = ww.get_impl().widget;
+    auto &widget = ww.get_impl().widget;
     widget->setParent(nullptr);
     widget->hide();
 }
 
-void Window::attach(Shape& s)
+void Window::attach(Shape &s)
 {
     impl->attach(s);
     s.set_window(this);
 }
-void Window::detach(Shape& s)
+void Window::detach(Shape &s)
 {
     impl->detach(s);
     s.set_window(nullptr);
 }
 
-
-void Window::put_on_top(Shape& s) {
+void Window::put_on_top(Shape &s)
+{
     impl->put_on_top(s);
     draw();
 }
@@ -435,7 +425,7 @@ void Window::end_button_wait()
     impl->end_button_wait();
 }
 
-WindowPrivate& Window::get_impl() const
+WindowPrivate &Window::get_impl() const
 {
     return *impl;
 }
@@ -459,10 +449,9 @@ void Window::timer_wait(int milliseconds, std::function<void()> cb)
 
 int gui_main()
 {
-    int argc=0;
+    int argc = 0;
     QApplication a(argc, nullptr);
     return a.exec();
 }
 
-} // Graph
-
+} // namespace Graph_lib
