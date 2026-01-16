@@ -7,7 +7,7 @@ cmake-build-*/
 *.user.*
 .qtc_clangd/
 .qtcsettings.cmake
-
+.DS_Store
 # clangd
 .cache/
 
