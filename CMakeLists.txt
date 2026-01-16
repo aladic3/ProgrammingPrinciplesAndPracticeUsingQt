@@ -27,12 +27,20 @@ set(PROJECT_SOURCES
     PPP/GUI_private.h
     Simple_window.cpp
     Colormap.cpp
+    Chapter_10/Ex1_4.cpp
+    Chapter_10/Ex1_4.h
+    Chapter_10/drill.cpp
+    Chapter_10/drill.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Programming_Qt
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        Chapter_10/Ex1_4.h
+        Chapter_10/Ex1_4.cpp
+        Chapter_10/drill.cpp
+        Chapter_10/drill.h
     )
 
 # Define target properties for Android with Qt 6 as:
