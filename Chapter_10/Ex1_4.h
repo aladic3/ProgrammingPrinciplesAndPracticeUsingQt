@@ -8,6 +8,8 @@
 
 namespace ex1_4{
     void ex1();
+    void ex2();
+    void ex3();
 }
 
 
