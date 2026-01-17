@@ -22,8 +22,32 @@ namespace ex1_4{
 
     }
 
-    void ex4(){
-        /*
+
+    void ex5_6(){
+        // change resolution == ex6 XD
+        const int width_1_4_itch = 57; //macbook air 13.3 itch / 2560 × 1600 px / 227 DPI
+        const int width_display = 2560;
+        const int high_display = 1600;
+        const int margin = 20*margin_default;
+
+        Application app;
+        Simple_window win {Point{0,0},width_display,high_display,"ex5-6_ch10"};
+
+        Rectangle rect {start_point,2*width_display/3, 3*high_display/4};
+        rect.set_style(style_default);
+        rect.set_fill_color(Color::dark_blue);
+        rect.move(margin/2, margin/2);
+
+        Rectangle frame_around {start_point,2*width_display/3 + margin, 3*high_display/4 + margin};
+        frame_around.set_style({Line_style::solid,width_1_4_itch});
+        frame_around.set_color(Color::red);
+
+        win.attach(rect);
+        win.attach(frame_around);
+        win.wait_for_button();
+    }
+
+    /*
          * tic-tac-toe board
          *
          *  x * x
@@ -39,10 +63,10 @@ namespace ex1_4{
          * * - white
          *
          */
+    void ex4(){
         Application app;
-        Simple_window win {Point{30,50},800,1000,"ex2_ch10"};
+        Simple_window win {Point{30,50},800,1000,"ex4_ch10"};
 
-        // rectangle
         Rectangle red_field_0{Point{x_start, y_start},tic_size,tic_size};
         Rectangle red_field_2{Point{x_start, y_start},tic_size,tic_size};
         Rectangle red_field_4{Point{x_start, y_start},tic_size,tic_size};
@@ -55,16 +79,12 @@ namespace ex1_4{
         set_color_position_rectangle(red_field_6, 6);
         set_color_position_rectangle(red_field_8, 8);
 
-
-
-
         win.attach(red_field_0);
         win.wait_for_button();
         win.attach(red_field_2);
         win.attach(red_field_4);
         win.attach(red_field_6);
         win.attach(red_field_8);
-
 
         win.wait_for_button();
 
@@ -73,9 +93,8 @@ namespace ex1_4{
 
 
     void ex3(){
-        Application app;
+        Application app;  
         Simple_window win {Point{30,50},800,1000,"ex3_ch10"};
-
         //initial letter K
         Point point_a {start_point};
         Point point_b {x_start,y_start+high_default};
