@@ -4,8 +4,8 @@
 
 
 namespace ex1_4{
-    const int x_start = 50;
-    const int y_start = 100;
+    const int x_start = 300;
+    const int y_start = 250;
     const int width_default = 60;
     const int high_default = 150;
     const int margin_default = 10;
@@ -19,6 +19,132 @@ namespace ex1_4{
         red_field.set_fill_color(Color::red);
         red_field.set_color(Color::red);
         red_field.move(tic_size*(i%3),tic_size*(i/3));
+
+    }
+
+    // input empty polygon. color, position, size
+    void set_all_roof_parameters(Polygon& roof, int step){
+        Point B {3*step,0};
+        Point A {0,2*step};
+        Point C {6*step,2*step};
+        roof.add(A);
+        roof.add(B);
+        roof.add(C);
+
+        roof.set_fill_color(Color::dark_blue);
+        roof.move(x_start,y_start);
+
+    }
+
+    void set_walls_parameters(Rectangle& walls, int step){
+        walls.move(step,2*step);
+        walls.set_fill_color(Color::yellow);
+    }
+
+    void set_door_parameters(Rectangle& door, int step){
+        door.move(static_cast<int>(2.6*step),3*step);
+        door.set_fill_color(Color::dark_red);
+    }
+
+    void set_windows_parameters(Rectangle& window1, Rectangle& window2, int step){
+        window1.set_fill_color(Color::white);
+        window2.set_fill_color(Color::white);
+        window1.move(static_cast<int>(1.3*step),step*3);
+        window2.move(static_cast<int>(3.7*step),step*3);
+    }
+
+    void set_chimney_parameters(Rectangle& chimney, int step){
+        chimney.set_fill_color(Color::black);
+        chimney.move(4*step,static_cast<int>(0.3*step));
+    }
+
+    void set_smoke_parameters(Circle& c1, Circle& c2, Circle& c3,
+                              Circle& c4, Circle& c5, int step){
+        c1.set_fill_color(Color::magenta);
+        c2.set_fill_color(Color::magenta);
+        c3.set_fill_color(Color::magenta);
+        c4.set_fill_color(Color::magenta);
+        c5.set_fill_color(Color::magenta);
+
+        auto current_radius = c1.radius();
+        double x_multy = 4.2;
+        double y_multy = 0;
+
+        c1.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        current_radius += c2.radius();
+        c2.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        current_radius += c3.radius();
+        c3.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        current_radius += c4.radius();
+        c4.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        current_radius += c5.radius();
+        c5.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+
+    }
+
+    void ex7(int scale){
+        const int count_of_marks = 20;
+        const int size_axis = count_of_marks*scale;
+        auto ya_start_point = Point{x_start,y_start+size_axis};
+
+        Application app;
+        Simple_window win {Point{0,0},800,600,"ex7_ch10"};
+
+        Axis xa(Axis::x,start_point,size_axis,count_of_marks);
+        Axis ya(Axis::y,ya_start_point,size_axis,count_of_marks);
+        xa.set_color(Color::invisible);
+        ya.set_color(Color::invisible);
+
+        Polygon roof;
+        set_all_roof_parameters(roof,scale);
+
+        Rectangle walls{start_point,4*scale,3*scale};
+        set_walls_parameters(walls,scale);
+
+        Rectangle door{start_point,static_cast<int>(0.8*scale),2*scale};
+        set_door_parameters(door,scale);
+
+        Rectangle window1{start_point,static_cast<int>(0.8*scale), scale};
+        Rectangle window2{start_point,static_cast<int>(0.8*scale), scale};
+        set_windows_parameters(window1,window2,scale);
+
+        Rectangle chimney{start_point,static_cast<int>(0.3*scale), static_cast<int>(1*scale)};
+        set_chimney_parameters(chimney,scale);
+
+        //smoke from chimney
+        int radius = static_cast<int>(0.1*scale);
+        Circle c1{start_point,radius};
+        radius*=2;
+        Circle c2{start_point,radius};
+        radius*=2;
+        Circle c3{start_point,radius};
+        radius*=2;
+        Circle c4{start_point,radius};
+        radius*=2;
+        Circle c5{start_point,radius};
+        set_smoke_parameters(c1,c2,c3,c4,c5,scale);
+
+
+
+        win.attach(xa);
+        win.attach(ya);
+
+        win.attach(c1);
+        win.attach(c2);
+        win.attach(c3);
+        win.attach(c4);
+        win.attach(c5);
+
+
+        win.attach(chimney);
+        win.attach(roof);
+
+
+        win.attach(walls);
+        win.attach(window1);
+        win.attach(window2);
+        win.attach(door);
+        win.wait_for_button();
 
     }
 
