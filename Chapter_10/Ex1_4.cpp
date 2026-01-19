@@ -6,14 +6,94 @@
 namespace ex1_4{
     const int x_start = 300;
     const int y_start = 250;
+    const int width_display_default = 1024;
+    const int high_display_default = 800;
+
     const int width_default = 60;
     const int high_default = 150;
     const int margin_default = 10;
     const int bold_default = 5;
     const int tic_size = 50;
 
+
     const Point start_point {x_start,y_start};
     const Line_style style_default {Line_style::solid,bold_default};
+
+    void set_rings_properties(Circle& r1, Circle& r2, Circle& r3, Circle& r4, Circle& r5){
+        r1.set_color(Color::blue);
+        r2.set_color(Color::yellow);
+        r3.set_color(Color::black);
+        r4.set_color(Color::green);
+        r5.set_color(Color::red);
+
+        r1.set_style(style_default);
+        r2.set_style(style_default);
+        r3.set_style(style_default);
+        r4.set_style(style_default);
+        r5.set_style(style_default);
+    }
+
+    void set_rings_positions(int margin, Circle& r1, Circle& r2, Circle& r3, Circle& r4, Circle& r5){
+        auto x_step = r1.radius() + margin;
+        auto y_step = r1.radius();
+
+        r2.move(x_step,y_step);
+        r3.move(2*x_step,0);
+        r4.move(3*x_step,y_step);
+        r5.move(4*x_step,0);
+
+    }
+
+    void ex9(){
+        const std::string file_name {"Gucci-flip-flap"};
+        Application app;
+        Simple_window win{Point{0,0},width_display_default,
+                                     high_display_default,file_name};
+
+        auto width = 600;
+        auto high = 500;
+
+        Image im {start_point,"image.png"};
+        im.scale(width,high);
+        Text label {start_point,file_name};
+        label.set_font_size(30);
+        label.move(width/3,-margin_default*6);
+
+        win.attach(im);
+        win.attach(label);
+
+        win.wait_for_button();
+    }
+
+    /*
+     * 1 3 5
+     *  2 4
+     * */
+    void ex8(int radius){
+        Application app;
+        Simple_window default_window{Point{0,0},width_display_default,
+                                     high_display_default,"ch10_ex8"};
+
+        auto margin = radius/5;
+
+        Circle ring1{start_point,radius};
+        Circle ring2{start_point,radius};
+        Circle ring3{start_point,radius};
+        Circle ring4{start_point,radius};
+        Circle ring5{start_point,radius};
+
+        set_rings_properties(ring1,ring2,ring3,ring4,ring5);
+        set_rings_positions(margin,ring1,ring2,ring3,ring4,ring5);
+
+        default_window.attach(ring1);
+        default_window.attach(ring2);
+        default_window.attach(ring3);
+        default_window.attach(ring4);
+        default_window.attach(ring5);
+        default_window.wait_for_button();
+
+
+    }
 
     void set_color_position_rectangle(Rectangle& red_field, int i){
         red_field.set_fill_color(Color::red);
