@@ -18,6 +18,7 @@ namespace ex1_4{
     void ex8(int radius = step_default);
     void ex9();
     void ex10();
+    void ex11();
 
 }
 

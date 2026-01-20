@@ -4,8 +4,8 @@
 
 
 namespace ex1_4{
-    const int x_start = 300;
-    const int y_start = 250;
+    const int x_start = 100;
+    const int y_start = 150;
     const int width_display_default = 1024;
     const int high_display_default = 800;
 
@@ -16,10 +16,13 @@ namespace ex1_4{
     const int tic_size = 50;
 
 
+    const Point zero_point {0,0};
     const Point start_point {x_start,y_start};
     const Line_style style_default {Line_style::solid,bold_default};
 
-    void set_rings_properties(Circle& r1, Circle& r2, Circle& r3, Circle& r4, Circle& r5){
+
+    void set_rings_properties(Circle& r1, Circle& r2,
+                              Circle& r3, Circle& r4, Circle& r5){
         r1.set_color(Color::blue);
         r2.set_color(Color::yellow);
         r3.set_color(Color::black);
@@ -33,7 +36,8 @@ namespace ex1_4{
         r5.set_style(style_default);
     }
 
-    void set_rings_positions(int margin, Circle& r1, Circle& r2, Circle& r3, Circle& r4, Circle& r5){
+    void set_rings_positions(int margin, Circle& r1, Circle& r2,
+                             Circle& r3, Circle& r4, Circle& r5){
         auto x_step = r1.radius() + margin;
         auto y_step = r1.radius();
 
@@ -41,6 +45,152 @@ namespace ex1_4{
         r3.move(2*x_step,0);
         r4.move(3*x_step,y_step);
         r5.move(4*x_step,0);
+    }
+
+
+
+
+    // about method Point Shape.point(int) i'm knew after 1h duration of coding...
+    void ex10(){
+        const int width_one_line = 230;
+        const int high_one_line = 20;
+        const std::string file_name {"ch10_ex10"};
+        Application app;
+        Simple_window win{zero_point,width_display_default,
+                          high_display_default,file_name};
+
+
+        Text file_main{start_point,"main.cpp:"};
+        Text line0_main{start_point,"int main() {...}"};
+        Rectangle r_main{start_point,width_one_line,high_one_line};
+        file_main.move(width_one_line/2,high_one_line*14);
+        r_main.move(width_one_line/2,high_one_line*15);
+        line0_main.move(width_one_line/2,high_one_line*15);
+
+
+        Text file_simple_window{start_point,"Simple_window.h:"};
+        Text line0_simple_window{start_point,"// Simple window interface"};
+        Text line1_simple_window{start_point,"struct Simple_window {...};"};
+        Text line2_simple_window{start_point,"..."};
+        Rectangle r_simple_window{start_point,width_one_line,high_one_line*3};
+        r_simple_window.move(width_one_line+margin_default*3,high_one_line*9);
+        file_simple_window.move(width_one_line+margin_default*3,high_one_line*8);
+        line0_simple_window.move(width_one_line+margin_default*3,high_one_line*9);
+        line1_simple_window.move(width_one_line+margin_default*3,high_one_line*10);
+        line2_simple_window.move(width_one_line+margin_default*3,high_one_line*11);
+
+
+        Text file_gui{start_point,"GUI.h:"};
+        Text line0_gui{start_point,"// GUI interface"};
+        Text line1_gui{start_point,"struct Button {...};"};
+        Text line2_gui{start_point,"..."};
+        Rectangle r_gui{start_point,width_one_line,high_one_line*3};
+        file_gui.move(2*(width_one_line+margin_default*3),high_one_line*3);
+        r_gui.move(2*(width_one_line+margin_default*3),high_one_line*4);
+        line0_gui.move(2*(width_one_line+margin_default*3),high_one_line*4);
+        line1_gui.move(2*(width_one_line+margin_default*3),high_one_line*5);
+        line2_gui.move(2*(width_one_line+margin_default*3),high_one_line*6);
+
+
+        Text file_graph{start_point,"Graph.h:"};
+        Text line0_graph{start_point,"// Graphing interface"};
+        Text line1_graph{start_point,"struct Shape {...};"};
+        Text line2_graph{start_point,"..."};
+        Rectangle r_graph{start_point,width_one_line,high_one_line*3};
+        r_graph.move(0,high_one_line*5);
+        file_graph.move(0,high_one_line*4);
+        line0_graph.move(0,high_one_line*5);
+        line1_graph.move(0,high_one_line*6);
+        line2_graph.move(0,high_one_line*7);
+
+
+        Text file_window{start_point,"Window.h:"};
+        Text line0_window{start_point,"// Window interface"};
+        Text line1_window{start_point,"struct Window {...};"};
+        Text line2_window{start_point,"..."};
+        Rectangle r_window{start_point,width_one_line,high_one_line*3};
+        file_window.move(width_one_line+margin_default*3,high_one_line*2);
+        r_window.move(width_one_line+margin_default*3,high_one_line*3);
+        line0_window.move(width_one_line+margin_default*3,high_one_line*3);
+        line1_window.move(width_one_line+margin_default*3,high_one_line*4);
+        line2_window.move(width_one_line+margin_default*3,high_one_line*5);
+
+
+        Text file_point{start_point,"Point.h:"};
+        Text line0_point{start_point,"struct Point {...};"};
+        Rectangle r_point{start_point,width_one_line,high_one_line};
+        r_point.move(0,high_one_line);
+        line0_point.move(1,high_one_line);
+
+        // TODO can refactor this
+        // Create function
+        // pair<Point,Point> get_top_bottom_shape_points(Shape& sh, width_line)
+        Point simple_window_bottom_point{r_simple_window.point(0).x+width_one_line/2,
+                                         r_simple_window.point(0).y+high_one_line*3};
+        Point main_top_point{r_main.point(0).x+width_one_line/2,r_main.point(0).y};
+        Point simple_window_top_point{simple_window_bottom_point.x,
+                                      simple_window_bottom_point.y-high_one_line*3};
+        Point graph_top_point{r_graph.point(0).x+width_one_line/2,r_graph.point(0).y};
+        Point graph_bottom_point{graph_top_point.x,graph_top_point.y+3*high_one_line};
+        Point window_top_point{r_window.point(0).x + width_one_line/2,
+                                     r_window.point(0).y};
+        Point window_bottom_point{window_top_point.x,
+                               window_top_point.y+high_one_line*3};
+        Point gui_top_point{r_gui.point(0).x + width_one_line/2,
+                               r_gui.point(0).y};
+        Point gui_bottom_point{gui_top_point.x,
+                                  gui_top_point.y+high_one_line*3};
+        Point point_top_point{r_point.point(0).x + width_one_line/2,
+                            r_point.point(0).y};
+        Point point_bottom_point{point_top_point.x,
+                               point_top_point.y+high_one_line};
+
+        Line line_main_simple(main_top_point,simple_window_bottom_point);
+        Line line_main_graph(main_top_point,graph_bottom_point);
+        Line line_simple_gui(simple_window_top_point,gui_bottom_point);
+        Line line_gui_window(gui_top_point,window_bottom_point);
+        Line line_window_point(window_top_point,point_bottom_point);
+        Line line_graph_point(graph_top_point,point_bottom_point);
+
+        win.attach(line_main_simple);
+        win.attach(line_main_graph);
+        win.attach(line_simple_gui);
+        win.attach(line_gui_window);
+        win.attach(line_window_point);
+        win.attach(line_graph_point);
+
+        win.attach(file_main);
+        win.attach(line0_main);
+        win.attach(r_main);
+
+        win.attach(file_point);
+        win.attach(line0_point);
+        win.attach(r_point);
+
+        win.attach(file_graph);
+        win.attach(r_graph);
+        win.attach(line0_graph);
+        win.attach(line1_graph);
+        win.attach(line2_graph);
+
+        win.attach(file_window);
+        win.attach(r_window);
+        win.attach(line0_window);
+        win.attach(line1_window);
+        win.attach(line2_window);
+
+        win.attach(file_simple_window);
+        win.attach(r_simple_window);
+        win.attach(line0_simple_window);
+        win.attach(line1_simple_window);
+        win.attach(line2_simple_window);
+
+        win.attach(file_gui);
+        win.attach(r_gui);
+        win.attach(line0_gui);
+        win.attach(line1_gui);
+        win.attach(line2_gui);
+        win.wait_for_button();
 
     }
 
@@ -56,6 +206,7 @@ namespace ex1_4{
         Image im {start_point,"image.png"};
         im.scale(width,high);
         Text label {start_point,file_name};
+
         label.set_font_size(30);
         label.move(width/3,-margin_default*6);
 
@@ -150,15 +301,20 @@ namespace ex1_4{
         double x_multy = 4.2;
         double y_multy = 0;
 
-        c1.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        c1.move(static_cast<int>(x_multy*step+current_radius),
+                static_cast<int>(y_multy*step-current_radius));
         current_radius += c2.radius();
-        c2.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        c2.move(static_cast<int>(x_multy*step+current_radius),
+                static_cast<int>(y_multy*step-current_radius));
         current_radius += c3.radius();
-        c3.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        c3.move(static_cast<int>(x_multy*step+current_radius),
+                static_cast<int>(y_multy*step-current_radius));
         current_radius += c4.radius();
-        c4.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        c4.move(static_cast<int>(x_multy*step+current_radius),
+                static_cast<int>(y_multy*step-current_radius));
         current_radius += c5.radius();
-        c5.move(static_cast<int>(x_multy*step+current_radius), static_cast<int>(y_multy*step-current_radius));
+        c5.move(static_cast<int>(x_multy*step+current_radius),
+                static_cast<int>(y_multy*step-current_radius));
 
     }
 
@@ -188,7 +344,8 @@ namespace ex1_4{
         Rectangle window2{start_point,static_cast<int>(0.8*scale), scale};
         set_windows_parameters(window1,window2,scale);
 
-        Rectangle chimney{start_point,static_cast<int>(0.3*scale), static_cast<int>(1*scale)};
+        Rectangle chimney{start_point,static_cast<int>(0.3*scale),
+                          static_cast<int>(1*scale)};
         set_chimney_parameters(chimney,scale);
 
         //smoke from chimney
@@ -230,8 +387,9 @@ namespace ex1_4{
 
 
     void ex5_6(){
-        // change resolution == ex6 XD
-        const int width_1_4_itch = 57; //macbook air 13.3 itch / 2560 × 1600 px / 227 DPI
+        // change resolution == ex6
+        //macbook air 13.3 itch / 2560 × 1600 px / 227 DPI... 1.25itch = 57px
+        const int width_1_4_itch = 57;
         const int width_display = 2560;
         const int high_display = 1600;
         const int margin = 20*margin_default;
@@ -244,7 +402,8 @@ namespace ex1_4{
         rect.set_fill_color(Color::dark_blue);
         rect.move(margin/2, margin/2);
 
-        Rectangle frame_around {start_point,2*width_display/3 + margin, 3*high_display/4 + margin};
+        Rectangle frame_around {start_point,2*width_display/3 + margin,
+                               3*high_display/4 + margin};
         frame_around.set_style({Line_style::solid,width_1_4_itch});
         frame_around.set_color(Color::red);
 
@@ -328,11 +487,15 @@ namespace ex1_4{
 
         Polygon initial_letter_D;
         initial_letter_D.add(start_point);
-        initial_letter_D.add({(2*start_point.x+width_default)/2,(2*start_point.y+3)/2}); //TODO
+        initial_letter_D.add({(2*start_point.x+width_default)/2,
+                              (2*start_point.y+3)/2});
         initial_letter_D.add({start_point.x+width_default,start_point.y+5});
-        initial_letter_D.add({start_point.x+width_default+5,(2*start_point.y+high_default)/2}); //TODO
-        initial_letter_D.add({start_point.x+width_default,start_point.y+high_default-5});
-        initial_letter_D.add({(2*start_point.x+width_default) /2,(2*start_point.y+2*high_default-3)/2}); //TODO
+        initial_letter_D.add({start_point.x+width_default+5,
+                              (2*start_point.y+high_default)/2});
+        initial_letter_D.add({start_point.x+width_default,
+                              start_point.y+high_default-5});
+        initial_letter_D.add({(2*start_point.x+width_default) /2,
+                              (2*start_point.y+2*high_default-3)/2});
         initial_letter_D.add({start_point.x,start_point.y+high_default});
 
         initial_letter_D.move(2*width_default+margin_default,0);
