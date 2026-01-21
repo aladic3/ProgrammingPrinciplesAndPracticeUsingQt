@@ -1,9 +1,14 @@
 #include "Ex1_4.h"
 #include <iostream>
 #include <vector>
+#include <math.h>
+#include <stdio.h>
+#include "../PPP/std_lib_facilities.h"
 
 
 namespace ex1_4{
+    constexpr double pi = 3.14159265;
+
     const int x_start = 100;
     const int y_start = 150;
     const int width_display_default = 1024;
@@ -12,7 +17,7 @@ namespace ex1_4{
     const int width_default = 60;
     const int high_default = 150;
     const int margin_default = 10;
-    const int bold_default = 5;
+    const int bold_default = 2;
     const int tic_size = 50;
 
 
@@ -47,10 +52,67 @@ namespace ex1_4{
         r5.move(4*x_step,0);
     }
 
+    std::vector<Point> get_points_for_polygon(int count_corners, const Point& central_point,
+                                              double radius){
+        std::vector<Point> result;
+
+        for(int k = 0; k < count_corners; ++k){
+            double corner_val = k * (2 * pi) / count_corners + pi/count_corners;
+            int x_k = central_point.x + radius * cos(corner_val);
+            int y_k = central_point.y + radius * sin(corner_val);
+
+            result.emplace_back(Point{x_k,y_k});
+        }
+
+        return result;
+    }
+
+    double get_radius_next_polygon(int count_corners_current, double radius_current){
+        return radius_current/(cos(pi/++count_corners_current));
+    }
+
+    void add_points_to_polygon(std::vector<Point>& points, Polygon& poly){
+        for (auto& point: points)
+            poly.add(point);
+
+    }
+
+    void ex11(const int N, double start_radius){
+        if (N < 3 || start_radius <= 0)
+            throw std::exception();
+
+        Application app;
+        Simple_window win{zero_point,width_display_default,high_display_default,
+                            "ch10_ex11"};
+        const Point central = Point{width_display_default/2,high_display_default/2};
+        std::vector<Polygon> polygons(N-2);
+        double current_radius = start_radius;
+
+        for (int i = 3;i<N;++i){
+            std::vector<Point> points_for_poly = get_points_for_polygon(i,central,current_radius);
+            Polygon& poly = polygons[i-3];
+            add_points_to_polygon(points_for_poly,poly);
+            //poly.set_color(randint(Color::rgb));
+            poly.set_style(style_default);
+
+            current_radius = get_radius_next_polygon(i,current_radius);
+            win.attach(poly);
+
+
+
+        }
+
+        int randint(int min, int max) ;
+
+        win.wait_for_button();
+
+    }
+
 
 
 
     // about method Point Shape.point(int) i'm knew after 1h duration of coding...
+    // TODO can refactor "move" arguments, points for lines.
     void ex10(){
         const int width_one_line = 230;
         const int high_one_line = 20;
