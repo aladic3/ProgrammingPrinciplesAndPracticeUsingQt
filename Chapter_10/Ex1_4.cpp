@@ -7,12 +7,12 @@
 
 
 namespace ex1_4{
-    constexpr double pi = 3.14159265;
+    const double pi = std::acos(-1.0);;
 
-    const int x_start = 100;
+    const int x_start = 300;
     const int y_start = 150;
-    const int width_display_default = 1024;
-    const int high_display_default = 800;
+    const int width_display_default = 1600;
+    const int high_display_default = 1000;
 
     const int width_default = 60;
     const int high_default = 150;
@@ -53,15 +53,17 @@ namespace ex1_4{
     }
 
     std::vector<Point> get_points_for_polygon(int count_corners, const Point& central_point,
-                                              double radius){
+                                              double radius, double start_corner = 0.0){
         std::vector<Point> result;
 
         for(int k = 0; k < count_corners; ++k){
-            double corner_val = k * (2 * pi) / count_corners + pi/count_corners;
-            int x_k = central_point.x + radius * cos(corner_val);
-            int y_k = central_point.y + radius * sin(corner_val);
+            double corner_val = k * 2. * pi / count_corners + start_corner;
+            double xf = central_point.x + radius * cos(corner_val);
+            double yf = central_point.y + radius * sin(corner_val);
 
-            result.emplace_back(Point{x_k,y_k});
+            int x = static_cast<int>(lround(xf));
+            int y = static_cast<int>(lround(yf));
+            result.emplace_back(Point{x,y});
         }
 
         return result;
@@ -71,9 +73,72 @@ namespace ex1_4{
         return radius_current/(cos(pi/++count_corners_current));
     }
 
+    double get_apofem_next(int count_corners_next, double radius_current){
+        return radius_current * cos(pi/--count_corners_next);
+    }
+
     void add_points_to_polygon(std::vector<Point>& points, Polygon& poly){
         for (auto& point: points)
             poly.add(point);
+
+    }
+
+    int get_sgn(double op){
+        int res = 1;
+
+        if (op<0)
+            res = -1;
+        else if (op == 0)
+            res = 0;
+
+        return res;
+    }
+
+    std::vector<Point> get_superellipse_points(double m, double n,
+                                               int a, int b, int N_max){
+        double dt = 2. * pi / static_cast<double>(N_max);
+        vector<Point> super_ellipse_points;
+        for (int k = 0; k < N_max; ++k){
+            double t = dt*k;
+
+
+            double xf = a * get_sgn(cos(t)) * pow(abs(cos(t)),2/m);
+            double yf = b * get_sgn(sin(t)) * pow(abs(sin(t)),2/n);
+
+            Point p;
+            p.x = static_cast<int>(lround(N_max*xf));
+            p.y = static_cast<int>(lround(N_max*yf));
+
+            if (super_ellipse_points.empty() || super_ellipse_points.back() != p)
+                super_ellipse_points.push_back(p);
+        }
+
+
+        return super_ellipse_points;
+    }
+
+    void add_points_to_polygon(Open_polyline& super_ellips, const std::vector<Point>& points){
+        for(auto& point: points)
+            super_ellips.add(point);
+
+    }
+
+
+    void ex12_13(double m, double n, int a, int b){
+        Application app;
+        Simple_window win{zero_point,width_display_default,high_display_default,"ex12_13"};
+        Polygon super_ellips;
+
+        int N_max = 150;
+        std::vector<Point> se_points = get_superellipse_points(m,n,a,b,N_max);
+        add_points_to_polygon(super_ellips,se_points);
+        super_ellips.move(width_display_default/2-N_max,
+                          high_display_default/2);
+
+        super_ellips.set_style(style_default);
+
+        win.attach(super_ellips);
+        win.wait_for_button();
 
     }
 
@@ -87,22 +152,21 @@ namespace ex1_4{
         const Point central = Point{width_display_default/2,high_display_default/2};
         std::vector<Polygon> polygons(N-2);
         double current_radius = start_radius;
+        double start_corner = 0.0;
 
         for (int i = 3;i<N;++i){
-            std::vector<Point> points_for_poly = get_points_for_polygon(i,central,current_radius);
+            std::vector<Point> points_for_poly = get_points_for_polygon(i,central,current_radius,start_corner);
             Polygon& poly = polygons[i-3];
             add_points_to_polygon(points_for_poly,poly);
             //poly.set_color(randint(Color::rgb));
             poly.set_style(style_default);
 
+            start_corner += pi/(i+1);
             current_radius = get_radius_next_polygon(i,current_radius);
             win.attach(poly);
 
-
-
         }
 
-        int randint(int min, int max) ;
 
         win.wait_for_button();
 
