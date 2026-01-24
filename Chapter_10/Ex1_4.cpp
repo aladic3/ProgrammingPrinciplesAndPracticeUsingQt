@@ -11,7 +11,7 @@ namespace ex1_4{
 
     const int x_start = 300;
     const int y_start = 150;
-    const int width_display_default = 1600;
+    const int width_display_default = 1000;
     const int high_display_default = 1000;
 
     const int width_default = 60;
@@ -94,14 +94,18 @@ namespace ex1_4{
         return res;
     }
 
-    std::vector<Point> get_superellipse_points(double m, double n,
-                                               int a, int b, int N_max){
+    std::vector<Point> get_superellipse_points(std::pair<int,int> ab, std::pair<double,double> mn, int N_max = 150) {
+        int a = ab.first;
+        int b = ab.second;
+        double m = mn.first;
+        double n = mn.second;
+
+        std::vector<Point> super_ellipse_points;
+
         double dt = 2. * pi / static_cast<double>(N_max);
-        vector<Point> super_ellipse_points;
+
         for (int k = 0; k < N_max; ++k){
             double t = dt*k;
-
-
             double xf = a * get_sgn(cos(t)) * pow(abs(cos(t)),2/m);
             double yf = b * get_sgn(sin(t)) * pow(abs(sin(t)),2/n);
 
@@ -113,33 +117,172 @@ namespace ex1_4{
                 super_ellipse_points.push_back(p);
         }
 
-
         return super_ellipse_points;
     }
 
-    void add_points_to_polygon(Open_polyline& super_ellips, const std::vector<Point>& points){
+    double distance_between_points(const std::pair<Point,Point>& points) {
+        auto first = points.first;
+        auto second = points.second;
+
+        auto a = abs(first.x - second.x);
+        auto b = abs(first.y - second.y);
+        auto c = pow(a*a + b*b, 0.5);
+
+        return c;
+    }
+
+    std::vector<double> get_sum_distances(const std::vector<Point>& poly_points) {
+        std::vector<double> result;
+        std::pair<Point,Point> two_points;
+        two_points.second = poly_points.front();
+
+        for (size_t i = 1; i < poly_points.size(); ++i) {
+            two_points.first = two_points.second;
+            two_points.second = poly_points[i];
+            auto distance = distance_between_points(two_points);
+
+            if (result.empty())
+                result.push_back(distance);
+            else
+                result.push_back(result.back()+distance);
+        }
+
+        return result;
+    }
+
+    std::vector<double> get_segment_distances(double step, int N) {
+        std::vector<double> result;
+
+        for (int i = 0; i<N; ++i) { // first point of segment equal zero and this point will be first point poly_points
+            result.push_back(i*step);
+        }
+
+        return result;
+    }
+
+    double get_segment_length(const std::vector<double>& poly_distances, int i) {
+        return  i==0 ? poly_distances[i] : poly_distances[i] - poly_distances[i-1];
+    }
+
+    Point get_interpolary_point(const std::vector<Point>& poly_points, int i, double local_t) {
+        Point A = poly_points[i];
+        Point B = poly_points[i+1];
+
+        double xf = A.x + local_t * (B.x - A.x);
+        double yf = A.y + local_t * (B.y - A.y);
+
+        Point p;
+        p.x = static_cast<int>(lround(xf));
+        p.y = static_cast<int>(lround(yf));
+
+        return p;
+    }
+
+    std::vector<Point> get_segment_coordinates(const std::vector<Point>& poly_points,
+                                               const std::vector<double>& target_distances, const std::vector<double>& poly_distances) {
+        std::vector<Point> result_coordinates{poly_points[0]}; // first point
+
+        for (size_t i = 1; i < target_distances.size(); ++i) // first is zero point
+        {
+            double target = target_distances[i];
+            for (size_t j = 0; j < poly_distances.size(); ++j) {
+                if (poly_distances[j] < target)
+                    continue;
+
+                double segment_length = get_segment_length(poly_distances,j);
+                double local_t = (poly_distances[j] - target) / segment_length;
+                Point p = get_interpolary_point(poly_points,j,local_t);
+
+                result_coordinates.push_back(p);
+                break;
+            }
+
+        }
+
+        return result_coordinates;
+    }
+
+    std::vector<Point> get_coordinates_equal_segments(const std::vector<Point>& poly_points, int N) {
+        std::vector<double> poly_distances = get_sum_distances(poly_points); // last element is approximate distance entire polygon
+
+        double step = poly_distances.back()/N;
+        std::vector<double> target_distances = get_segment_distances(step,N);
+
+        return get_segment_coordinates(poly_points,target_distances,poly_distances);
+    }
+
+    void add_points_to_polygon(Open_polyline& polygon, const std::vector<Point>& points){
         for(auto& point: points)
-            super_ellips.add(point);
+            polygon.add(point);
+
+    }
+
+    std::vector<Line*> get_randColor_lines(const std::vector<Point>& segment_points,
+                                  pair<int,int> move_xy, int N){
+        std::vector<Line*> lines;
+        int move_x = move_xy.first;
+        int move_y = move_xy.second;
+
+        Line* line = new Line{segment_points.front(),segment_points.back()};
+        lines.push_back(line);
+        line->move(move_x,move_y);
+        for(int i = 1; i < N; ++i){
+            Line* line = new Line{segment_points[i],segment_points[i-1]};
+            line->move(move_x,move_y);
+            lines.push_back(line);
+            line->set_style(style_default);
+            line->set_color(randint(Color::rgb));
+        }
+
+        return lines;
+    }
+
+    void attach_lines_to_win(const std::vector<Line*>& lines,
+                             Simple_window& win){
+        for (auto& line: lines)
+            win.attach(*line);
 
     }
 
 
-    void ex12_13(double m, double n, int a, int b){
+
+    void ex12_13(double m, double n, int a, int b, int N){
+        if(N < 3) error("bad N");
+
+        int N_max = 200;
+        int move_x = width_display_default/2-N_max;
+        int move_y = high_display_default/2-N_max/2.5;
+
         Application app;
         Simple_window win{zero_point,width_display_default,high_display_default,"ex12_13"};
         Polygon super_ellips;
 
-        int N_max = 150;
-        std::vector<Point> se_points = get_superellipse_points(m,n,a,b,N_max);
+        std::vector<Point> se_points = get_superellipse_points(std::pair{a,b},std::pair{m,n},N_max);
+        std::vector<Point> segment_points = get_coordinates_equal_segments(se_points,N);
+
         add_points_to_polygon(super_ellips,se_points);
-        super_ellips.move(width_display_default/2-N_max,
-                          high_display_default/2);
+        std::vector<Line*> lines = get_randColor_lines(segment_points,{move_x,move_y},N);
+
+
+        attach_lines_to_win(lines,win);
+        super_ellips.move(move_x,move_y);
+
 
         super_ellips.set_style(style_default);
 
         win.attach(super_ellips);
+
         win.wait_for_button();
 
+        for (auto& line: lines)
+            delete line;
+
+
+        //Polygon equal_segments;
+        //add_points_to_polygon(equal_segments,segment_points);
+        //equal_segments.move(move_x,move_y);
+        //equal_segments.set_color(Color::red);
+        //win.attach(equal_segments);
     }
 
     void ex11(const int N, double start_radius){

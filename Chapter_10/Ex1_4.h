@@ -19,7 +19,7 @@ namespace ex1_4{
     void ex9();
     void ex10();
     void ex11(const int N = 6, double start_radius = 40);
-    void ex12_13(double m = 0.5, double n = 0.5, int a = 1, int b = 1);
+    void ex12_13(double m = 0.5, double n = 0.5, int a = 1, int b = 1, int N = 5);
 
 }
 
