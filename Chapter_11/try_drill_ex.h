@@ -25,6 +25,12 @@ const Line_style style_default {Line_style::solid,bold_default};
 
 namespace ch11::_try{
     void first_try();
+    void second_try();
+}
+
+namespace ch11::drill {
+    void do_drill();
+
 }
 
 

@@ -43,6 +43,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Chapter_10/drill.h
         Chapter_11/try_drill_ex.h
         Chapter_11/try.cpp
+        Chapter_11/drill.cpp
     )
 
 # Define target properties for Android with Qt 6 as:

@@ -6,7 +6,7 @@
 int main(int /*argc*/, char * /*argv*/[])
 {
     try{
-        ch11::_try::first_try();
+        ch11::drill::do_drill();
     }catch(std::exception& ex){
         std::cerr << ex.what();
     }

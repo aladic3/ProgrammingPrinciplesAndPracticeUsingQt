@@ -22,4 +22,15 @@ namespace ch11::_try {
         win.attach(grid);
         win.wait_for_button();
     }
+
+    void second_try(){
+        Application app;
+        Simple_window win {zero_point,width_display_default,high_display_default,"ch11_try2"};
+
+        Image img{zero_point,"image.png"};
+        img.scale(width_display_default,high_display_default,false);
+
+        win.attach(img);
+        win.wait_for_button();
+    }
 }
