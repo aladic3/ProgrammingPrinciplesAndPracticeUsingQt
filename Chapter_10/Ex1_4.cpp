@@ -246,10 +246,9 @@ namespace ex1_4{
 
 
 
-    void ex12_13(double m, double n, int a, int b, int N){
-        if(N < 3) error("bad N");
+    void ex12_13(double m, double n, int a, int b, int N, int N_max){
+        if(N < 3 || N_max < 10) error("bad N");
 
-        int N_max = 200;
         int move_x = width_display_default/2-N_max;
         int move_y = high_display_default/2-N_max/2.5;
 
