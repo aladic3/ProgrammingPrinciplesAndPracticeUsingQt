@@ -65,6 +65,27 @@ unique_ptr<Vector_ref<Image>> get_attach_images(int N, Simple_window& win){
     return result;
 }
 
+unique_ptr<Image> get_image(const std::string name, int size = 100){
+    auto img = make_unique<Image>(zero_point,name);
+    img->scale(size,size,false);
+    return img;
+}
+
+void attach_snake_image(Simple_window& win, unique_ptr<Image>& img, int x = 8, int y = 8, int step = 100){
+    win.attach(*img);
+    for (int i = 0; i < x; ++i){
+        for(int j = 0; j < y; ++j)
+        {
+            win.wait_for_button();
+            img->move(0,step);
+
+        }
+
+        img->move(step,-y*step);
+    }
+
+}
+
 void do_drill(){
     Application app;
     Simple_window win{zero_point,800,1000,"ch11_drills"};
@@ -74,7 +95,9 @@ void do_drill(){
     win.attach(grid);
 
     auto diagonal = get_diagonal_and_attach(win);
-    auto images = get_attach_images(3,win);
+    //auto images = get_attach_images(3,win);
+    unique_ptr<Image> image = get_image("image2.PNG");
+    attach_snake_image(win,image);
 
     win.wait_for_button();
 }
