@@ -43,15 +43,39 @@ unique_ptr<Vector_ref<Rectangle>> get_diagonal_and_attach(Simple_window& win){
     return result;
 }
 
+unique_ptr<Vector_ref<Image>> get_attach_images(int N, Simple_window& win){
+    unique_ptr<Vector_ref<Image>> result = make_unique<Vector_ref<Image>>();
+    const std::string image_name = "image.png";
+
+    int width = width_element; //width == high
+    int high = high_element;
+    int start = width*2;
+
+    for (int i = 0; i < N; ++i){
+        Point left_top {start+width*i*2, i*high*2};
+        result->push_back(make_unique<Image>(left_top,image_name));
+    }
+
+    for (auto* img: *result){
+        img->set_mask(zero_point,width*2,high*2);
+        win.attach(*img);
+    }
+
+
+    return result;
+}
+
 void do_drill(){
     Application app;
     Simple_window win{zero_point,800,1000,"ch11_drills"};
 
     Lines grid;
     set_lines_to_grid(grid);
-    auto diagonal = get_diagonal_and_attach(win);
-
     win.attach(grid);
+
+    auto diagonal = get_diagonal_and_attach(win);
+    auto images = get_attach_images(3,win);
+
     win.wait_for_button();
 }
 
