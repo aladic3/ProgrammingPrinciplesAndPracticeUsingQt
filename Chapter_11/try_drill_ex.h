@@ -33,5 +33,27 @@ namespace ch11::drill {
 
 }
 
+namespace ch11::exercises{
+    struct Arrow : Shape{
+        Arrow(Point p1, Point p2): dir_triangle(get_direction_triangle(p1,p2))
+        { add(p1); add(p2);}
+
+
+        void draw_specifics(Painter& painter) const override;
+        void move(int dx, int dy) override;
+
+
+
+    private:
+        Polygon dir_triangle;
+
+        Polygon get_direction_triangle(Point p1, Point p2);
+
+
+
+    };
+    void ex1();
+
+}
 
 #endif // TRY_DRILL_EX_H

@@ -301,7 +301,7 @@ namespace ex1_4{
             Polygon& poly = polygons[i-3];
             add_points_to_polygon(points_for_poly,poly);
             //poly.set_color(randint(Color::rgb));
-            poly.set_style(style_default);
+            //poly.set_style(style_default);
 
             start_corner += pi/(i+1);
             current_radius = get_radius_next_polygon(i,current_radius);
