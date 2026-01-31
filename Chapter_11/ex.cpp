@@ -110,9 +110,11 @@ namespace ch11::exercises{
 
             return result;
         }
+
         Point center(Circle& c){
             return c.center();
         }
+
         Point ne(Circle& c){
             Point result {c.center()};
             int xy = static_cast<int>(c.radius()/sqrt(2)) + 1;
@@ -122,6 +124,7 @@ namespace ch11::exercises{
 
             return result;
         }
+
         Point nw(Circle& c){
             Point result {c.center()};
             int xy = static_cast<int>(c.radius()/sqrt(2))+ 1;
@@ -131,6 +134,7 @@ namespace ch11::exercises{
 
             return result;
         }
+
         Point se(Circle& c){
             Point result {c.center()};
             int xy = static_cast<int>(c.radius()/sqrt(2)) + 1;
@@ -140,6 +144,7 @@ namespace ch11::exercises{
 
             return result;
         }
+
         Point sw(Circle&c){
             Point result {c.center()};
             int xy = static_cast<int>(c.radius()/sqrt(2)) + 1;
@@ -150,16 +155,74 @@ namespace ch11::exercises{
             return result;
         }
 
-        Point n(Ellipse&);
-        Point s(Ellipse&);
-        Point e(Ellipse&);
-        Point w(Ellipse&);
-        Point center(Ellipse&);
-        Point ne(Ellipse&);
-        Point nw(Ellipse&);
-        Point se(Ellipse&);
-        Point sw(Ellipse&);
+        Point n(Ellipse& e){
+            Point result = e.center();
+
+            result.y -= e.minor();
+
+            return result;
         }
+
+        Point s(Ellipse& e){
+            Point result = e.center();
+
+            result.y += e.minor();
+
+            return result;
+        }
+
+        Point e(Ellipse& e){
+            Point result = e.center();
+
+            result.x += e.major();
+
+            return result;
+        }
+
+        Point w(Ellipse& e){
+            Point result = e.center();
+
+            result.x -= e.major();
+
+            return result;
+        }
+
+        Point center(Ellipse& e){
+            return e.center();
+        }
+
+        Point ne(Ellipse& e){
+            Point result = n(e);
+
+            result.x += e.major();
+
+            return result;
+        }
+
+        Point nw(Ellipse& e){
+            Point result = n(e);
+
+            result.x -= e.major();
+
+            return result;
+        }
+
+        Point se(Ellipse& e){
+            Point result = s(e);
+
+            result.x += e.major();
+
+            return result;
+        }
+
+        Point sw(Ellipse& e){
+            Point result = s(e);
+
+            result.x -= e.major();
+
+            return result;
+        }
+    }
 
     void Arrow::draw_specifics(Painter& painter) const{
         painter.draw_line(point(0), point(1));
@@ -196,6 +259,8 @@ namespace ch11::exercises{
         Simple_window win{zero_point,width_display_default,high_display_default,"ch11_ex3. Test"};
 
         Circle c{zero_point,100};
+        Ellipse elipse{zero_point,200,100};
+        elipse.move(400,400);
         c.move(200,200);
 
         Marks marks {"x",{
@@ -209,6 +274,21 @@ namespace ch11::exercises{
                           se(c),
                           sw(c)}};
 
+        Marked_polyline marks_e{"+",{
+                            n(elipse),
+                            s(elipse),
+                            e(elipse),
+                            w(elipse),
+                            center(elipse),
+                            ne(elipse),
+                            nw(elipse),
+                            se(elipse),
+                    sw(elipse)}
+
+        };
+
+        win.attach(elipse);
+        win.attach(marks_e);
         win.attach(c);
         win.attach(marks);
         win.wait_for_button();
