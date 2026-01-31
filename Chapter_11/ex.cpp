@@ -253,6 +253,41 @@ namespace ch11::exercises{
         return Polygon{left_basepoint,right_basepoint,p2};
     }
 
+    Box::Box(Point pp, const std::string ss):
+        text(pp,ss),
+        width_symbol(static_cast<int>(text.font_size()/2)),
+        width(ss.capacity()*width_symbol),
+        high(width_symbol*4),
+        box({pp.x-width_symbol, pp.y - width_symbol},width,high) {}
+
+    void Box::draw_specifics(Painter& painter) const{
+        this->box.draw_specifics(painter);
+        this->text.draw_specifics(painter);
+    }
+    void Box::move(int dx, int dy){
+        this->box.move(dx,dy);
+        this->text.move(dx,dy);
+        redraw();
+    }
+
+    void ex4(){
+        Application app;
+        Simple_window win{zero_point,width_display_default,high_display_default,"ch11_ex4."};
+
+        Box b1{zero_point,"Hello test world"};
+
+        win.attach(b1);
+        win.wait_for_button();
+
+        b1.move(100,50);
+        b1.set_color(Color::blue);
+        win.wait_for_button();
+        b1.set_fill_color(Color::dark_cyan);
+        win.wait_for_button();
+        b1.set_style(style_default);
+        win.wait_for_button();
+    }
+
     void ex3(){
         using namespace ex_3;
         Application app;

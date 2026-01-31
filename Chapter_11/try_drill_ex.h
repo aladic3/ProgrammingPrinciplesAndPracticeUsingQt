@@ -7,6 +7,7 @@
 
 const double pi = std::acos(-1.0);;
 
+
 const int x_start = 300;
 const int y_start = 150;
 const int width_display_default = 1000;
@@ -34,6 +35,22 @@ namespace ch11::drill {
 }
 
 namespace ch11::exercises{
+    struct Box : Shape {
+        Box(Point pp, const std::string ss);
+        Box(Point pp, int ww, int hh, const std::string ss) : text(pp,ss),
+            width(ww), high(hh), box(pp,high,width){};
+        void draw_specifics(Painter& painter) const override;
+        void move(int dx, int dy) override;
+    private:
+        Text text;
+        int width_symbol = 7;
+        int width;
+        int high;
+        Rectangle box;
+
+    };
+
+
     struct Arrow : Shape{
         Arrow(Point p1, Point p2): dir_triangle(get_direction_triangle(p1,p2))
         { add(p1); add(p2);}
@@ -83,6 +100,7 @@ namespace ch11::exercises{
     void ex1();
     void ex2();
     void ex3();
+    void ex4();
 
 }
 
