@@ -38,21 +38,51 @@ namespace ch11::exercises{
         Arrow(Point p1, Point p2): dir_triangle(get_direction_triangle(p1,p2))
         { add(p1); add(p2);}
 
-
         void draw_specifics(Painter& painter) const override;
         void move(int dx, int dy) override;
 
-
-
     private:
         Polygon dir_triangle;
-
         Polygon get_direction_triangle(Point p1, Point p2);
-
-
-
     };
+
+    namespace ex_2{
+        Point n(Rectangle&);
+        Point s(Rectangle&);
+        Point e(Rectangle&);
+        Point w(Rectangle&);
+        Point center(Rectangle&);
+        Point ne(Rectangle&);
+        Point nw(Rectangle&);
+        Point se(Rectangle&);
+        Point sw(Rectangle&);
+    }
+
+    namespace ex_3{
+        Point n(Circle&);
+        Point s(Circle&);
+        Point e(Circle&);
+        Point w(Circle&);
+        Point center(Circle&);
+        Point ne(Circle&);
+        Point nw(Circle&);
+        Point se(Circle&);
+        Point sw(Circle&);
+
+        Point n(Ellipse&);
+        Point s(Ellipse&);
+        Point e(Ellipse&);
+        Point w(Ellipse&);
+        Point center(Ellipse&);
+        Point ne(Ellipse&);
+        Point nw(Ellipse&);
+        Point se(Ellipse&);
+        Point sw(Ellipse&);
+    }
+
     void ex1();
+    void ex2();
+    void ex3();
 
 }
 
