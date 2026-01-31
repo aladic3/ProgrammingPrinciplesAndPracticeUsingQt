@@ -249,16 +249,15 @@ namespace ch11::exercises{
         right_basepoint.x = C.x - half_wide_arrowhead * sin(corner_direction);
         right_basepoint.y = C.y + half_wide_arrowhead * cos(corner_direction);
 
-
         return Polygon{left_basepoint,right_basepoint,p2};
     }
 
     Box::Box(Point pp, const std::string ss):
-        text(pp,ss),
-        width_symbol(static_cast<int>(text.font_size()/2)),
-        width(ss.capacity()*width_symbol),
+        width_symbol(14),
+        width(ss.size()*width_symbol),
         high(width_symbol*4),
-        box({pp.x-width_symbol, pp.y - width_symbol},width,high) {}
+        text({pp.x+width_symbol,pp.y+width_symbol},ss),
+        box(pp,width,high) {}
 
     void Box::draw_specifics(Painter& painter) const{
         this->box.draw_specifics(painter);
@@ -274,17 +273,37 @@ namespace ch11::exercises{
         Application app;
         Simple_window win{zero_point,width_display_default,high_display_default,"ch11_ex4."};
 
-        Box b1{zero_point,"Hello test world"};
+        Vector_ref<Box> shapes_boxes {
+            make_unique<Box>(zero_point,"      "),
+            make_unique<Box>(zero_point,"Lines"),
+            make_unique<Box>(zero_point,"Polygon"),
+            make_unique<Box>(zero_point,"Axis")
+        };
+        shapes_boxes.push_back(make_unique<Box>(zero_point,"Rectangle"));
+        shapes_boxes.push_back(make_unique<Box>(zero_point,"Text"));
+        shapes_boxes.push_back(make_unique<Box>(zero_point,"Image"));
+        shapes_boxes.push_back(make_unique<Box>(zero_point,"Shape"));
 
-        win.attach(b1);
-        win.wait_for_button();
+        shapes_boxes[0].move(50,300);
+        win.attach(shapes_boxes[0]);
+        for(int i = 1; i < shapes_boxes.size()-1; ++i){
+            Point prev_start_position = shapes_boxes[i-1].point(0);
+            int prev_width = shapes_boxes[i-1].get_width();
+            shapes_boxes[i].move(prev_start_position.x + prev_width + margin_default*2,
+                                 prev_start_position.y);
 
-        b1.move(100,50);
-        b1.set_color(Color::blue);
-        win.wait_for_button();
-        b1.set_fill_color(Color::dark_cyan);
-        win.wait_for_button();
-        b1.set_style(style_default);
+            win.attach(shapes_boxes[i]);
+        }
+        Box& shape = shapes_boxes[shapes_boxes.size()-1];
+        shape.move(shapes_boxes[(shapes_boxes.size()-1)/2].point(0).x,
+                   shapes_boxes[0].point(0).y - 100);
+        win.attach(shape);
+
+        Arrow ar1 {shapes_boxes[0].point(0),shape.point(0)};
+        win.attach(ar1);
+
+
+
         win.wait_for_button();
     }
 

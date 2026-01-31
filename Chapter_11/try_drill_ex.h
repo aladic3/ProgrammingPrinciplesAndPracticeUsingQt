@@ -37,15 +37,17 @@ namespace ch11::drill {
 namespace ch11::exercises{
     struct Box : Shape {
         Box(Point pp, const std::string ss);
-        Box(Point pp, int ww, int hh, const std::string ss) : text(pp,ss),
-            width(ww), high(hh), box(pp,high,width){};
+        Box(Point pp, int ww, int hh, const std::string ss) :
+            width(ww), high(hh), text(pp,ss), box(pp,high,width){};
         void draw_specifics(Painter& painter) const override;
         void move(int dx, int dy) override;
+        int get_width() const {return width;}
+        Point point(int i) {return box.point(i);}
     private:
-        Text text;
-        int width_symbol = 7;
+        int width_symbol = 14;
         int width;
         int high;
+        Text text;
         Rectangle box;
 
     };
@@ -53,7 +55,7 @@ namespace ch11::exercises{
 
     struct Arrow : Shape{
         Arrow(Point p1, Point p2): dir_triangle(get_direction_triangle(p1,p2))
-        { add(p1); add(p2);}
+        { add(p1); add(p2); Shape::set_fill_color(Color::black);}
 
         void draw_specifics(Painter& painter) const override;
         void move(int dx, int dy) override;
