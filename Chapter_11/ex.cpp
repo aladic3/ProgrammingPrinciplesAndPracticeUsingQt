@@ -2,11 +2,10 @@
 #include <math.h>
 
 namespace ch11::exercises{
-    const int long_arrowhead = 14;
-    const int half_wide_arrowhead = 6;
+
 
     namespace ex_2{
-        Point n(Rectangle& r){
+        Point n(const Rectangle& r){
             const Point& left_top_corner = r.point(0);
             Point result{left_top_corner};
 
@@ -14,7 +13,7 @@ namespace ch11::exercises{
 
             return result;
         }
-        Point s(Rectangle& r){
+        Point s(const Rectangle& r){
             const Point& left_top_corner = r.point(0);
             Point result{left_top_corner};
 
@@ -257,7 +256,10 @@ namespace ch11::exercises{
         width(ss.size()*width_symbol),
         high(width_symbol*4),
         text({pp.x+width_symbol,pp.y+width_symbol},ss),
-        box(pp,width,high) {}
+        box(pp,width,high) {
+        Shape::set_color(Color::dark_blue);
+        Shape::set_fill_color(Color::yellow);
+    }
 
     void Box::draw_specifics(Painter& painter) const{
         this->box.draw_specifics(painter);
@@ -269,41 +271,91 @@ namespace ch11::exercises{
         redraw();
     }
 
+
+    unique_ptr<Vector_ref<Box>> init_shape_boxes(){
+        auto res  = make_unique<Vector_ref<Box>>
+            (make_unique<Box>(zero_point,"      "),
+             make_unique<Box>(zero_point,"Lines"),
+             make_unique<Box>(zero_point,"Polygon"),
+             make_unique<Box>(zero_point,"Axis"));
+        res->push_back(make_unique<Box>(zero_point,"Rectangle"));
+        res->push_back(make_unique<Box>(zero_point,"Text"));
+        res->push_back(make_unique<Box>(zero_point,"Image"));
+
+        return res;
+    }
+
+    unique_ptr<Vector_ref<Box>> get_arrange_attach_shape_boxes(Simple_window& win){
+
+        auto res = init_shape_boxes();
+
+        (*res)[0].move(50,300);
+        win.attach((*res)[0]);
+
+        for(int i = 1; i < (*res).size(); ++i){
+            Point prev_start_position = (*res)[i-1].point(0);
+            int prev_width = (*res)[i-1].get_width();
+            (*res)[i].move(prev_start_position.x + prev_width + margin_default*2,
+                                 prev_start_position.y);
+
+            win.attach((*res)[i]);
+        }
+
+        return res;
+    }
+
+    unique_ptr<Vector_ref<Arrow>> get_attach_shape_arrows(Box& shape,
+                                                   Vector_ref<Box>& shape_boxes,
+                                                Simple_window& win){
+        using namespace ex_2;
+
+        unique_ptr<Vector_ref<Arrow>> arrows = make_unique<Vector_ref<Arrow>>();
+        Point shape_south = s(shape.get_box());
+
+        for(auto box: shape_boxes){
+            arrows->push_back(make_unique<Arrow>(n(box->get_box()), shape_south));
+            win.attach((*arrows)[arrows->size()-1]);
+        }
+
+        return arrows;
+    }
+
     void ex4(){
         Application app;
         Simple_window win{zero_point,width_display_default,high_display_default,"ch11_ex4."};
 
-        Vector_ref<Box> shapes_boxes {
-            make_unique<Box>(zero_point,"      "),
-            make_unique<Box>(zero_point,"Lines"),
-            make_unique<Box>(zero_point,"Polygon"),
-            make_unique<Box>(zero_point,"Axis")
-        };
-        shapes_boxes.push_back(make_unique<Box>(zero_point,"Rectangle"));
-        shapes_boxes.push_back(make_unique<Box>(zero_point,"Text"));
-        shapes_boxes.push_back(make_unique<Box>(zero_point,"Image"));
-        shapes_boxes.push_back(make_unique<Box>(zero_point,"Shape"));
+        unique_ptr<Vector_ref<Box>> shape_boxes = get_arrange_attach_shape_boxes(win);
+        unique_ptr<Box> shape = make_unique<Box>(zero_point,"Shape");
+        unique_ptr<Vector_ref<Arrow>> shape_arrows;
 
-        shapes_boxes[0].move(50,300);
-        win.attach(shapes_boxes[0]);
-        for(int i = 1; i < shapes_boxes.size()-1; ++i){
-            Point prev_start_position = shapes_boxes[i-1].point(0);
-            int prev_width = shapes_boxes[i-1].get_width();
-            shapes_boxes[i].move(prev_start_position.x + prev_width + margin_default*2,
-                                 prev_start_position.y);
+        shape->move((*shape_boxes)[shape_boxes->size()/2].point(0).x,
+                    (*shape_boxes)[0].point(0).y - 100);
+        shape_arrows = get_attach_shape_arrows(*shape,*shape_boxes,win);
 
-            win.attach(shapes_boxes[i]);
-        }
-        Box& shape = shapes_boxes[shapes_boxes.size()-1];
-        shape.move(shapes_boxes[(shapes_boxes.size()-1)/2].point(0).x,
-                   shapes_boxes[0].point(0).y - 100);
-        win.attach(shape);
+        using namespace ex_2;
 
-        Arrow ar1 {shapes_boxes[0].point(0),shape.point(0)};
-        win.attach(ar1);
+        Box window_box{zero_point,"Window"};
+        Box simple_window_box{zero_point,"Simple window"};
+        window_box.move(width_default,high_default/3);
+        simple_window_box.move(width_default,
+                            high_default);
+        Arrow simple_to_win_arrow {n(simple_window_box.get_box()),
+                                  s(window_box.get_box())};
 
+        Box line_style_box {{window_box.point(0).x + window_box.get_width() * 3,window_box.point(0).y},
+                           "Line style"  };
+        Box color_box {{window_box.point(0).x + window_box.get_width() * 3 * 2,window_box.point(0).y},
+                      "Color"  };
+        Box point_box {{window_box.point(0).x + window_box.get_width() * 3 * 2,simple_window_box.point(0).y},
+                      "Point"  };
 
-
+        win.attach(point_box);
+        win.attach(color_box);
+        win.attach(*shape);
+        win.attach(line_style_box);
+        win.attach(window_box);
+        win.attach(simple_window_box);
+        win.attach(simple_to_win_arrow);
         win.wait_for_button();
     }
 

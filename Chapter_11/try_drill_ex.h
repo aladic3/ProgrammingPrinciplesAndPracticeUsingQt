@@ -7,6 +7,8 @@
 
 const double pi = std::acos(-1.0);;
 
+const int long_arrowhead = 14;
+const int half_wide_arrowhead = 4;
 
 const int x_start = 300;
 const int y_start = 150;
@@ -43,6 +45,7 @@ namespace ch11::exercises{
         void move(int dx, int dy) override;
         int get_width() const {return width;}
         Point point(int i) {return box.point(i);}
+        const Rectangle& get_box() const{return box;}
     private:
         int width_symbol = 14;
         int width;
@@ -66,8 +69,8 @@ namespace ch11::exercises{
     };
 
     namespace ex_2{
-        Point n(Rectangle&);
-        Point s(Rectangle&);
+        Point n(const Rectangle&);
+        Point s(const Rectangle&);
         Point e(Rectangle&);
         Point w(Rectangle&);
         Point center(Rectangle&);
