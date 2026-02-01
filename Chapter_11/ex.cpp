@@ -320,6 +320,38 @@ namespace ch11::exercises{
         return arrows;
     }
 
+    pair<Point,Point> Regular_hexagon::calculate_point_regular_hexagon(Point center, Point B){
+        pair<Point,Point> result;
+
+        int x1 = center.x;
+        int x2 = B.x;
+        int y1 = center.y;
+        int y2 = B.y;
+
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+
+        result.first.x = x1 + dx * 0.5 - dy * sqrt(3)/2;
+        result.first.y = y1 + dx * sqrt(3)/2 + dy * 0.5;
+
+        result.second.x = x1 + dx * 0.5 + dy * sqrt(3)/2;
+        result.second.y = y1 - dx * sqrt(3)/2 + dy * 0.5;
+
+
+        return result;
+    }
+
+    void ex6(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex6."};
+
+        Regular_hexagon hex{zero_point,50};
+        hex.move(100,100);
+
+        win.attach(hex);
+        win.wait_for_button();
+    }
+
     void ex5(){
         Application app;
         Simple_window win{zero_point,1920,1080,"ch11_ex5."};

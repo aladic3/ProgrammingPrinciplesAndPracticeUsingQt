@@ -55,6 +55,27 @@ namespace ch11::exercises{
 
     };
 
+    struct Regular_hexagon : Closed_polyline{
+        Regular_hexagon(Point center, int radius){
+            Point north = {center.x,center.y-radius};
+            Point south = {center.x,center.y+radius};
+            auto rl_north = calculate_point_regular_hexagon(center,north);
+            auto rl_south = calculate_point_regular_hexagon(center,south);
+
+            Closed_polyline::add(north);
+            Closed_polyline::add(rl_north.second);
+            Closed_polyline::add(rl_south.first);
+
+            Closed_polyline::add(south);
+            Closed_polyline::add(rl_south.second);
+            Closed_polyline::add(rl_north.first);
+        }
+
+    private:
+        pair<Point,Point> calculate_point_regular_hexagon(Point center, Point B);
+
+    };
+
 
     struct Arrow : Shape{
         Arrow(Point p1, Point p2): dir_triangle(get_direction_triangle(p1,p2))
@@ -107,6 +128,8 @@ namespace ch11::exercises{
     void ex3();
     void ex4();
     void ex5();
+    void ex6();
+
 
 }
 
