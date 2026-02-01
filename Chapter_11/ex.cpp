@@ -257,8 +257,8 @@ namespace ch11::exercises{
         high(width_symbol*4),
         text({pp.x+width_symbol,pp.y+width_symbol},ss),
         box(pp,width,high) {
-        Shape::set_color(Color::dark_blue);
-        Shape::set_fill_color(Color::yellow);
+            Shape::set_color(Color::dark_blue);
+            Shape::set_fill_color(Color::yellow);
     }
 
     void Box::draw_specifics(Painter& painter) const{
@@ -318,6 +318,44 @@ namespace ch11::exercises{
         }
 
         return arrows;
+    }
+
+    void ex5(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex5."};
+
+        constexpr int rgb_limit = 255;
+        constexpr int step = 4;
+        constexpr int columns_count = 8;
+
+        Vector_ref<Mark> rgb_color_chart;
+        Point current_position = zero_point;
+        int y_offset = 0;
+        int x_offset = 0;
+        int index = rgb_limit / step;
+
+        for (int r = 0; r <= rgb_limit; r+=step){
+            int x_block = (r / step) % columns_count;
+            int y_block = (r / step) / columns_count;
+            x_offset = index * x_block;
+            y_offset = index * y_block;//x_offset==0 ? y_offset + (rgb_limit / step) : y_offset;      //(r / columns_count) * rgb_limit / step ;
+
+            for(int g = 0; g <= rgb_limit; g+=step)
+                for(int b = 0; b <= rgb_limit; b+=step)
+                {
+                    current_position.x = g / step + x_offset ;
+                    current_position.y = b / step + y_offset ;
+
+                    rgb_color_chart.push_back(make_unique<Mark>(current_position,'.'));
+                    Mark& last_el = rgb_color_chart[rgb_color_chart.size()-1];
+                    last_el.set_mark_color(Color{r,g,b});
+
+                    win.attach(last_el);
+                }
+
+        }
+
+        win.wait_for_button();
     }
 
     void ex4(){
