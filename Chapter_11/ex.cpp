@@ -222,6 +222,47 @@ namespace ch11::exercises{
             return result;
         }
     }
+        void Regular_hexagons::draw_specifics(Painter& painter) const{
+            for(auto& hex : vec)
+                hex->draw_specifics(painter);
+        }
+        void Regular_hexagons::move(int x, int y){
+            for (auto& hex : vec){
+                hex->move(x,y);
+            }
+            redraw();
+        }
+
+        Regular_hexagons::Regular_hexagons(int count, Point center, int r, int margin = 0){
+            const int minimum_count_per_row = 3;
+            int count_per_row = count/10 + minimum_count_per_row;
+            int dx_overall = r * sqrt(3);
+            int dy_overall = 1.5*r;
+            int offset_x_overall = r * sqrt(3) / 2;
+
+            for (int i = 0; i < count; ++i){
+                Point current_center_point;
+
+                int x_index = i % count_per_row;
+                int y_index = i / count_per_row;
+                int offset_index = (i / count_per_row) % 2;
+
+                int x_margin = x_index * margin;
+                int y_margin = y_index * margin;
+                int offset_margin = offset_index * margin;
+
+                int dx_current = dx_overall * x_index + x_margin;
+                int dy_current = dy_overall * y_index + y_margin;
+                int offset_current = offset_x_overall * offset_index + offset_margin;
+
+                current_center_point.x = center.x + dx_current + offset_current;
+                current_center_point.y = center.y + dy_current;
+
+                vec.push_back(make_unique<Regular_hexagon>(current_center_point,r));
+            }
+
+
+        }
 
     void Arrow::draw_specifics(Painter& painter) const{
         painter.draw_line(point(0), point(1));
@@ -320,6 +361,7 @@ namespace ch11::exercises{
         return arrows;
     }
 
+
     pair<Point,Point> Regular_hexagon::calculate_point_regular_hexagon(Point center, Point B){
         pair<Point,Point> result;
 
@@ -339,6 +381,18 @@ namespace ch11::exercises{
 
 
         return result;
+    }
+
+    void ex7(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex6."};
+
+        Regular_hexagons hex{103,zero_point,50,5};
+        hex.move(100,100);
+        hex.set_fill_color(Color::blue);
+
+        win.attach(hex);
+        win.wait_for_button();
     }
 
     void ex6(){

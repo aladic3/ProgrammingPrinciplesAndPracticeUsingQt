@@ -56,6 +56,7 @@ namespace ch11::exercises{
     };
 
     struct Regular_hexagon : Closed_polyline{
+
         Regular_hexagon(Point center, int radius){
             Point north = {center.x,center.y-radius};
             Point south = {center.x,center.y+radius};
@@ -70,10 +71,20 @@ namespace ch11::exercises{
             Closed_polyline::add(rl_south.second);
             Closed_polyline::add(rl_north.first);
         }
+        Regular_hexagon(){Regular_hexagon(zero_point,30);}
 
     private:
         pair<Point,Point> calculate_point_regular_hexagon(Point center, Point B);
 
+    };
+
+    struct Regular_hexagons : Regular_hexagon {
+        Regular_hexagons(int count, Point center, int radius, int margin);
+        void draw_specifics(Painter& painter) const override;
+        void move(int x, int y) override;
+
+    private:
+        Vector_ref<Regular_hexagon> vec {};
     };
 
 
@@ -129,6 +140,7 @@ namespace ch11::exercises{
     void ex4();
     void ex5();
     void ex6();
+    void ex7();
 
 
 }
