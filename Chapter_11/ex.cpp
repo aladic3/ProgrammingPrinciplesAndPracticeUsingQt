@@ -418,6 +418,66 @@ namespace ch11::exercises{
         return result;
     }
 
+    void ex10(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex10"};
+
+        using namespace ex_3;
+        Circle c{zero_point, 50};
+        c.move(200,200);
+
+        Mark m {n(c),'x'};
+        win.attach(c);
+        win.attach(m);
+
+
+        win.wait_for_button();
+        m.move(ne(c).x-m.point(0).x,ne(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(e(c).x-m.point(0).x,e(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(se(c).x-m.point(0).x,se(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(s(c).x-m.point(0).x,s(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(sw(c).x-m.point(0).x,sw(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(w(c).x-m.point(0).x,w(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(nw(c).x-m.point(0).x,nw(c).y-m.point(0).y);
+        win.wait_for_button();
+        m.move(n(c).x-m.point(0).x,n(c).y-m.point(0).y);
+
+        win.wait_for_button();
+    }
+
+    void ex9(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex9"};
+
+        using namespace ex_3;
+        Ellipse el{zero_point,300,200};
+        Axis xa{Axis::x,zero_point,400,40,"x axis"};
+        Axis ya{Axis::y,zero_point,300,30,"y axis"};
+        Marks foci_s{"x",{el.focus1(),el.focus2(),s(el)}};
+        Lines lines{el.focus1(),s(el),s(el),el.focus2()};
+
+        el.move(500,500);
+        xa.move(500,500);
+        ya.move(500,500);
+        foci_s.move(500,500);
+        lines.move(500,500);
+
+
+        win.attach(el);
+        win.attach(xa);
+        win.attach(ya);
+        win.attach(foci_s);
+        win.attach(lines);
+        win.wait_for_button();
+
+    }
+
     void ex8(){
         Application app;
         Simple_window win{zero_point,1920,1080,"ch11_ex8."};

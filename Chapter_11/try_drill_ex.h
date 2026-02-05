@@ -155,6 +155,8 @@ namespace ch11::exercises{
     void ex6();
     void ex7();
     void ex8();
+    void ex9();
+    void ex10();
 
 
 }
