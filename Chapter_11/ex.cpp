@@ -222,18 +222,53 @@ namespace ch11::exercises{
             return result;
         }
     }
-        void Regular_hexagons::draw_specifics(Painter& painter) const{
+
+        void Regular_polygon::draw_specifics(Painter& painter) const{
+            painter.draw_polygon(*this);
+            //circle.draw_specifics(painter);
+            //center.draw_specifics(painter);
+        }
+
+        Regular_polygon::Regular_polygon(Point center, int radius, int count_sides):
+            circle(center,radius), center("x",{center,{center.x,center.y-radius}}),
+            radius(radius), count_sides(count_sides){
+
+
+        double corner = 2 * pi / count_sides;
+        int x1 = center.x;
+        int y1 = center.y;
+        Point B = center;
+        B.y -= radius;
+
+        Regular_polygon::add(B);
+        for (int i  = 1; i < count_sides; ++i){
+            int x2 = B.x;
+            int y2 = B.y;
+            int dx = x2 - x1;
+            int dy = y2 - y1;
+
+            int x3 = x1 + dx * cos(corner) - dy * sin(corner);
+            int y3 = y1 + dx * sin(corner) + dy * cos(corner);
+
+            B = {x3,y3};
+            Regular_polygon::add(B);
+
+        }
+
+    }
+
+    void Regular_hexagons::draw_specifics(Painter& painter) const{
             for(auto& hex : vec)
                 hex->draw_specifics(painter);
-        }
-        void Regular_hexagons::move(int x, int y){
+    }
+    void Regular_hexagons::move(int x, int y){
             for (auto& hex : vec){
                 hex->move(x,y);
             }
             redraw();
-        }
+    }
 
-        Regular_hexagons::Regular_hexagons(int count, Point center, int r, int margin = 0){
+    Regular_hexagons::Regular_hexagons(int count, Point center, int r, int margin = 0){
             const int minimum_count_per_row = 3;
             int count_per_row = count/10 + minimum_count_per_row;
             int dx_overall = r * sqrt(3);
@@ -262,7 +297,7 @@ namespace ch11::exercises{
             }
 
 
-        }
+    }
 
     void Arrow::draw_specifics(Painter& painter) const{
         painter.draw_line(point(0), point(1));
@@ -383,9 +418,21 @@ namespace ch11::exercises{
         return result;
     }
 
+    void ex8(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex8."};
+
+        Regular_polygon pol{{200,200},100,10};
+
+        pol.set_fill_color(253);
+
+        win.attach(pol);
+        win.wait_for_button();
+    }
+
     void ex7(){
         Application app;
-        Simple_window win{zero_point,1920,1080,"ch11_ex6."};
+        Simple_window win{zero_point,1920,1080,"ch11_ex7."};
 
         Regular_hexagons hex{103,zero_point,50,5};
         hex.move(100,100);

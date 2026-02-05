@@ -55,6 +55,19 @@ namespace ch11::exercises{
 
     };
 
+    struct Regular_polygon : Closed_polyline{
+        Regular_polygon(Point center, int radius, int count_sides);
+        void draw_specifics(Painter& painter) const override;
+        int get_radius() const {return radius;}
+        int get_count_sides() const {return count_sides;}
+
+    private:
+        Circle circle;
+        Marks center;
+        int radius;
+        int count_sides;
+    };
+
     struct Regular_hexagon : Closed_polyline{
 
         Regular_hexagon(Point center, int radius){
@@ -141,6 +154,7 @@ namespace ch11::exercises{
     void ex5();
     void ex6();
     void ex7();
+    void ex8();
 
 
 }
