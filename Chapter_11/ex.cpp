@@ -224,7 +224,6 @@ namespace ch11::exercises{
     }
 
         Right_triangle::Right_triangle(Point pp, int ww, int hh, Orientation oo){
-        //high(hh), width(ww), orientation(oo){
             if (hh < 1 || ww < 1)
                 error("high or width < 1 px!");
 
@@ -254,6 +253,72 @@ namespace ch11::exercises{
             }
 
         }
+
+        // arguments np and last_el_index is changing by refference!
+        unique_ptr<Right_triangle> get_triangle_for_octagonal(Point& np,
+            std::pair<int,int> delta_wh,std::pair<int,int> wh,
+            Right_triangle::Orientation oo, int& last_el_index){
+            unique_ptr<Right_triangle> res;
+
+            np.x += delta_wh.first;
+            np.y += delta_wh.second;
+
+            res = make_unique<Right_triangle>(np,wh.first,wh.second,oo);
+
+            res->set_fill_color(Color(last_el_index));
+            ++last_el_index;
+
+            return res;
+        }
+
+
+
+        unique_ptr<Vector_ref<Right_triangle>> get_octagonal
+            (Point pp, int ww, int hh){
+            auto triangle_vec = make_unique<Vector_ref<Right_triangle>>();
+            Point np = pp;
+            int last_el_index = 0;
+            //first
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{0,0},{ww,hh},Right_triangle::nw,last_el_index)
+                );
+            //second
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{ww,0},{ww,hh},Right_triangle::sw,last_el_index)
+                );
+            //third
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{ww,0},{ww,hh},Right_triangle::ne,last_el_index)
+                );
+            //4
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{0,hh},{ww,hh},Right_triangle::nw,last_el_index)
+                );
+            //5
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{0,hh},{ww,hh},Right_triangle::se,last_el_index)
+                );
+            //6
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{-ww,0},{ww,hh},Right_triangle::nw,last_el_index)
+                );
+            //7
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{-ww,0},{ww,hh},Right_triangle::sw,last_el_index)
+                );
+            //8
+            triangle_vec->push_back(
+                get_triangle_for_octagonal(np,{0,-hh},{ww,hh},Right_triangle::se,last_el_index)
+                );
+
+            /*for (int i = 0; i < triangle_vec.size(); ++i)
+                triangle_vec[i].set_fill_color(Color(i));*/
+
+            return triangle_vec;
+        }
+
+
+
 
         void Regular_polygon::draw_specifics(Painter& painter) const{
             painter.draw_polygon(*this);
@@ -457,7 +522,7 @@ namespace ch11::exercises{
         Vector_ref<Right_triangle> tri_v;
         int width = 100;
         int high = 200;
-        int margin = 0;//margin_default
+        int margin = margin_default;
 
         for (int i = 0; i < 4; ++i){
             tri_v.push_back(make_unique<Right_triangle>(zero_point,width,high,
@@ -466,6 +531,15 @@ namespace ch11::exercises{
             tri_v[i].move((width+margin)*i,high);
             win.attach(tri_v[i]);
         }
+
+
+        auto triangle_vec = get_octagonal({400,300},100,150);
+
+
+        for (auto& el: *triangle_vec)
+            win.attach(*el);
+
+
 
         win.wait_for_button();
     }

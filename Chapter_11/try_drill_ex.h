@@ -117,13 +117,6 @@ namespace ch11::exercises{
         enum Orientation{nw,se,ne,sw};
 
         Right_triangle(Point pp, int ww, int hh, Orientation oo=ne);
-
-    /*
-    private:
-
-        int high;
-        int width;
-        Orientation orientation;*/
     };
 
     namespace ex_2{
