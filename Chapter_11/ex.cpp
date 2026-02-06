@@ -223,6 +223,38 @@ namespace ch11::exercises{
         }
     }
 
+        Right_triangle::Right_triangle(Point pp, int ww, int hh, Orientation oo){
+        //high(hh), width(ww), orientation(oo){
+            if (hh < 1 || ww < 1)
+                error("high or width < 1 px!");
+
+            switch(oo){
+            case nw:
+                Right_triangle::add(pp);
+                Right_triangle::add({pp.x+ww,pp.y});
+                Right_triangle::add({pp.x+ww,pp.y-hh});
+                break;
+            case se:
+                Right_triangle::add(pp);
+                Right_triangle::add({pp.x,pp.y-hh});
+                Right_triangle::add({pp.x+ww,pp.y-hh});
+                break;
+            case ne:
+                Right_triangle::add(pp);
+                Right_triangle::add({pp.x+ww,pp.y});
+                Right_triangle::add({pp.x,pp.y-hh});
+                break;
+            case sw:
+                Right_triangle::add({pp.x,pp.y-hh});
+                Right_triangle::add({pp.x+ww,pp.y-hh});
+                Right_triangle::add({pp.x+ww,pp.y});
+                break;
+            default:
+                error("orientation right triangle is bad");
+            }
+
+        }
+
         void Regular_polygon::draw_specifics(Painter& painter) const{
             painter.draw_polygon(*this);
             //circle.draw_specifics(painter);
@@ -416,6 +448,26 @@ namespace ch11::exercises{
 
 
         return result;
+    }
+
+    void ex12(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex12. Right triangle."};
+
+        Vector_ref<Right_triangle> tri_v;
+        int width = 100;
+        int high = 200;
+        int margin = 0;//margin_default
+
+        for (int i = 0; i < 4; ++i){
+            tri_v.push_back(make_unique<Right_triangle>(zero_point,width,high,
+                                                        Right_triangle::Orientation(i)));
+            tri_v[i].set_fill_color(Color(i));
+            tri_v[i].move((width+margin)*i,high);
+            win.attach(tri_v[i]);
+        }
+
+        win.wait_for_button();
     }
 
     void ex11(int margin){

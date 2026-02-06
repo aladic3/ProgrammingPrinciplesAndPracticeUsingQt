@@ -113,6 +113,19 @@ namespace ch11::exercises{
         Polygon get_direction_triangle(Point p1, Point p2);
     };
 
+    struct Right_triangle : Polygon {
+        enum Orientation{nw,se,ne,sw};
+
+        Right_triangle(Point pp, int ww, int hh, Orientation oo=ne);
+
+    /*
+    private:
+
+        int high;
+        int width;
+        Orientation orientation;*/
+    };
+
     namespace ex_2{
         Point n(const Rectangle&);
         Point s(const Rectangle&);
@@ -158,7 +171,7 @@ namespace ch11::exercises{
     void ex9();
     void ex10();
     void ex11(int margin = 5);
-
+    void ex12();
 
 }
 
