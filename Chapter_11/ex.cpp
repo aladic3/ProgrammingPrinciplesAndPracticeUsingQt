@@ -418,6 +418,38 @@ namespace ch11::exercises{
         return result;
     }
 
+    void ex11(int margin){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex11. Color matrix."};
+
+        Vector_ref<Rectangle> vec;
+        const int size_h = 25;
+        const int size_w = 25;
+
+
+        for (int i = 0; i < 255; ++i){
+            int index = 20;
+            int x_offset_index = i / index;
+            int y_offset_index = i % index;
+            int x_offset = x_offset_index * size_w;
+            int y_offset = y_offset_index * size_h;
+
+            int x_margin = x_offset_index * margin;
+            int y_margin = y_offset_index * margin;
+
+
+            Point xy {zero_point.x + x_offset + x_margin,
+                     zero_point.y + y_offset + y_margin};
+
+            vec.push_back(make_unique<Rectangle>(xy,size_w,size_h));
+            vec[i].set_color(Color::Transparency(0));
+            vec[i].set_fill_color(Color(i));
+            win.attach(vec[i]);
+        }
+
+        win.wait_for_button();
+    }
+
     void ex10(){
         Application app;
         Simple_window win{zero_point,1920,1080,"ch11_ex10"};
