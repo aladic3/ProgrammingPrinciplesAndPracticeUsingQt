@@ -22,7 +22,7 @@ const int bold_default = 2;
 const int tic_size = 50;
 
 
-const Point zero_point {0,0};
+const Point zero_point {100,100};
 const Point start_point {x_start,y_start};
 const Line_style style_default {Line_style::solid,bold_default};
 
@@ -119,6 +119,14 @@ namespace ch11::exercises{
         Right_triangle(Point pp, int ww, int hh, Orientation oo=ne);
     };
 
+    struct Tile_triangles : Shape {
+        Tile_triangles(Point pp, int ww, int hh, int size, int margin = 5);
+        void draw_specifics(Painter& painter) const override;
+        void move(int dx, int dy) override;
+    private:
+        Vector_ref<Right_triangle> tri_v;
+    };
+
     namespace ex_2{
         Point n(const Rectangle&);
         Point s(const Rectangle&);
@@ -165,6 +173,8 @@ namespace ch11::exercises{
     void ex10();
     void ex11(int margin = 5);
     void ex12();
+    void ex13();
+
 
 }
 

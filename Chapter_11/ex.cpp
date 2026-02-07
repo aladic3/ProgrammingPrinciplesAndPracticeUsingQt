@@ -272,6 +272,45 @@ namespace ch11::exercises{
         }
 
 
+        Tile_triangles::Tile_triangles(Point pp, int ww, int hh, int size, int margin){
+            const std::vector<Right_triangle::Orientation> oo {Right_triangle::ne,Right_triangle::sw};
+            const int minimum_count_per_row = 3;
+            int count_per_row = size/20 + minimum_count_per_row;
+            int dx_overall = ww;
+            int dy_overall = hh;
+
+
+            for (int i = 0; i < size; ++i){
+                Point current_start_point;
+
+                int x_index = i % count_per_row;
+                int y_index = i / (count_per_row * 2);
+
+                int oo_index = (i / count_per_row) % 2;
+
+                int x_margin = x_index * margin;
+                int y_margin = y_index * margin;
+
+
+                int dx_current = dx_overall * x_index + x_margin;
+                int dy_current = dy_overall * y_index + y_margin;
+
+                current_start_point.x = pp.x + dx_current;
+                current_start_point.y = pp.y + dy_current;
+
+                this->tri_v.push_back(make_unique<Right_triangle>(current_start_point,ww,hh,oo[oo_index]));
+            }
+        }
+        void Tile_triangles::draw_specifics(Painter& painter) const{
+            for (auto& el: this->tri_v)
+                el->draw_specifics(painter);
+        }
+        void Tile_triangles::move(int dx, int dy){
+            for (auto& el: this->tri_v)
+                el->move(dx,dy);
+        }
+
+
 
         unique_ptr<Vector_ref<Right_triangle>> get_octagonal
             (Point pp, int ww, int hh){
@@ -513,6 +552,16 @@ namespace ch11::exercises{
 
 
         return result;
+    }
+
+    void ex13(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex13. Tile Right triangle."};
+        Tile_triangles tile_tri{zero_point,30,20,504,1};
+        tile_tri.set_fill_color(Color::dark_green);
+
+        win.attach(tile_tri);
+        win.wait_for_button();
     }
 
     void ex12(){
