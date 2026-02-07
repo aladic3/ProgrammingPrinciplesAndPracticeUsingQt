@@ -37,6 +37,11 @@ namespace ch11::drill {
 }
 
 namespace ch11::exercises{
+    struct Poly : Polygon {
+        Poly(initializer_list<Point> ll);
+    };
+
+
     struct Box : Shape {
         Box(Point pp, const std::string ss);
         Box(Point pp, int ww, int hh, const std::string ss) :
@@ -175,6 +180,7 @@ namespace ch11::exercises{
     void ex12();
     void ex13();
     void ex14_15();
+    void ex16();
 
 
 }

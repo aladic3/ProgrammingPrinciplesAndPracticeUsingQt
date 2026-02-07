@@ -223,6 +223,14 @@ namespace ch11::exercises{
         }
     }
 
+        Poly::Poly(initializer_list<Point> ll){
+            if (ll.size() < 3)
+                error("bad count points for Poly\n");
+
+            for (auto& el : ll)
+                Polygon::add(el);
+        }
+
         Right_triangle::Right_triangle(Point pp, int ww, int hh, Orientation oo){
             if (hh < 1 || ww < 1)
                 error("high or width < 1 px!");
@@ -559,6 +567,53 @@ namespace ch11::exercises{
 
 
         return result;
+    }
+
+    void ex16(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex16. class Poly"};
+        Vector_ref<Poly> v_poly;
+
+        vector<initializer_list<Point>> good_init_values{
+            initializer_list<Point>{
+                {50,50}, {150,20}, {250,80}, {230,180},
+                    {180,250}, {80,220}, {30,150}
+            },
+            initializer_list<Point>{
+                {100,0}, {200,50}, {200,150},
+                    {100,200}, {0,150}, {0,50}
+            },
+            initializer_list<Point>{{0,0}, {200,0}, {100,150}},
+            initializer_list<Point>{{0,0}, {200,0}, {200,200}, {0,200}},
+            initializer_list<Point>{{0,0}, {200,0}, {150,100}, {200,200}, {0,200}},
+            initializer_list<Point>{{0,0}, {100,100},{300,250}}
+        };
+
+        vector<initializer_list<Point>> bad_init_values {
+            initializer_list<Point>{{0,0}, {100,100}},
+            initializer_list<Point>{{0,0}, {100,100}, {100,100}, {200,0}},
+            initializer_list<Point>{{0,0}, {100,0}, {200,0}, {300,0}},
+            initializer_list<Point>{{0,0}, {200,200}, {0,200}, {200,0}},
+            initializer_list<Point>{{0,0}, {300,0}, {100,200}, {200,-100}, {0,200}}
+        };
+
+        // init good val
+        for(auto& el : good_init_values){
+            v_poly.push_back(make_unique<Poly>(el));
+            int index = v_poly.size()-1;
+            v_poly[index].set_color(Color(index));
+            win.attach(v_poly[index]);
+        }
+
+        // test for bad init
+        for (auto& el : bad_init_values)
+            try{
+                v_poly.push_back(make_unique<Poly>(el));
+            } catch (exception& ex){
+                std::cerr << "Must be bad: msg:" << ex.what() << endl;
+            }
+
+        win.wait_for_button();
     }
 
     void ex14_15(){
