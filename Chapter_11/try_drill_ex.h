@@ -22,7 +22,7 @@ const int bold_default = 2;
 const int tic_size = 50;
 
 
-const Point zero_point {100,100};
+const Point zero_point {30,30};
 const Point start_point {x_start,y_start};
 const Line_style style_default {Line_style::solid,bold_default};
 
@@ -97,7 +97,7 @@ namespace ch11::exercises{
         void move(int x, int y) override;
 
     private:
-        Vector_ref<Regular_hexagon> vec {};
+        unique_ptr<Vector_ref<Regular_hexagon>> vec;
     };
 
 
@@ -174,6 +174,7 @@ namespace ch11::exercises{
     void ex11(int margin = 5);
     void ex12();
     void ex13();
+    void ex14_15();
 
 
 }

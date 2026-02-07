@@ -394,46 +394,53 @@ namespace ch11::exercises{
     }
 
     void Regular_hexagons::draw_specifics(Painter& painter) const{
-            for(auto& hex : vec)
+            for(auto& hex : *vec)
                 hex->draw_specifics(painter);
     }
     void Regular_hexagons::move(int x, int y){
-            for (auto& hex : vec){
+            for (auto& hex : *vec){
                 hex->move(x,y);
             }
             redraw();
     }
 
-    Regular_hexagons::Regular_hexagons(int count, Point center, int r, int margin = 0){
-            const int minimum_count_per_row = 3;
-            int count_per_row = count/10 + minimum_count_per_row;
-            int dx_overall = r * sqrt(3);
-            int dy_overall = 1.5*r;
-            int offset_x_overall = r * sqrt(3) / 2;
+    unique_ptr<Vector_ref<Regular_hexagon>> get_tile_hexagons(int count, Point center, int r, int margin = 0){
+        unique_ptr<Vector_ref<Regular_hexagon>> vec = make_unique<Vector_ref<Regular_hexagon>>();
 
-            for (int i = 0; i < count; ++i){
-                Point current_center_point;
+        const int minimum_count_per_row = 3;
+        int count_per_row = count/20 + minimum_count_per_row;
+        int dx_overall = r * sqrt(3);
+        int dy_overall = 1.5*r;
+        int offset_x_overall = r * sqrt(3) / 2;
 
-                int x_index = i % count_per_row;
-                int y_index = i / count_per_row;
-                int offset_index = (i / count_per_row) % 2;
+        for (int i = 0; i < count; ++i){
+            Point current_center_point;
 
-                int x_margin = x_index * margin;
-                int y_margin = y_index * margin;
-                int offset_margin = offset_index * margin;
+            int x_index = i % count_per_row;
+            int y_index = i / count_per_row;
+            int offset_index = (i / count_per_row) % 2;
 
-                int dx_current = dx_overall * x_index + x_margin;
-                int dy_current = dy_overall * y_index + y_margin;
-                int offset_current = offset_x_overall * offset_index + offset_margin;
+            int x_margin = x_index * margin;
+            int y_margin = y_index * margin;
+            int offset_margin = offset_index * margin;
 
-                current_center_point.x = center.x + dx_current + offset_current;
-                current_center_point.y = center.y + dy_current;
+            int dx_current = dx_overall * x_index + x_margin;
+            int dy_current = dy_overall * y_index + y_margin;
+            int offset_current = offset_x_overall * offset_index + offset_margin;
 
-                vec.push_back(make_unique<Regular_hexagon>(current_center_point,r));
-            }
+            current_center_point.x = center.x + dx_current + offset_current;
+            current_center_point.y = center.y + dy_current;
 
+            vec->push_back(make_unique<Regular_hexagon>(current_center_point,r));
+            (*vec)[i].set_fill_color(Color(i%255));
+        }
 
+        return vec;
     }
+
+    Regular_hexagons::Regular_hexagons(int count, Point center, int r, int margin = 0):
+        vec(get_tile_hexagons(count,center,r,margin)){}
+
 
     void Arrow::draw_specifics(Painter& painter) const{
         painter.draw_line(point(0), point(1));
@@ -552,6 +559,20 @@ namespace ch11::exercises{
 
 
         return result;
+    }
+
+    void ex14_15(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex14-15. Tile hexagons/different colors."};
+        auto tile = get_tile_hexagons(300,zero_point,30, 4);
+
+        for (auto& el: *tile){
+            win.attach(*el);
+        }
+        //Regular_hexagons hex{200,zero_point,30, 4};
+        //hex.set_fill_color(Color::dark_blue);
+        //win.attach(hex);
+        win.wait_for_button();
     }
 
     void ex13(){
