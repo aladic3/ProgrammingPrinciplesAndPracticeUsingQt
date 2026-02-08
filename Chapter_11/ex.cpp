@@ -373,30 +373,51 @@ namespace ch11::exercises{
             //center.draw_specifics(painter);
         }
 
-        Regular_polygon::Regular_polygon(Point center, int radius, int count_sides):
-            circle(center,radius), center("x",{center,{center.x,center.y-radius}}),
-            radius(radius), count_sides(count_sides){
+        std::vector<Point> calculate_coordinates_equal_corner(Point center,
+                                                              int radius, int count_points){
+            std::vector<Point> result;
+            double corner = 2 * pi / count_points;
+            int x1 = center.x;
+            int y1 = center.y;
+            Point B = center;
+            B.y -= radius;
 
+            result.push_back(B);
+            for (int i  = 1; i < count_points; ++i){
+                int x2 = B.x;
+                int y2 = B.y;
+                int dx = x2 - x1;
+                int dy = y2 - y1;
 
-        double corner = 2 * pi / count_sides;
-        int x1 = center.x;
-        int y1 = center.y;
-        Point B = center;
-        B.y -= radius;
+                int x3 = static_cast<int>(lround(x1 + dx * cos(corner) - dy * sin(corner)));
+                int y3 = static_cast<int>(lround(y1 + dx * sin(corner) + dy * cos(corner)));
 
-        Regular_polygon::add(B);
-        for (int i  = 1; i < count_sides; ++i){
-            int x2 = B.x;
-            int y2 = B.y;
-            int dx = x2 - x1;
-            int dy = y2 - y1;
+                B = {x3,y3};
+                result.push_back(B);
 
-            int x3 = x1 + dx * cos(corner) - dy * sin(corner);
-            int y3 = y1 + dx * sin(corner) + dy * cos(corner);
+            }
+            return result;
+        }
 
-            B = {x3,y3};
-            Regular_polygon::add(B);
+    Regular_polygon::Regular_polygon(Point center, int radius, int count_sides):
+                circle(center,radius), center("x",{center,{center.x,center.y-radius}}),
+                radius(radius), count_sides(count_sides){
+            auto points = calculate_coordinates_equal_corner(center, radius, count_sides);
 
+            for(auto& el : points)
+                Closed_polyline::add(el);
+
+    }
+
+    Star::Star(Point cc, int radius, int count_corners){
+        auto coordinates_top_corners = calculate_coordinates_equal_corner(cc, radius, count_corners);
+        auto coordinates_low_corners = calculate_coordinates_equal_corner(cc, static_cast<int>(radius*0.3), count_corners*2);
+
+        size_t lower_index = 1;
+        for (size_t i = 0; i < coordinates_top_corners.size(); ++i){
+            Closed_polyline::add(coordinates_top_corners[i]);
+            Closed_polyline::add(coordinates_low_corners[lower_index]);
+            lower_index += 2;
         }
 
     }
@@ -567,6 +588,48 @@ namespace ch11::exercises{
 
 
         return result;
+    }
+
+    void ex17(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex17. class Star"};
+        Vector_ref<Star> stars;
+        const int count = 100;
+        const int r = 100;
+        const int margin = 5;
+        const Point start_point {100,100};
+
+        const int minimum_count_per_row = 3;
+        int count_per_row = count/11 + minimum_count_per_row;
+        int dx_overall = 2*r;
+        int dy_overall = 2*r;
+
+
+        for (int i = 0; i < count; ++i){
+            Point current_center_point;
+            int count_top_points = i + 3;
+
+            int x_index = i % count_per_row;
+            int y_index = i / count_per_row;
+
+            int x_margin = x_index * margin;
+            int y_margin = y_index * margin;
+
+            int dx_current = dx_overall * x_index + x_margin;
+            int dy_current = dy_overall * y_index + y_margin;
+
+            current_center_point.x = start_point.x + dx_current;
+            current_center_point.y = start_point.y + dy_current;
+
+            stars.push_back(make_unique<Star>(current_center_point,r,count_top_points));
+            stars[i].set_fill_color(Color(i%255));
+            stars[i].set_color(Color(255-i%255));
+            win.attach(stars[i]);
+        }
+
+
+
+        win.wait_for_button();
     }
 
     void ex16(){

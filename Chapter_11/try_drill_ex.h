@@ -166,6 +166,14 @@ namespace ch11::exercises{
         Point sw(Ellipse&);
     }
 
+    struct Star : Closed_polyline{
+        Star(Point cc, int radius, int count_corners);
+
+    };
+
+    std::vector<Point> calculate_coordinates_equal_corner(Point center, int radius, int count_points);
+
+
     void ex1();
     void ex2();
     void ex3();
@@ -181,7 +189,7 @@ namespace ch11::exercises{
     void ex13();
     void ex14_15();
     void ex16();
-
+    void ex17();
 
 }
 
