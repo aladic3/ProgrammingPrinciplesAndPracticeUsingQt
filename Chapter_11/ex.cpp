@@ -590,6 +590,16 @@ namespace ch11::exercises{
         return result;
     }
 
+    void ex18(){
+        Application app;
+        Simple_window win{zero_point,1920,1080,"ch11_ex18. Arc"};
+
+        Arc arc {{100, 100},100,50,100,1000};
+
+        win.attach(arc);
+        win.wait_for_button();
+    }
+
     void ex17(){
         Application app;
         Simple_window win{zero_point,1920,1080,"ch11_ex17. class Star"};

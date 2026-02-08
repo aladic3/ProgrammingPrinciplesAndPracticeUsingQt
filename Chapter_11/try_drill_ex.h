@@ -190,6 +190,7 @@ namespace ch11::exercises{
     void ex14_15();
     void ex16();
     void ex17();
+    void ex18();
 
 }
 
