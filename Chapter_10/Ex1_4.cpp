@@ -1,4 +1,5 @@
 #include "Ex1_4.h"
+#include "../base.h"
 #include <iostream>
 #include <vector>
 #include <math.h>

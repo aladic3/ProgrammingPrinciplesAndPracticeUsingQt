@@ -1,10 +1,7 @@
 #ifndef EX1_4_H
 #define EX1_4_H
 
-#pragma once
-#include "PPP/Graph.h"
-#include "PPP/Window.h"
-#include "PPP/Simple_window.h"
+
 
 const int step_default = 30; //pixel on 1 mark axis
 

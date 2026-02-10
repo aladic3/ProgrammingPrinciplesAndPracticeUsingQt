@@ -1,13 +1,12 @@
 
-#include "Chapter_11/try_drill_ex.h"
-//#include "Chapter_10/Ex1_4.h"
+#include "Chapter_12/drill_ex.h"
 #include <iostream>
 
 
 int main(int /*argc*/, char * /*argv*/[])
 {
     try{
-        ch11::exercises::ex18();
+        ch12::drill::virtual_func_drill();
     }catch(std::exception& ex){
         std::cerr << ex.what();
     }
