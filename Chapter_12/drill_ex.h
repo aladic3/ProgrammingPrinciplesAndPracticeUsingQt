@@ -33,7 +33,13 @@ struct Frowny : Face {
     Frowny(Point p, int rr) : Face(p,rr){make_frowny_mouth();}
 };
 
+struct Immobile_Circle : Circle{
+    Immobile_Circle(Point p, int rr) : Circle(p,rr){};
+    void move(int x, int y) {x+=y;y+=x;error("cant't move");}
+};
+
 void ex_1();
+void ex_4();
 
 }
 

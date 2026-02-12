@@ -68,4 +68,16 @@ void ex_1(){
     win.wait_for_button();
 
 }
+
+void ex_4(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex4. Immobile circle"};
+
+    Immobile_Circle imc {zero_point,32};
+    imc.set_fill_color(Color::dark_blue);
+
+
+    win.attach(imc);
+    win.wait_for_button();
+}
 }
