@@ -50,6 +50,37 @@ void Face::make_smiley_face(){
     mouth.add(sw(eyes_accomodation));
 }
 
+void Striped_rectangle::make_striped_lines(int margin){
+    int y_start = this->point(0).y;
+    int y_end = y_start + this->height();
+    int x_start = this->point(0).x;
+    int x_end = x_start + this->width();
+
+    for(int y_iterator = y_start; y_iterator < y_end; y_iterator+=margin){
+        Point first {x_start,y_iterator};
+        Point last {x_end,y_iterator};
+        lines.add(first,last);
+    }
+}
+
+Striped_rectangle::Striped_rectangle(Point x, Point y) : Rectangle(x,y){
+    make_striped_lines(5);
+}
+
+Striped_rectangle::Striped_rectangle(Point xy, int ww, int hh) : Rectangle(xy,ww,hh){
+    make_striped_lines(5);
+};
+
+void Striped_rectangle::move(int x, int y){
+    Rectangle::move(x,y);
+    lines.move(x,y);
+}
+
+void Striped_rectangle::draw_specifics(Painter& painter) const{
+    Rectangle::draw_specifics(painter);
+    lines.draw_specifics(painter);
+}
+
 void ex_1(){
     Application app;
     Simple_window win {zero_point,1920,1080,"ch12_ex1. "};
@@ -78,6 +109,17 @@ void ex_4(){
 
 
     win.attach(imc);
+    win.wait_for_button();
+}
+
+void ex_5(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex5. Striped_rectangle"};
+
+    Striped_rectangle s_rec {{100,100}, {200,200}};
+    s_rec.set_color(Color::white);
+
+    win.attach(s_rec);
     win.wait_for_button();
 }
 }

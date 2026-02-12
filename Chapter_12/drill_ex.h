@@ -35,11 +35,25 @@ struct Frowny : Face {
 
 struct Immobile_Circle : Circle{
     Immobile_Circle(Point p, int rr) : Circle(p,rr){};
-    void move(int x, int y) {x+=y;y+=x;error("cant't move");}
+    void move(int x, int y) {x+=y;y+=x;error("cant't move");} // do first 2 states because IDE not allow not using variables
+};
+
+struct Striped_rectangle : Rectangle {
+    Striped_rectangle(Point x, Point y);
+    Striped_rectangle(Point xy, int ww, int hh);
+
+    void move(int x, int y) override;
+    void draw_specifics(Painter& painter) const override;
+
+
+private:
+    void make_striped_lines(int margin = 5);
+    Lines lines;
 };
 
 void ex_1();
 void ex_4();
+void ex_5();
 
 }
 
