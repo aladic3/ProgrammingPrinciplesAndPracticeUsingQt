@@ -6,7 +6,7 @@
 int main(int /*argc*/, char * /*argv*/[])
 {
     try{
-        ch12::drill::virtual_func_drill();
+        ch12::exercices::ex_1();
     }catch(std::exception& ex){
         std::cerr << ex.what();
     }
