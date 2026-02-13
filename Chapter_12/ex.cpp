@@ -81,6 +81,41 @@ void Striped_rectangle::draw_specifics(Painter& painter) const{
     lines.draw_specifics(painter);
 }
 
+vector<pair<Point,Point>> get_coordinates_stripe_circle(Point center, int radius,
+                                                         int margin = 5){
+    vector<pair<Point,Point>> result;
+    const int y_start = center.y - radius;
+    const int y_end = center.y + radius;
+
+    for (int y = y_start; y < y_end; y+=margin){
+        int dy = y - center.y;
+        double half_width = sqrt(radius*radius - dy*dy);
+        int x_left = static_cast<int>(lround(center.x - half_width));
+        int x_right = static_cast<int>(lround(center.x + half_width));
+
+        Point left_point {x_left,y};
+        Point right_point {x_right, y};
+
+        result.push_back({left_point,right_point});
+    }
+
+    return result;
+}
+
+Striped_circle::Striped_circle(Point p, int r) : Circle(p, r){
+    int margin = 15;
+    auto lines_coordinates = get_coordinates_stripe_circle(p,r,margin);
+
+    for (auto& line : lines_coordinates) {
+        lines.add(line.first,line.second);
+    }
+}
+
+void Striped_circle::draw_specifics(Painter& painter) const{
+    Circle::draw_specifics(painter);
+    lines.draw_specifics(painter);
+}
+
 void ex_1(){
     Application app;
     Simple_window win {zero_point,1920,1080,"ch12_ex1. "};
@@ -97,7 +132,6 @@ void ex_1(){
     win.attach(sm);
     win.attach(fr);
     win.wait_for_button();
-
 }
 
 void ex_4(){
@@ -120,6 +154,31 @@ void ex_5(){
     s_rec.set_color(Color::white);
 
     win.attach(s_rec);
+    win.wait_for_button();
+}
+
+void ex_6(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex6. Striped_circle"};
+
+    Striped_circle s_cir {{200,200},100};
+    s_cir.set_color(Color::white);
+
+    win.attach(s_cir);
+    win.wait_for_button();
+}
+
+void ex_8(){
+
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex8. Regular octagon"};
+
+    Octagon oct {{200,200}, 100};
+    oct.set_color(Color::white);
+    oct.move(100,100);
+    oct.set_fill_color(Color::green);
+
+    win.attach(oct);
     win.wait_for_button();
 }
 }

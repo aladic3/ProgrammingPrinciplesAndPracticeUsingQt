@@ -51,10 +51,25 @@ private:
     Lines lines;
 };
 
+struct Striped_circle : Circle {
+    Striped_circle(Point p, int r);
+
+    void draw_specifics(Painter& painter) const override;
+
+private:
+    Lines lines;
+};
+
+struct Octagon : ch11::exercises::Regular_polygon{
+    Octagon(Point center, int radius) :
+        ch11::exercises::Regular_polygon(center,radius,8){};
+};
+
 void ex_1();
 void ex_4();
 void ex_5();
-
+void ex_6();
+void ex_8();
 }
 
 
