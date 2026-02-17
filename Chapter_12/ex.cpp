@@ -116,6 +116,176 @@ void Striped_circle::draw_specifics(Painter& painter) const{
     lines.draw_specifics(painter);
 }
 
+Point calc_inersection(const pair<Point,Point>& line1,
+                                const pair<Point,Point>& line2){
+    Point result;
+    double t = 0;
+    int dx1 = line1.second.x - line1.first.x;
+    int dy1 = line1.second.y - line1.first.y;
+
+    int dx2 = line2.second.x - line2.first.x;
+    int dy2 = line2.second.y - line2.first.y;
+
+    Point d1 {dx1,dy1};
+    Point d2 {dx2,dy2};
+    Point r1 {line1.first.x,line1.first.y};
+    Point r2 {line2.first.x,line2.first.y};
+
+    double delta = d1.y * d2.x - d1.x * d2.y;
+
+    if (delta == 0){
+        cout << "delta == 0";
+        return {};
+    }
+
+    t = (r2.x - r1.x) * (-d2.y) - (r2.y - r1.y) * (-d2.x);
+    t /= delta;
+
+    result.x = static_cast<int>(lround(r1.x + t * d1.x));
+    result.y = static_cast<int>(lround(r1.y + t * d1.y));
+
+    return result;
+}
+
+
+
+void sort_lines_by_x(vector<pair<Point,Point>>& poly_lines) { //bubble method
+    for (size_t i = 0; i < poly_lines.size() - 1; ++i)
+        for (size_t j = i+1; j < poly_lines.size(); ++j) {
+            auto& a = poly_lines[i];
+            auto& b = poly_lines[j];
+
+            if (a.first.x > b.first.x)
+                std::swap(a,b);
+        }
+}
+
+void arrange_lines_by_x_coordinate(vector<pair<Point,Point>>& poly_lines){
+    // first point must be always lowest by x
+    for (auto& line : poly_lines)
+        if (line.second.x < line.first.x)
+            swap(line.first,line.second);
+
+
+    sort_lines_by_x(poly_lines);
+}
+
+void sort_points_by_x(vector<Point>& points) { //bubble method
+    for (size_t i = 0; i < points.size() - 1; ++i)
+        for (size_t j = i+1; j < points.size(); ++j) {
+            auto& a = points[i];
+            auto& b = points[j];
+
+            if (a.x > b.x)
+                std::swap(a,b);
+        }
+}
+
+void sort_points_by_y(vector<Point>& points) { //bubble method
+    for (size_t i = 0; i < points.size() - 1; ++i)
+        for (size_t j = i+1; j < points.size(); ++j) {
+            auto& a = points[i];
+            auto& b = points[j];
+
+            if (a.y > b.y)
+                std::swap(a,b);
+        }
+}
+
+pair<int,int> get_min_max_x(vector<Point>& points){
+    sort_points_by_x(points);
+    return {points.front().x, points.back().x};
+}
+
+pair<int,int> get_min_max_y(vector<Point>& points){
+    sort_points_by_y(points);
+    return {points.front().y, points.back().y};
+}
+
+void init_points_and_lines(std::initializer_list<Point>& p, vector<Point>& points,
+                       vector<pair<Point,Point>>& poly_lines){
+    if (p.size() < 3)
+        error("can't create striped closed polyline");
+
+    poly_lines.push_back({*p.begin(),*(p.end()-1)});
+    points.push_back(*p.begin());
+
+    for (auto it = p.begin()+1; it != p.end(); ++it){
+        poly_lines.push_back({*(it-1),*it});
+        points.push_back(*it);
+    }
+}
+
+vector<pair<Point,Point>> calculate_striped_lines_coordinates_poly(std::initializer_list<Point>& p,
+                                                                    int margin = 5){
+    pair<int,int> min_max_x {0,0};
+    pair<int,int> min_max_y {0,0};
+
+    vector<pair<Point,Point>> result;
+    vector<pair<Point,Point>> poly_lines;
+    vector<Point> points;
+
+    init_points_and_lines(p,points,poly_lines);
+    //arrange_lines_by_x_coordinate(poly_lines);
+
+    min_max_x = get_min_max_x(points);
+    min_max_y = get_min_max_y(points);
+
+    for (int y = min_max_y.first; y < min_max_y.second; y+=margin){
+        pair<Point,Point> y_line {{min_max_x.first,y},{min_max_x.second,y}};
+        Point ignored_point{0, 0};
+        vector<int> intersections_for_this_y;// {0};
+
+        for (auto& poly_line : poly_lines){
+            if(!line_segment_intersect(poly_line.first, poly_line.second,
+                                        y_line.first,y_line.second, ignored_point)){
+                continue;
+            }
+
+            int x_intersection = calc_inersection(poly_line,y_line).x;
+
+            intersections_for_this_y.push_back(x_intersection);
+
+        }
+
+       const size_t start = intersections_for_this_y.size() % 2  == 0 ? 1
+                    : intersections_for_this_y.front() == intersections_for_this_y[1]
+                    ? 2 : 1;
+
+        for (size_t i = start; i < intersections_for_this_y.size(); i+=2){
+            int first_x = intersections_for_this_y[i-1];
+            int second_x = intersections_for_this_y[i];
+
+            if (first_x == second_x)
+                continue;
+
+            Point first {first_x,y};
+            Point second {second_x,y};
+
+            result.push_back({first,second});
+        }
+    }
+
+    return result;
+}
+
+Striped_closed_polyline::Striped_closed_polyline(std::initializer_list<Point> p) :
+    Closed_polyline(p){
+    auto stiped_lines_coordinates = calculate_striped_lines_coordinates_poly(p);
+
+    for (auto& line_coordinates : stiped_lines_coordinates)
+        this->lines.add(line_coordinates.first, line_coordinates.second);
+
+}
+
+void Striped_closed_polyline::draw_specifics(Painter& painter) const {
+    Closed_polyline::draw_specifics(painter);
+    lines.draw_specifics(painter);
+}
+
+
+
+
 void ex_1(){
     Application app;
     Simple_window win {zero_point,1920,1080,"ch12_ex1. "};
@@ -165,6 +335,64 @@ void ex_6(){
     s_cir.set_color(Color::white);
 
     win.attach(s_cir);
+    win.wait_for_button();
+}
+
+void ex_7(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex6. Striped_polyline"};
+
+    Striped_closed_polyline scp {{100,400},{200,150},{300,550},{350,50},{550,300}};
+    Striped_closed_polyline scp1 {
+        {250,250},{350,200},{450,250},{400,350},{300,350}
+    };
+    Striped_closed_polyline scp2 {
+        {100,100},{200,80},{300,120},{320,200},{220,240},{120,180}
+    };
+    Striped_closed_polyline scp3 {
+        {150,400},{250,300},{350,420},{300,500},{200,470}
+    };
+
+    Striped_closed_polyline scp4 {
+        {500,100},{650,100},{650,250},{575,200},{500,250}
+    };
+    Striped_closed_polyline scp5 {
+        {50,50},{750,80},{700,500},{400,580},{100,450}
+    };
+    Striped_closed_polyline scp6 {
+        {400,100},{450,250},{600,250},{475,350},
+        {525,500},{400,400},{275,500},{325,350},
+        {200,250},{350,250}
+    };
+    Striped_closed_polyline scp7 {
+        {700,400},{730,420},{710,450},{680,440}
+    };
+    Striped_closed_polyline scp8 {
+        {100,550},{200,520},{300,560},{400,530},
+        {500,570},{600,540},{700,580}
+    };
+    Striped_closed_polyline scp9 {
+        {600,300},{750,450},{550,500}
+    };
+    Striped_closed_polyline scp10 {
+        {300,150},{450,120},{520,200},{480,280},
+        {520,360},{400,420},{300,350},{260,250}
+    };
+
+win.attach(scp4);
+
+win.attach(scp1);
+win.attach(scp2);
+
+win.attach(scp3);
+  //win.attach(scp5);
+
+  win.attach(scp6);
+   win.attach(scp7);
+    win.attach(scp8);
+    win.attach(scp9);
+   // win.attach(scp10);
+  win.attach(scp);
     win.wait_for_button();
 }
 

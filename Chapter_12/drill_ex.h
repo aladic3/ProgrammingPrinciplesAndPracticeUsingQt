@@ -65,10 +65,19 @@ struct Octagon : ch11::exercises::Regular_polygon{
         ch11::exercises::Regular_polygon(center,radius,8){};
 };
 
+struct Striped_closed_polyline : Closed_polyline{ // v1 stable without strong invariants
+    Striped_closed_polyline(std::initializer_list<Point> p = {});
+    void draw_specifics(Painter& painter) const override;
+
+private:
+    Lines lines;
+};
+
 void ex_1();
 void ex_4();
 void ex_5();
 void ex_6();
+void ex_7();
 void ex_8();
 }
 

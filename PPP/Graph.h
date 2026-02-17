@@ -456,6 +456,7 @@ private:
     std::unique_ptr<ImagePrivate> impl;
 };
 
+bool line_segment_intersect(Point p1, Point p2, Point p3, Point p4, Point &intersection);
 }
 #endif
 
