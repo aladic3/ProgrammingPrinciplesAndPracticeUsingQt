@@ -82,6 +82,11 @@ private:
     Lines sides;
 };
 
+struct Box : Pie {
+    Box(Point p, int ww, int hh) : Pie(p,ww,hh,90,180) {}
+};
+
+
 void ex_1();
 void ex_4();
 void ex_5();
@@ -89,6 +94,7 @@ void ex_6();
 void ex_7();
 void ex_8();
 void ex_9();
+void ex_10();
 }
 
 

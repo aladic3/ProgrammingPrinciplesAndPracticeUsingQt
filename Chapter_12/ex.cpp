@@ -505,4 +505,17 @@ void ex_9(){
     win.attach(rounded);
     win.wait_for_button();
 }
+
+void ex_10(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex10. class Box"};
+
+    Box box {{300,100}, 300, 50};
+    box.move(100,0);
+    box.set_fill_color(Color::blue);
+
+    win.attach(box);
+    win.wait_for_button();
+
+}
 }
