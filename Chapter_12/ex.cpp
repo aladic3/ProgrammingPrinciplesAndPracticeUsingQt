@@ -284,7 +284,90 @@ void Striped_closed_polyline::draw_specifics(Painter& painter) const {
 }
 
 
+struct Corners {
+    Corners(int ww, int hh, Point p, int size_corner) : size_corner(size_corner){
+        ltop_p.first = p;
+        ltop_p.second = p;
+        ltop_p.first.x += size_corner;
+        ltop_p.second.y += size_corner;
 
+        rtop_p.first = p;
+        rtop_p.second = p;
+        rtop_p.first.x += ww - size_corner;
+        rtop_p.second.x += ww;
+        rtop_p.second.y += size_corner;
+
+        llow_p.first = p;
+        llow_p.second = p;
+        llow_p.first.y += hh - size_corner;
+        llow_p.second.x += size_corner;
+        llow_p.second.y += hh;
+
+        rlow_p.first.y = llow_p.first.y;
+        rlow_p.first.x = rtop_p.second.x;
+        rlow_p.second.x = rtop_p.first.x;
+        rlow_p.second.y = llow_p.second.y;
+    }
+
+    pair<Point,Point> ltop_p, rtop_p, llow_p, rlow_p;
+    const int size_corner;
+};
+
+/*    f     f
+ *  o x --- x o
+ * sx         xs
+ *  |         |
+ *  |         |
+ *  |         |
+ * fx         xf
+ *  o x --- x o
+ *    s     s
+ */
+
+
+Rounded::Rounded(Point p, int ww, int hh){
+    const int size_corner = 20; //pixel
+
+    Corners corners(ww,hh,p,size_corner);
+
+    sides.add(corners.ltop_p.first,corners.rtop_p.first);
+    sides.add(corners.rtop_p.second,corners.rlow_p.first);
+    sides.add(corners.rlow_p.second,corners.llow_p.second);
+    sides.add(corners.ltop_p.second,corners.llow_p.first);
+
+    //int count_circle_px = pi*size_corner*2;
+    vector<Point> r_p {{corners.ltop_p.first.x,corners.ltop_p.first.y + size_corner},
+                      {corners.rtop_p.first.x,corners.rtop_p.first.y + size_corner},
+                      {corners.rlow_p.first.x - size_corner,corners.rlow_p.first.y},
+                      {corners.llow_p.first.x + size_corner,corners.llow_p.first.y}};
+
+    rounded_corners.push_back(make_unique<Arc>(r_p[0],
+                                               size_corner,size_corner,
+                                               90,90));
+    rounded_corners.push_back(make_unique<Arc>(r_p[1],
+                                               size_corner,size_corner,
+                                               0,90));
+    rounded_corners.push_back(make_unique<Arc>(r_p[2],
+                                               size_corner,size_corner,
+                                               270,90));
+    rounded_corners.push_back(make_unique<Arc>(r_p[3],
+                                               size_corner,size_corner,
+                                               180,90));
+}
+
+void Rounded::draw_specifics(Painter& painter) const {
+    sides.draw_specifics(painter);
+
+    for(auto& corner : rounded_corners)
+        corner->draw_specifics(painter);
+}
+
+void Rounded::move(int x, int y) {
+    sides.move(x,y);
+
+    for(auto& corner : rounded_corners)
+        corner->move(x,y);
+}
 
 void ex_1(){
     Application app;
@@ -407,6 +490,19 @@ void ex_8(){
     oct.set_fill_color(Color::green);
 
     win.attach(oct);
+    win.wait_for_button();
+}
+
+void ex_9(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex9. Rounded"};
+
+    Rounded rounded ({300,200},300,150);
+    rounded.move(50,100);
+    rounded.set_color(Color::blue);
+
+
+    win.attach(rounded);
     win.wait_for_button();
 }
 }

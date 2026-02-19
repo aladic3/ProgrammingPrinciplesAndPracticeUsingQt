@@ -73,12 +73,22 @@ private:
     Lines lines;
 };
 
+struct Rounded : Shape {
+    Rounded(Point p, int ww, int hh);
+    void draw_specifics(Painter& painter) const override;
+    void move(int x, int y) override;
+private:
+    Vector_ref<Arc> rounded_corners;
+    Lines sides;
+};
+
 void ex_1();
 void ex_4();
 void ex_5();
 void ex_6();
 void ex_7();
 void ex_8();
+void ex_9();
 }
 
 
