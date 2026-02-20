@@ -86,6 +86,22 @@ struct Box : Pie {
     Box(Point p, int ww, int hh) : Pie(p,ww,hh,90,180) {}
 };
 
+struct Group : Shape {
+    Group(){}
+    Group(bool is_checkers, Point pp = {100,100}, int size_board = 400);
+
+    void add_shape(Shape& sh){ shapes.push_back(sh);}
+
+    void move_checker_left();
+    void move_checker_right();
+
+    void move(int dx, int dy) override;
+    void draw_specifics(Painter& painter) const override;
+private:
+    Vector_ref<Shape> shapes;
+    int size_board = 400;
+};
+
 
 void ex_1();
 void ex_4();
@@ -95,6 +111,8 @@ void ex_7();
 void ex_8();
 void ex_9();
 void ex_10();
+void ex_11();
+
 }
 
 

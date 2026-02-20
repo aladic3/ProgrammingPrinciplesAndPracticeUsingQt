@@ -369,6 +369,109 @@ void Rounded::move(int x, int y) {
         corner->move(x,y);
 }
 
+void create_board(Vector_ref<Shape>& shapes, Point pp, int size_board ){
+    const int count_rect = 8;
+    const int ww = size_board / count_rect;
+
+    for (int i = 0; i < count_rect; ++i){
+        for(int j = 0; j < count_rect; ++j){
+            Point location = pp;
+
+            location.x += size_board/count_rect * j;
+            location.y += size_board/count_rect * i;
+
+            shapes.push_back(make_unique<Rectangle>(location,ww,ww));
+
+            const int last_index = shapes.size();
+            const int offset = i % 2;
+            Color col = (i*count_rect + j + offset) % 2 == 0 ? Color::black : Color::yellow;
+            shapes[last_index-1].set_fill_color(col);
+
+            std::cout << "index: " << i << " " << j
+                      << " coord: " << location.x << " " << location.y << endl;
+        }
+    }
+}
+
+void create_checkers(Vector_ref<Shape>& shapes, int size_board){
+    const int count_rect = static_cast<int>(sqrt(shapes.size()));
+    const int size_rect = size_board / count_rect;
+    const int size_checker = static_cast<int>(lround(size_rect / 2 * 0.8));
+
+    for (int i = 0; i < count_rect; ++i)
+        for (int j = 0; j < count_rect; ++j){
+            const int current_rect_index = i*count_rect + j;
+
+            if (shapes[current_rect_index].fill_color().as_int() != Color::black)
+                continue;
+
+            Point current_coord = shapes[current_rect_index].point(0);
+            current_coord.x += size_rect / 2;
+            current_coord.y += size_rect / 2;
+
+            shapes.push_back(make_unique<Circle>(current_coord,size_checker));
+            const int last_el_ind = shapes.size() - 1;
+            shapes[last_el_ind].set_fill_color(Color::blue);
+        }
+}
+
+void create_checker_on_last_rect(Vector_ref<Shape>& shapes, int size_board, Color color){
+    const int count_rect = static_cast<int>(sqrt(shapes.size()));
+    const int size_rect = size_board / count_rect;
+    const int size_checker = static_cast<int>(lround(size_rect / 2 * 0.8));
+
+
+    Point current_coord = shapes[shapes.size()-1].point(0);
+    std::cout << "index: last"
+              << " coord: " << current_coord.x << " " << current_coord.y << endl;
+
+    current_coord.x += size_rect / 2;
+    current_coord.y += size_rect / 2;
+
+    shapes.push_back(make_unique<Circle>(current_coord,size_checker));
+    const int last_el_ind = shapes.size() - 1;
+    shapes[last_el_ind].set_fill_color(color);
+
+    std::cout << "index: last"
+              << " coord: " << current_coord.x << " " << current_coord.y << endl;
+
+
+
+}
+
+Group::Group(bool is_checkers, Point pp, int size_board) : size_board(size_board){
+    if (!is_checkers)
+        return;
+
+    create_board(shapes,pp,size_board);
+    //create_checkers(shapes,size_board);
+    create_checker_on_last_rect(shapes,size_board,Color::white);
+}
+
+void Group::move_checker_left(){
+    const int count_rect = static_cast<int>(sqrt(shapes.size()));
+    const int size_rect = size_board / count_rect;
+
+    const int checker_index = shapes.size() - 1;
+    shapes[checker_index].move(-size_rect,-size_rect);
+}
+void Group::move_checker_right(){
+    const int count_rect = static_cast<int>(sqrt(shapes.size()));
+    const int size_rect = size_board / count_rect;
+
+    const int checker_index = shapes.size() - 1;
+    shapes[checker_index].move(+size_rect,-size_rect);
+}
+
+void Group::move(int dx, int dy){
+    for(auto& el : this->shapes)
+        el->move(dx,dy);
+}
+void Group::draw_specifics(Painter& painter) const{
+    for(auto& el : this->shapes)
+        el->draw(painter);
+}
+
 void ex_1(){
     Application app;
     Simple_window win {zero_point,1920,1080,"ch12_ex1. "};
@@ -515,6 +618,21 @@ void ex_10(){
     box.set_fill_color(Color::blue);
 
     win.attach(box);
+    win.wait_for_button();
+
+}
+
+void ex_11(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex11. class Group"};
+
+    Group gr{true};
+    gr.move_checker_left();
+    gr.move_checker_right();
+
+    Rounded rounded ({300,200},300,150);
+    gr.add_shape(rounded);
+    win.attach(gr);
     win.wait_for_button();
 
 }
