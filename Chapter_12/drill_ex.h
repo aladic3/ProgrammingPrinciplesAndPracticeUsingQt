@@ -90,7 +90,9 @@ struct Group : Shape {
     Group(){}
     Group(bool is_checkers, Point pp = {100,100}, int size_board = 400);
 
-    void add_shape(Shape& sh){ shapes.push_back(sh);}
+    void add_shape(unique_ptr<Shape> sh) {shapes.push_back(std::move(sh));}
+    void set_fill_color_last_el(Color col) {shapes.back()->set_fill_color(col);}
+    void set_color_last_el(Color col) {shapes.back()->set_color(col);}
 
     void move_checker_left();
     void move_checker_right();
@@ -98,10 +100,19 @@ struct Group : Shape {
     void move(int dx, int dy) override;
     void draw_specifics(Painter& painter) const override;
 private:
-    Vector_ref<Shape> shapes;
+    vector<unique_ptr<Shape>> shapes;
     int size_board = 400;
 };
 
+struct Pseudo_window : Shape {
+
+    Pseudo_window(Point pp, int ww, int hh, const string label);
+
+    void move(int dx, int dy) override;
+    void draw_specifics(Painter& painter) const override;
+private:
+    Group elements{};
+};
 
 void ex_1();
 void ex_4();
@@ -112,6 +123,7 @@ void ex_8();
 void ex_9();
 void ex_10();
 void ex_11();
+void ex_12();
 
 }
 

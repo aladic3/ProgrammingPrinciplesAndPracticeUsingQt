@@ -369,7 +369,7 @@ void Rounded::move(int x, int y) {
         corner->move(x,y);
 }
 
-void create_board(Vector_ref<Shape>& shapes, Point pp, int size_board ){
+void create_board(vector<unique_ptr<Shape>>& shapes, Point pp, int size_board ){
     const int count_rect = 8;
     const int ww = size_board / count_rect;
 
@@ -385,7 +385,7 @@ void create_board(Vector_ref<Shape>& shapes, Point pp, int size_board ){
             const int last_index = shapes.size();
             const int offset = i % 2;
             Color col = (i*count_rect + j + offset) % 2 == 0 ? Color::black : Color::yellow;
-            shapes[last_index-1].set_fill_color(col);
+            shapes[last_index-1]->set_fill_color(col);
 
             std::cout << "index: " << i << " " << j
                       << " coord: " << location.x << " " << location.y << endl;
@@ -415,13 +415,13 @@ void create_checkers(Vector_ref<Shape>& shapes, int size_board){
         }
 }
 
-void create_checker_on_last_rect(Vector_ref<Shape>& shapes, int size_board, Color color){
+void create_checker_on_last_rect(vector<unique_ptr<Shape>>& shapes, int size_board, Color color){
     const int count_rect = static_cast<int>(sqrt(shapes.size()));
     const int size_rect = size_board / count_rect;
     const int size_checker = static_cast<int>(lround(size_rect / 2 * 0.8));
 
 
-    Point current_coord = shapes[shapes.size()-1].point(0);
+    Point current_coord = shapes[shapes.size()-1]->point(0);
     std::cout << "index: last"
               << " coord: " << current_coord.x << " " << current_coord.y << endl;
 
@@ -430,7 +430,7 @@ void create_checker_on_last_rect(Vector_ref<Shape>& shapes, int size_board, Colo
 
     shapes.push_back(make_unique<Circle>(current_coord,size_checker));
     const int last_el_ind = shapes.size() - 1;
-    shapes[last_el_ind].set_fill_color(color);
+    shapes[last_el_ind]->set_fill_color(color);
 
     std::cout << "index: last"
               << " coord: " << current_coord.x << " " << current_coord.y << endl;
@@ -453,14 +453,14 @@ void Group::move_checker_left(){
     const int size_rect = size_board / count_rect;
 
     const int checker_index = shapes.size() - 1;
-    shapes[checker_index].move(-size_rect,-size_rect);
+    shapes[checker_index]->move(-size_rect,-size_rect);
 }
 void Group::move_checker_right(){
     const int count_rect = static_cast<int>(sqrt(shapes.size()));
     const int size_rect = size_board / count_rect;
 
     const int checker_index = shapes.size() - 1;
-    shapes[checker_index].move(+size_rect,-size_rect);
+    shapes[checker_index]->move(+size_rect,-size_rect);
 }
 
 void Group::move(int dx, int dy){
@@ -470,6 +470,48 @@ void Group::move(int dx, int dy){
 void Group::draw_specifics(Painter& painter) const{
     for(auto& el : this->shapes)
         el->draw(painter);
+}
+
+Pseudo_window::Pseudo_window(Point pp, int ww, int hh, const string label){
+    // window
+    const int radius_button = 5;
+    const int size_top_field = 20;
+
+    //Circle red_button {{pp.x + 10, pp.y + radius_button + 5}, radius_button};
+    //red_button.set_fill_color(Color::red);
+
+    //Text win_label {, label};
+
+    //Line ln {Point{pp.x,pp.y+size_top_field}, Point{pp.x+ww,pp.y+size_top_field}};
+
+
+    this->elements.add_shape(make_unique<Rounded>(pp,ww,hh));
+    this->elements.add_shape(make_unique<Text>(Point{pp.x + 3*ww/4, pp.y + 4}, label));
+
+
+    this->elements.add_shape(make_unique<Circle>(Point{pp.x + 15, pp.y + radius_button + 5}, radius_button));
+    this->elements.set_fill_color_last_el(Color::red);
+
+    this->elements.add_shape(make_unique<Circle>(Point{pp.x + 30, pp.y + radius_button + 5}, radius_button));
+    this->elements.set_fill_color_last_el(Color::yellow);
+
+    this->elements.add_shape(make_unique<Circle>(Point{pp.x + 45, pp.y + radius_button + 5}, radius_button));
+    this->elements.set_fill_color_last_el(Color::green);
+
+
+    this->elements.add_shape(make_unique<Line>(Point{pp.x,pp.y+size_top_field}, Point{pp.x+ww,pp.y+size_top_field}));
+
+    this->elements.add_shape(make_unique<Image>(Point{pp.x + 10, pp.y + size_top_field*2}, "image2.PNG"));
+    //Image im {Point{pp.x + 10, pp.y + size_top_field + 3}, "image2.PNG"};
+
+}
+
+void Pseudo_window::move(int dx, int dy){
+    elements.move(dx,dy);
+}
+
+void Pseudo_window::draw_specifics(Painter& painter) const{
+    elements.draw_specifics(painter);
 }
 
 void ex_1(){
@@ -630,9 +672,21 @@ void ex_11(){
     gr.move_checker_left();
     gr.move_checker_right();
 
-    Rounded rounded ({300,200},300,150);
-    gr.add_shape(rounded);
+
+    gr.add_shape(make_unique<Rounded>(Point{300,200},300,150));
     win.attach(gr);
+    win.wait_for_button();
+
+}
+
+void ex_12(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex12. Pseudo_window"};
+
+    Pseudo_window ps {{20,20}, 800, 600, "Pseudo_win"};
+    ps.move(300,500);
+
+    win.attach(ps);
     win.wait_for_button();
 
 }
