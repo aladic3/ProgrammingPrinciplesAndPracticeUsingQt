@@ -114,6 +114,31 @@ private:
     Group elements{};
 };
 
+
+struct Binary_tree : Shape {
+    enum Kind_node_shape {
+        b_circle,b_rectangle,b_triangle
+    };
+    void set_color(Color col) {node_shape->set_color(col); if (levels == 1) return; left_node->set_color(col); right_node->set_color(col);}
+    Binary_tree(size_t ll = 0,
+                const string& label = "Bin",
+                Point pp = {100,100},
+                Kind_node_shape kind = b_circle);
+    void move(int dx, int dy) override;
+    void draw_specifics(Painter& painter) const override;
+
+private:
+    size_t levels = 0; // 0 - zero node, 1 - single node, 2 - single with two subnodes
+    unique_ptr<Shape> node_shape; // rect, triangle, circle or any another shape
+    unique_ptr<Lines> lr_lines;
+    unique_ptr<Text> label_node;
+
+
+    unique_ptr<Binary_tree> left_node;
+    unique_ptr<Binary_tree> right_node;
+
+};
+
 void ex_1();
 void ex_4();
 void ex_5();
@@ -124,6 +149,7 @@ void ex_9();
 void ex_10();
 void ex_11();
 void ex_12();
+void ex_13();
 
 }
 

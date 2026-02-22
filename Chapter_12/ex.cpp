@@ -473,17 +473,9 @@ void Group::draw_specifics(Painter& painter) const{
 }
 
 Pseudo_window::Pseudo_window(Point pp, int ww, int hh, const string label){
-    // window
+
     const int radius_button = 5;
     const int size_top_field = 20;
-
-    //Circle red_button {{pp.x + 10, pp.y + radius_button + 5}, radius_button};
-    //red_button.set_fill_color(Color::red);
-
-    //Text win_label {, label};
-
-    //Line ln {Point{pp.x,pp.y+size_top_field}, Point{pp.x+ww,pp.y+size_top_field}};
-
 
     this->elements.add_shape(make_unique<Rounded>(pp,ww,hh));
     this->elements.add_shape(make_unique<Text>(Point{pp.x + 3*ww/4, pp.y + 4}, label));
@@ -502,7 +494,7 @@ Pseudo_window::Pseudo_window(Point pp, int ww, int hh, const string label){
     this->elements.add_shape(make_unique<Line>(Point{pp.x,pp.y+size_top_field}, Point{pp.x+ww,pp.y+size_top_field}));
 
     this->elements.add_shape(make_unique<Image>(Point{pp.x + 10, pp.y + size_top_field*2}, "image2.PNG"));
-    //Image im {Point{pp.x + 10, pp.y + size_top_field + 3}, "image2.PNG"};
+
 
 }
 
@@ -513,6 +505,70 @@ void Pseudo_window::move(int dx, int dy){
 void Pseudo_window::draw_specifics(Painter& painter) const{
     elements.draw_specifics(painter);
 }
+
+void Binary_tree::move(int dx, int dy){
+    if (levels == 0) return;
+
+    node_shape->move(dx,dy);
+    label_node->move(dx,dy);
+
+    if (levels == 1) return;
+
+    lr_lines->move(dx,dy);
+    left_node->move(dx,dy);
+    right_node->move(dx,dy);
+}
+
+void Binary_tree::draw_specifics(Painter& painter) const {
+    if (levels == 0) return;
+
+
+    node_shape->draw(painter);
+    label_node->draw_specifics(painter);
+
+    if (this->levels == 1) return;
+
+    lr_lines->draw_specifics(painter);
+    left_node->draw_specifics(painter);
+    right_node->draw_specifics(painter);
+}
+
+Binary_tree::Binary_tree(size_t ll, const string& label, Point p, Kind_node_shape kind) : levels(ll) {
+    int step_xy = default_size_node * 2;
+    if (ll == 0)
+        return;
+
+    switch (kind) {
+    case b_circle:
+        node_shape = make_unique<Circle>(p,default_size_node);
+        break;
+
+    case b_rectangle:
+
+        break;
+
+    case b_triangle:
+
+        break;
+
+    default:
+        node_shape = make_unique<Circle>(p,default_size_node);
+        break;
+    }
+
+    label_node = make_unique<Text>(p,label);
+
+    if (ll == 1) return;
+
+    Point left {p.x - step_xy, p.y + step_xy};
+    Point right {p.x + step_xy, p.y + step_xy};
+
+    lr_lines = make_unique<Lines>(initializer_list<Point>{p,left,p,right});
+
+    left_node = make_unique<Binary_tree>(levels-1,label,left,kind);
+    right_node = make_unique<Binary_tree>(levels-1,label,right,kind);
+}
+
 
 void ex_1(){
     Application app;
@@ -689,5 +745,17 @@ void ex_12(){
     win.attach(ps);
     win.wait_for_button();
 
+}
+
+void ex_13(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex13. Binary_tree class"};
+
+    Binary_tree bin {8};
+    bin.move(100,-50);
+    bin.set_color(Color::cyan);
+
+    win.attach(bin);
+    win.wait_for_button();
 }
 }

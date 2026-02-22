@@ -5,6 +5,7 @@
 #include "PPP/Window.h"
 #include "PPP/Simple_window.h"
 
+constexpr int default_size_node = 30;
 const double pi = std::acos(-1.0);;
 
 const int long_arrowhead = 14;
