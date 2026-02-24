@@ -114,16 +114,34 @@ private:
     Group elements{};
 };
 
+struct Node_shape_factory {
+public:
+    virtual unique_ptr<Shape> create_node(Point p, int size) const = 0;
+};
+
+struct Circle_node_factory : Node_shape_factory {
+    unique_ptr<Shape> create_node(Point p, int size) const{
+        return make_unique<Circle>(p,size);
+    }
+};
+
+struct Rectangle_node_factory : Node_shape_factory {
+    unique_ptr<Shape> create_node(Point p, int size) const{
+        return make_unique<Rectangle>(p,size,size);
+    }
+};
+
+struct Triangle_node_factory : Node_shape_factory {
+    unique_ptr<Shape> create_node(Point p, int size) const{
+        using namespace ch11::exercises;
+        return make_unique<Regular_polygon>(p,size,3);
+    }
+};
 
 struct Binary_tree : Shape {
-    enum Kind_node_shape {
-        b_circle,b_rectangle,b_triangle
-    };
-    void set_color(Color col) {node_shape->set_color(col); if (levels == 1) return; left_node->set_color(col); right_node->set_color(col);}
-    Binary_tree(size_t ll = 0,
-                const string& label = "Bin",
-                Point pp = {100,100},
-                Kind_node_shape kind = b_circle);
+    Binary_tree(size_t ll,
+                const string& label ,
+                Point pp, const Node_shape_factory& node_factory);
     void move(int dx, int dy) override;
     void draw_specifics(Painter& painter) const override;
 
@@ -150,6 +168,7 @@ void ex_10();
 void ex_11();
 void ex_12();
 void ex_13();
+void ex_14();
 
 }
 

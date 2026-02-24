@@ -522,7 +522,6 @@ void Binary_tree::move(int dx, int dy){
 void Binary_tree::draw_specifics(Painter& painter) const {
     if (levels == 0) return;
 
-
     node_shape->draw(painter);
     label_node->draw_specifics(painter);
 
@@ -533,30 +532,16 @@ void Binary_tree::draw_specifics(Painter& painter) const {
     right_node->draw_specifics(painter);
 }
 
-Binary_tree::Binary_tree(size_t ll, const string& label, Point p, Kind_node_shape kind) : levels(ll) {
+
+Binary_tree::Binary_tree(size_t ll, const string& label, Point p,
+                         const Node_shape_factory& node_factory) : levels(ll) {
     int step_xy = default_size_node * 2;
     if (ll == 0)
         return;
 
-    switch (kind) {
-    case b_circle:
-        node_shape = make_unique<Circle>(p,default_size_node);
-        break;
-
-    case b_rectangle:
-
-        break;
-
-    case b_triangle:
-
-        break;
-
-    default:
-        node_shape = make_unique<Circle>(p,default_size_node);
-        break;
-    }
 
     label_node = make_unique<Text>(p,label);
+    node_shape = node_factory.create_node(p,default_size_node);
 
     if (ll == 1) return;
 
@@ -565,8 +550,8 @@ Binary_tree::Binary_tree(size_t ll, const string& label, Point p, Kind_node_shap
 
     lr_lines = make_unique<Lines>(initializer_list<Point>{p,left,p,right});
 
-    left_node = make_unique<Binary_tree>(levels-1,label,left,kind);
-    right_node = make_unique<Binary_tree>(levels-1,label,right,kind);
+    left_node = make_unique<Binary_tree>(levels-1,label,left,node_factory);
+    right_node = make_unique<Binary_tree>(levels-1,label,right,node_factory);
 }
 
 
@@ -748,14 +733,37 @@ void ex_12(){
 }
 
 void ex_13(){
-    Application app;
-    Simple_window win {zero_point,1920,1080,"ch12_ex13. Binary_tree class"};
+        Application app;
+        Simple_window win {zero_point,1920,1080,"ch12_ex13. Binary_tree class"};
 
-    Binary_tree bin {8};
+        Circle_node_factory c;
+        Binary_tree bin {8,"l",zero_point,c};
+        bin.move(100,-50);
+
+
+        win.attach(bin);
+        win.wait_for_button();
+
+}
+
+void ex_14(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex14. Binary_tree class"};
+
+    Circle_node_factory c;
+    Rectangle_node_factory r;
+    Triangle_node_factory t;
+
+    Binary_tree bin {8,"v2",zero_point,c};
+    Binary_tree bin_r {5,"v2", {800,100},r};
+    Binary_tree bin_t {8, "triangle", {1000,100},t};
+
     bin.move(100,-50);
-    bin.set_color(Color::cyan);
+
 
     win.attach(bin);
+    win.attach(bin_r);
+    win.attach(bin_t);
     win.wait_for_button();
 }
 }
