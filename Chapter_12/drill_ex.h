@@ -115,40 +115,52 @@ private:
 };
 
 struct Node_shape_factory {
-public:
     virtual unique_ptr<Shape> create_node(Point p, int size) const = 0;
 };
 
+struct Tree_lines_factory {
+    virtual vector<unique_ptr<Shape>> create_lines(Point base_p, Point line_1, Point line_2) const = 0;
+};
+
+struct Default_line_factory : Tree_lines_factory {
+    vector<unique_ptr<Shape>> create_lines(Point base_p, Point line_1, Point line_2) const;
+};
+
+struct Arrows_factory : Tree_lines_factory {
+    vector<unique_ptr<Shape>> create_lines(Point base_p, Point line_1, Point line_2) const;
+};
+
+struct Red_arrows_up_factory : Tree_lines_factory {
+    vector<unique_ptr<Shape>> create_lines(Point base_p, Point line_1, Point line_2) const;
+};
+
 struct Circle_node_factory : Node_shape_factory {
-    unique_ptr<Shape> create_node(Point p, int size) const{
-        return make_unique<Circle>(p,size);
-    }
+    unique_ptr<Shape> create_node(Point p, int size) const{ return make_unique<Circle>(p,size); }
 };
 
 struct Rectangle_node_factory : Node_shape_factory {
-    unique_ptr<Shape> create_node(Point p, int size) const{
-        return make_unique<Rectangle>(p,size,size);
-    }
+    unique_ptr<Shape> create_node(Point p, int size) const{return make_unique<Rectangle>(p,size,size);}
 };
 
 struct Triangle_node_factory : Node_shape_factory {
-    unique_ptr<Shape> create_node(Point p, int size) const{
-        using namespace ch11::exercises;
-        return make_unique<Regular_polygon>(p,size,3);
-    }
+    unique_ptr<Shape> create_node(Point p, int size) const{using namespace ch11::exercises; return make_unique<Regular_polygon>(p,size,3);}
 };
 
 struct Binary_tree : Shape {
     Binary_tree(size_t ll,
                 const string& label ,
-                Point pp, const Node_shape_factory& node_factory);
+                Point p, const Node_shape_factory& node_factory);
+    Binary_tree(size_t ll,
+                const string& label ,
+                Point p, const Node_shape_factory& node_factory,
+                const Tree_lines_factory& lines_factory);
     void move(int dx, int dy) override;
     void draw_specifics(Painter& painter) const override;
 
 private:
     size_t levels = 0; // 0 - zero node, 1 - single node, 2 - single with two subnodes
     unique_ptr<Shape> node_shape; // rect, triangle, circle or any another shape
-    unique_ptr<Lines> lr_lines;
+    vector<unique_ptr<Shape>> lr_lines;
     unique_ptr<Text> label_node;
 
 
@@ -169,6 +181,7 @@ void ex_11();
 void ex_12();
 void ex_13();
 void ex_14();
+void ex_15();
 
 }
 

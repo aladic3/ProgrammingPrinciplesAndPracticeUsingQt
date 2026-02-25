@@ -83,9 +83,11 @@ namespace ch11::exercises{
     };
 
 
-    struct Arrow : Shape{
-        Arrow(Point p1, Point p2): dir_triangle(get_direction_triangle(p1,p2))
-        { add(p1); add(p2); Shape::set_fill_color(Color::black);}
+    struct Arrow : Line{
+        Arrow(Point p1, Point p2): Line(p1,p2),dir_triangle(get_direction_triangle(p1,p2))
+        { Shape::set_fill_color(Color::black);}
+
+        void set_color(Color col) {Shape::set_fill_color(col);Shape::set_color(col);}
 
         void draw_specifics(Painter& painter) const override;
         void move(int dx, int dy) override;
