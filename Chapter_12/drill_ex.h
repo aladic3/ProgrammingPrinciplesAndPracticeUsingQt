@@ -130,8 +130,12 @@ struct Arrows_factory : Tree_lines_factory {
     vector<unique_ptr<Shape>> create_lines(Point base_p, Point line_1, Point line_2) const;
 };
 
-struct Red_arrows_up_factory : Tree_lines_factory {
+struct Any_color_arrows_up_factory : Tree_lines_factory {
+    Any_color_arrows_up_factory (Color col) : lcol(col){};
     vector<unique_ptr<Shape>> create_lines(Point base_p, Point line_1, Point line_2) const;
+
+private:
+    Color lcol;
 };
 
 struct Circle_node_factory : Node_shape_factory {
@@ -146,28 +150,44 @@ struct Triangle_node_factory : Node_shape_factory {
     unique_ptr<Shape> create_node(Point p, int size) const{using namespace ch11::exercises; return make_unique<Regular_polygon>(p,size,3);}
 };
 
+struct Binary_tree_parameters{
+    Binary_tree_parameters(size_t ll,
+                           const string& label ,
+                           Point p):ll(ll),label(label),p(p){};
+
+    const size_t ll;
+    const string& label;
+    const Point p;
+};
+
 struct Binary_tree : Shape {
-    Binary_tree(size_t ll,
-                const string& label ,
-                Point p, const Node_shape_factory& node_factory);
-    Binary_tree(size_t ll,
-                const string& label ,
-                Point p, const Node_shape_factory& node_factory,
+    Binary_tree(Binary_tree_parameters& parameters,
+                const Node_shape_factory& node_factory);
+    Binary_tree(Binary_tree_parameters& parameters,
+                const Node_shape_factory& node_factory,
                 const Tree_lines_factory& lines_factory);
+
     void move(int dx, int dy) override;
     void draw_specifics(Painter& painter) const override;
+    void change_label_base_node(const string&);
 
+    size_t get_levels() const {return levels;}
+    Binary_tree& get_left_node() {return *left_node;}
+    Binary_tree& get_right_node() {return *right_node;}
 private:
     size_t levels = 0; // 0 - zero node, 1 - single node, 2 - single with two subnodes
     unique_ptr<Shape> node_shape; // rect, triangle, circle or any another shape
     vector<unique_ptr<Shape>> lr_lines;
     unique_ptr<Text> label_node;
 
-
     unique_ptr<Binary_tree> left_node;
     unique_ptr<Binary_tree> right_node;
-
 };
+
+// path example: lrrl
+// 'l' mean go to left node from base node
+// 'r' mean to right
+void change_label_by_path_to_node(const string& path, const string& label, Binary_tree&);
 
 void ex_1();
 void ex_4();
@@ -182,6 +202,7 @@ void ex_12();
 void ex_13();
 void ex_14();
 void ex_15();
+void ex_16();
 
 }
 

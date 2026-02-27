@@ -506,6 +506,43 @@ void Pseudo_window::draw_specifics(Painter& painter) const{
     elements.draw_specifics(painter);
 }
 
+
+vector<unique_ptr<Shape>> Any_color_arrows_up_factory::create_lines(Point base_p, Point line_1, Point line_2) const{
+    using namespace ch11::exercises;
+
+    vector<unique_ptr<Shape>> res;
+
+    unique_ptr<Arrow> a1 = make_unique<Arrow>(line_1,base_p);
+    unique_ptr<Arrow> a2 = make_unique<Arrow>(line_2,base_p);
+
+    a1->set_color(lcol);
+    a2->set_color(lcol);
+
+    res.push_back(std::move(a1));
+    res.push_back(std::move(a2));
+
+    return res;
+}
+
+vector<unique_ptr<Shape>> Arrows_factory::create_lines(Point base_p, Point line_1, Point line_2) const{
+    using namespace ch11::exercises;
+
+    vector<unique_ptr<Shape>> res;
+
+    res.push_back(make_unique<Arrow>(base_p,line_1));
+    res.push_back(make_unique<Arrow>(base_p,line_2));
+
+    return res;
+}
+
+vector<unique_ptr<Shape>> Default_line_factory::create_lines(Point base_p, Point line_1, Point line_2) const{
+    vector<unique_ptr<Shape>> res;
+    res.push_back(make_unique<Line>(base_p,line_1));
+    res.push_back(make_unique<Line>(base_p,line_2));
+    return res;
+}
+
+
 void Binary_tree::move(int dx, int dy){
     if (levels == 0) return;
 
@@ -537,17 +574,19 @@ void Binary_tree::draw_specifics(Painter& painter) const {
 }
 
 
-Binary_tree::Binary_tree(size_t ll, const string& label, Point p,
-                         const Node_shape_factory& node_factory) : levels(ll) {
+Binary_tree::Binary_tree(Binary_tree_parameters& pp,
+                         const Node_shape_factory& node_factory) : levels(pp.ll) {
     int step_xy = default_size_node * 2;
-    if (ll == 0)
+    Point p = pp.p;
+    const string& label = pp.label;
+    if (levels == 0)
         return;
 
 
     label_node = make_unique<Text>(p,label);
     node_shape = node_factory.create_node(p,default_size_node);
 
-    if (ll == 1) return;
+    if (levels == 1) return;
 
     Point left {p.x - step_xy, p.y + step_xy};
     Point right {p.x + step_xy, p.y + step_xy};
@@ -555,67 +594,68 @@ Binary_tree::Binary_tree(size_t ll, const string& label, Point p,
     lr_lines.push_back(make_unique<Line>(p,left));
     lr_lines.push_back(make_unique<Line>(p,right));
 
-    left_node = make_unique<Binary_tree>(levels-1,label,left,node_factory);
-    right_node = make_unique<Binary_tree>(levels-1,label,right,node_factory);
+    Binary_tree_parameters l_param {levels-1,label,left};
+    Binary_tree_parameters r_param {levels-1,label,right};
+
+    left_node = make_unique<Binary_tree>(l_param,node_factory);
+    right_node = make_unique<Binary_tree>(r_param,node_factory);
 }
 
-Binary_tree::Binary_tree(size_t ll,
-            const string& label ,
-            Point p, const Node_shape_factory& node_factory,
-            const Tree_lines_factory& lines_factory) : levels(ll){
+Binary_tree::Binary_tree(
+            Binary_tree_parameters& pp,
+            const Node_shape_factory& node_factory,
+            const Tree_lines_factory& lines_factory) : levels(pp.ll){
     int step_xy = default_size_node * 2;
-    if (ll == 0)
+    if (levels == 0)
         return;
-
+    Point p = pp.p;
+    const string& label = pp.label;
 
     label_node = make_unique<Text>(p,label);
     node_shape = node_factory.create_node(p,default_size_node);
 
-    if (ll == 1) return;
+    if (levels == 1) return;
 
     Point left {p.x - step_xy, p.y + step_xy};
     Point right {p.x + step_xy, p.y + step_xy};
 
     lr_lines = lines_factory.create_lines(p,left,right);
 
-    left_node = make_unique<Binary_tree>(levels-1,label,left,node_factory,lines_factory);
-    right_node = make_unique<Binary_tree>(levels-1,label,right,node_factory,lines_factory);
+    Binary_tree_parameters l_param {levels-1,label,left};
+    Binary_tree_parameters r_param {levels-1,label,right};
+
+    left_node = make_unique<Binary_tree>(l_param,node_factory,lines_factory);
+    right_node = make_unique<Binary_tree>(r_param,node_factory,lines_factory);
 }
 
-vector<unique_ptr<Shape>> Red_arrows_up_factory::create_lines(Point base_p, Point line_1, Point line_2) const{
-    using namespace ch11::exercises;
-
-    vector<unique_ptr<Shape>> res;
-
-    unique_ptr<Arrow> a1 = make_unique<Arrow>(line_1,base_p);
-    unique_ptr<Arrow> a2 = make_unique<Arrow>(line_2,base_p);
-
-    a1->set_color(Color::red);
-    a2->set_color(Color::red);
-
-    res.push_back(std::move(a1));
-    res.push_back(std::move(a2));
-
-    return res;
+void Binary_tree::change_label_base_node(const string& new_label){
+    this->label_node->set_label(new_label);
 }
 
+// path example: lrrl
+// 'l' mean go to left node from base node
+// 'r' mean to right
+void change_label_by_path_to_node(const string& path, const string& label, Binary_tree& tree){
+    if (path.size() > tree.get_levels() - 1)
+        error("bad size path");
 
-vector<unique_ptr<Shape>> Arrows_factory::create_lines(Point base_p, Point line_1, Point line_2) const{
-    using namespace ch11::exercises;
+    if (path.size() == 0){
+        tree.change_label_base_node(label);
+        return;
+    }
 
-    vector<unique_ptr<Shape>> res;
+    switch (path.front()){
+    case 'l':
+        change_label_by_path_to_node(path.substr(1),label,tree.get_left_node());
+        break;
 
-    res.push_back(make_unique<Arrow>(base_p,line_1));
-    res.push_back(make_unique<Arrow>(base_p,line_2));
+    case 'r':
+        change_label_by_path_to_node(path.substr(1),label,tree.get_right_node());
+        break;
 
-    return res;
-}
-
-vector<unique_ptr<Shape>> Default_line_factory::create_lines(Point base_p, Point line_1, Point line_2) const{
-    vector<unique_ptr<Shape>> res;
-    res.push_back(make_unique<Line>(base_p,line_1));
-    res.push_back(make_unique<Line>(base_p,line_2));
-    return res;
+    default:
+        error("bad value in path!");
+    }
 }
 
 void ex_1(){
@@ -800,7 +840,8 @@ void ex_13(){
         Simple_window win {zero_point,1920,1080,"ch12_ex13. Binary_tree class"};
 
         Circle_node_factory c;
-        Binary_tree bin {8,"l",zero_point,c};
+        Binary_tree_parameters param {8,"l",zero_point};
+        Binary_tree bin {param,c};
         bin.move(100,-50);
 
 
@@ -817,9 +858,13 @@ void ex_14(){
     Rectangle_node_factory r;
     Triangle_node_factory t;
 
-    Binary_tree bin {8,"v2",zero_point,c};
-    Binary_tree bin_r {5,"v2", {800,100},r};
-    Binary_tree bin_t {8, "triangle", {1000,100},t};
+    Binary_tree_parameters param1 {8,"v2",zero_point};
+    Binary_tree_parameters param2 {5,"v2",{800,100}};
+    Binary_tree_parameters param3 {10,"triangle", {1000,100}};
+
+    Binary_tree bin {param1,c};
+    Binary_tree bin_r {param2,r};
+    Binary_tree bin_t {param3,t};
 
     bin.move(100,-50);
 
@@ -840,11 +885,50 @@ void ex_15(){
 
     Default_line_factory def_l;
     Arrows_factory arr_l;
-    Red_arrows_up_factory red_up_arrows;
 
-    Binary_tree bin {8,"v2",zero_point,c,def_l};
-    Binary_tree bin_r {5,"v2", {800,100},r,arr_l};
-    Binary_tree bin_t {8, "triangle", {1000,100},t,red_up_arrows};
+    Binary_tree_parameters param1 {8,"v2",zero_point};
+    Binary_tree_parameters param2 {5,"v2", {800,100}};
+    Binary_tree_parameters param3 {8, "triangle", {1000,100}};
+
+    Any_color_arrows_up_factory red_up_arrows {Color::dark_magenta};
+
+    Binary_tree bin {param1,c,def_l};
+    Binary_tree bin_r {param2,r,arr_l};
+    Binary_tree bin_t {param3,t,red_up_arrows};
+
+    bin.move(100,-50);
+
+    win.attach(bin);
+
+    win.attach(bin_r);
+    win.attach(bin_t);
+    win.wait_for_button();
+}
+
+void ex_16(){
+    Application app;
+    Simple_window win {zero_point,1920,1080,"ch12_ex16. Binary_tree class"};
+
+    Circle_node_factory c;
+    Rectangle_node_factory r;
+    Triangle_node_factory t;
+
+    Default_line_factory def_l;
+    Arrows_factory arr_l;
+
+    Binary_tree_parameters param1 {8,"v2",zero_point};
+    Binary_tree_parameters param2 {5,"v2", {800,100}};
+    Binary_tree_parameters param3 {8, "triangle", {1000,100}};
+
+    Any_color_arrows_up_factory red_up_arrows {Color::dark_magenta};
+
+    Binary_tree bin {param1,c,def_l};
+    Binary_tree bin_r {param2,r,arr_l};
+    Binary_tree bin_t {param3,t,red_up_arrows};
+
+    change_label_by_path_to_node("rrrrrrr","changed",bin);
+    change_label_by_path_to_node("rrrrrrl","good",bin);
+    change_label_by_path_to_node("rlrlrlr","changed",bin_t);
 
     bin.move(100,-50);
 
