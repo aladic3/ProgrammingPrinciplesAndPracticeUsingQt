@@ -938,4 +938,40 @@ void ex_16(){
     win.attach(bin_t);
     win.wait_for_button();
 }
+
+void ex_17(){
+    Application app;
+    Simple_window win {zero_point,1300,800,"ch12_ex17. Controller class"};
+
+    Circle bin {zero_point,50};
+    bin.set_style(style_default);
+
+    Second_gen_controller c2 {bin};
+
+
+    c2.show();
+
+    win.attach(bin);
+    win.wait_for_button();
+
+    c2.on();
+    c2.show();
+
+    win.wait_for_button();
+
+    c2.set_level(89);
+    c2.show();
+
+    win.wait_for_button();
+
+    c2.off();
+    c2.show();
+
+    win.wait_for_button();
+
+    c2.on();
+    c2.show();
+
+    win.wait_for_button();
+}
 }

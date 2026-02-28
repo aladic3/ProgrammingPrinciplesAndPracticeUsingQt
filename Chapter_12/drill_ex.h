@@ -189,6 +189,55 @@ private:
 // 'r' mean to right
 void change_label_by_path_to_node(const string& path, const string& label, Binary_tree&);
 
+struct Controller {
+    virtual void on() = 0;
+    virtual void off() = 0;
+    virtual void show() = 0;
+    virtual void set_level(int) = 0;
+};
+
+struct First_gen_controller : Controller {
+    void on() {status = ON;}
+    void off() {status = OFF;}
+    void show() {std::cerr << std::format("Status: {}\nLevel: {}\n",get_status_str(),level);}
+    void set_level(int l) {level = l;};
+
+private:
+    enum Status { ON, OFF };
+    string get_status_str() { return status == ON ? "ON" : "OFF";}
+
+    int level = 0;
+    Status status = OFF;
+};
+
+// "Somehow control the line color of a Shape"
+struct Second_gen_controller : Controller {
+    Second_gen_controller(Shape& sh) : control_sh(&sh),
+        sh_color(sh.color()),
+        level(sh.color().as_int()) {control_sh->set_color(Color::invisible);};
+
+    void on() override {status = ON; control_sh->set_color(sh_color);}
+    void off()override {status = OFF; control_sh->set_color(Color::invisible);}
+    void show() override {std::cerr << std::format("Status: {}\nLevel: {}\n",get_status_str(),level);}
+    void set_level(int l) override {
+        control_sh->set_color(l);
+        level = control_sh->color().as_int();
+        status=ON;
+        sh_color=control_sh->color();
+    }
+
+
+
+private:
+    enum Status { ON, OFF };
+    string get_status_str() { return status == ON ? "ON" : "OFF";}
+
+    Shape* control_sh;
+    Color sh_color;
+    int level = 0;
+    Status status = OFF;
+};
+
 void ex_1();
 void ex_4();
 void ex_5();
@@ -203,6 +252,7 @@ void ex_13();
 void ex_14();
 void ex_15();
 void ex_16();
+void ex_17();
 
 }
 
