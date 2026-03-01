@@ -974,4 +974,85 @@ void ex_17(){
 
     win.wait_for_button();
 }
+
+void ex_18(){
+    using namespace  ch11::exercises;
+    using namespace ex_2;
+    Application app;
+    Simple_window win {zero_point,1300,800,"ch12_ex18. Error hierarchy"};
+
+    const int level_0y = 50;
+    const int level_1y = level_0y * 3;
+    const int level_2y = level_0y * 5;
+
+    const int level_0x = 200;
+    const int level_1x = level_0x * 2;
+    const int level_2x = level_0x * 3;
+
+
+
+    ch11::exercises::Box exception_b {{level_1x,level_0y}, "exception"};
+    ch11::exercises::Box runtime_error_b {{level_0x,level_1y}, "runtime_error"};
+    ch11::exercises::Box logic_error_b {{level_2x,level_1y}, "logic_error"};
+
+    ch11::exercises::Box out_of_range_b {{level_2x,level_2y}, "out_of_range"};
+    ch11::exercises::Box range_error_b {{level_0x,level_2y}, "range_error"};
+
+    Arrow rue_e_arrow {n(runtime_error_b.get_box()),s(exception_b.get_box())};
+    Arrow re_rue_arrow {n(range_error_b.get_box()),s(runtime_error_b.get_box())};
+    Arrow le_e_arrow {n(logic_error_b.get_box()),s(exception_b.get_box())};
+    Arrow oor_le_arrow {n(out_of_range_b.get_box()),s(logic_error_b.get_box())};
+
+    win.attach(rue_e_arrow);
+    win.attach(re_rue_arrow);
+    win.attach(le_e_arrow);
+    win.attach(oor_le_arrow);
+
+    win.attach(exception_b);
+    win.attach(runtime_error_b);
+    win.attach(logic_error_b);
+    win.attach(out_of_range_b);
+    win.attach(range_error_b);
+
+    win.wait_for_button();
 }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

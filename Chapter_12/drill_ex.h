@@ -238,6 +238,33 @@ private:
     Status status = OFF;
 };
 
+struct Third_gen_controller : Controller{
+    Third_gen_controller(Shape& sh) : control_sh(&sh),
+        sh_color(sh.color()),
+        level(sh.color().as_int()) {control_sh->set_color(Color::invisible);};
+
+    void on() override {status = ON; control_sh->set_color(sh_color);}
+    void off()override {status = OFF; control_sh->set_color(Color::invisible);}
+    void show() override {std::cerr << std::format("Status: {}\nLevel: {}\n",get_status_str(),level);}
+    void set_level(int l) override {
+        control_sh->set_color(l);
+        level = control_sh->color().as_int();
+        status=ON;
+        sh_color=control_sh->color();
+    }
+
+
+
+private:
+    enum Status { ON, OFF };
+    string get_status_str() { return status == ON ? "ON" : "OFF";}
+
+    Shape* control_sh;
+    Color sh_color;
+    int level = 0;
+    Status status = OFF;
+};
+
 void ex_1();
 void ex_4();
 void ex_5();
@@ -253,6 +280,8 @@ void ex_14();
 void ex_15();
 void ex_16();
 void ex_17();
+void ex_18();
+
 
 }
 
