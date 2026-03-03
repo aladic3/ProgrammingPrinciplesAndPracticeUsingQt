@@ -658,6 +658,26 @@ void change_label_by_path_to_node(const string& path, const string& label, Binar
     }
 }
 
+
+
+void Third_gen_controller::set_level(int l)  {
+    First_gen_controller::set_level(l);
+    Line_style::Line_style_type style_type = Line_style::Line_style_type(line_style.style());
+    line_style = Line_style{style_type,l};
+    control_sh->set_style(line_style);
+}
+void Third_gen_controller::off() {
+    First_gen_controller::off();
+    control_sh->set_color(Color::invisible);
+}
+
+
+void Third_gen_controller::on() {
+    First_gen_controller::on();
+    control_sh->set_style(line_style);
+    control_sh->set_color(sh_color);
+}
+
 void ex_1(){
     Application app;
     Simple_window win {zero_point,1920,1080,"ch12_ex1. "};
@@ -946,7 +966,7 @@ void ex_17(){
     Circle bin {zero_point,50};
     bin.set_style(style_default);
 
-    Second_gen_controller c2 {bin};
+    Third_gen_controller c2 {bin};
 
 
     c2.show();
@@ -954,23 +974,28 @@ void ex_17(){
     win.attach(bin);
     win.wait_for_button();
 
-    c2.on();
-    c2.show();
-
-    win.wait_for_button();
-
-    c2.set_level(89);
-    c2.show();
-
-    win.wait_for_button();
-
     c2.off();
     c2.show();
 
     win.wait_for_button();
 
+    c2.set_level(30);
+    c2.show();
+
+    win.wait_for_button();
+
     c2.on();
     c2.show();
+
+    win.wait_for_button();
+    c2.off();
+    c2.show();
+
+    win.wait_for_button();
+
+    c2.set_level(5);
+    c2.show();
+    c2.on();
 
     win.wait_for_button();
 }

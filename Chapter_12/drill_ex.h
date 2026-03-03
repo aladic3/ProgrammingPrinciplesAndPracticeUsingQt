@@ -201,6 +201,7 @@ struct First_gen_controller : Controller {
     void off() {status = OFF;}
     void show() {std::cerr << std::format("Status: {}\nLevel: {}\n",get_status_str(),level);}
     void set_level(int l) {level = l;};
+    int get_level() const {return level;}
 
 private:
     enum Status { ON, OFF };
@@ -238,32 +239,22 @@ private:
     Status status = OFF;
 };
 
-struct Third_gen_controller : Controller{
-    Third_gen_controller(Shape& sh) : control_sh(&sh),
-        sh_color(sh.color()),
-        level(sh.color().as_int()) {control_sh->set_color(Color::invisible);};
+struct Third_gen_controller : First_gen_controller{ // Line_style width edit
+    Third_gen_controller(Shape& sh) : control_sh(&sh),line_style(sh.style()),
+        sh_color(sh.color()) {First_gen_controller::set_level(line_style.width()); on();};
 
-    void on() override {status = ON; control_sh->set_color(sh_color);}
-    void off()override {status = OFF; control_sh->set_color(Color::invisible);}
-    void show() override {std::cerr << std::format("Status: {}\nLevel: {}\n",get_status_str(),level);}
-    void set_level(int l) override {
-        control_sh->set_color(l);
-        level = control_sh->color().as_int();
-        status=ON;
-        sh_color=control_sh->color();
-    }
-
+    void on() override;
+    void off()override;
+    void set_level(int l) override;
 
 
 private:
-    enum Status { ON, OFF };
-    string get_status_str() { return status == ON ? "ON" : "OFF";}
-
     Shape* control_sh;
+    Line_style line_style;
     Color sh_color;
-    int level = 0;
-    Status status = OFF;
+
 };
+
 
 void ex_1();
 void ex_4();
