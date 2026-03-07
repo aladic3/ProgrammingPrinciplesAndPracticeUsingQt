@@ -6,7 +6,7 @@
 int main(int /*argc*/, char * /*argv*/[])
 {
     try{
-        ch13::drill::graphing_drill();
+        ch13::drill::class_definition_drill();
     }catch(std::exception& ex){
         std::cerr << ex.what();
     }
