@@ -31,6 +31,7 @@ set(PROJECT_SOURCES
     Chapter_10/Ex1_4.h
     Chapter_10/drill.cpp
     Chapter_10/drill.h
+        Chapter_13/ex.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -51,6 +52,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         base.h
         Chapter_13/drill_ex.h
         Chapter_13/drill.cpp
+            Chapter_13/ex.cpp
     )
 
 # Define target properties for Android with Qt 6 as:

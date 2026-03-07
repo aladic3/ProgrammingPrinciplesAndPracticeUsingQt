@@ -34,5 +34,7 @@ namespace ch13::drill{
     void class_definition_drill();
 }
 
-
+namespace ch13::exercises {
+    void ex_1();
+}
 #endif // DRILL_EX_H
