@@ -19,7 +19,7 @@ namespace ch13::exercises {
     }
 
     void ex_1() {
-        const int n = 1;
+        constexpr int n = 1;
         std::cout << fac_recursive(n) << endl;
         cout <<  fac_loop(n) << endl;
     }
@@ -34,23 +34,26 @@ namespace ch13::exercises {
 
         constexpr pair xy_scale {20,20};
 
-        constexpr pair<int,int> range {-10,11}; //min, max
-        constexpr int count_points = 400;
+        constexpr pair range {-10,11}; //min, max
+
 
         constexpr string xy_axis_label = "1 == 20 pixels";
         constexpr Point cross_point {300,300};
-        const Color axes_color {Color::red};
 
         Application app;
         Simple_window win {zero_point,1300,800,"ch13_ex2. Class Fct"};
 
-        Fct1 f_one {one,range,cross_point,count_points,xy_scale};
+        Fct1 f_one {slope_cos,range,cross_point,xy_scale,20};
+        f_one.set_color(Color::yellow);
+        win.attach(f_one);
+        win.wait_for_button();
+
         f_one.set_f(square);
-        f_one.set_count(1000);
+        f_one.set_precision(100);
         f_one.reset();
         f_one.move(0,300);
 
-        win.attach(f_one);
+
         win.wait_for_button();
     }
 }
