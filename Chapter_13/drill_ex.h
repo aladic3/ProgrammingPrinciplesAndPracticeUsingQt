@@ -102,6 +102,7 @@ private:
 namespace ch13::exercises {
     void ex_1();
     void ex_2();
+    void ex_4();
     void ex_5();
 
 }

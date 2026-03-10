@@ -65,6 +65,60 @@ namespace ch13::exercises {
         win.wait_for_button();
     }
 
+    void ex_4() {
+        const std::function<double(double)> cos = [](double x){return std::cos(x);};
+        const std::function<double(double)> sin = [](double x){return std::sin(x);};
+        const std::function<double(double)> sum_sin_cos = [](double x){return std::cos(x) + std::sin(x);};
+        const std::function<double(double)> sum_sin_cos_square = [](double x) {
+            return std::cos(x)*std::cos(x) + std::sin(x)*std::sin(x);
+        };
+
+
+        constexpr int x_max = 600;
+        constexpr int y_max = 600;
+        constexpr int xya_length = 400;
+        constexpr int xya_scale = 20;
+        constexpr int xya_count_notches = xya_length / xya_scale;
+        constexpr pair<int,int> range {-10,11}; //min, max
+        constexpr int count_points = 400;
+
+        constexpr string xy_axis_label = "1 == 20 pixels";
+        constexpr Point cross_point {300,300};
+        const Color axes_color {Color::red};
+
+
+        Application app;
+        Simple_window win {zero_point,1300,800,"ch13_ex4"};
+
+
+        Axis xa {Axis::x,{0,cross_point.y},x_max,xya_count_notches,xy_axis_label};
+        Axis ya {Axis::y,{cross_point.x,cross_point.y*2},y_max,xya_count_notches};
+
+        Function f_sin {sin,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
+        Function f_cos {cos,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
+        Function f_square {sum_sin_cos_square,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
+        Function f_sum {sum_sin_cos,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
+
+        f_cos.set_color(Color::cyan);
+        f_square.set_color(Color::blue);
+        f_sum.set_color(Color::dark_red);
+
+        xa.set_color(axes_color);
+        ya.set_color(axes_color);
+        ya.label.move(-150,200);
+        xa.label.move(150,0);
+
+
+        win.attach(xa);
+        win.attach(ya);
+        win.attach(f_cos);
+        win.attach(f_sin);
+        win.attach(f_square);
+        win.attach(f_sum);
+
+        win.wait_for_button();
+    }
+
     void ex_5() {
         const std::function<double(double,double)> exp_n = [](double x, double precision) {
             double result = 1;
@@ -90,7 +144,7 @@ namespace ch13::exercises {
         constexpr Point cross_point {300,300};
 
         Application app;
-        Simple_window win {zero_point,1300,800,"ch13_ex4"};
+        Simple_window win {zero_point,1300,800,"ch13_ex5"};
 
         Fct1<double> f_one {leibniz_n,range,cross_point,xy_scale,10};
         f_one.set_color(Color::dark_green);
