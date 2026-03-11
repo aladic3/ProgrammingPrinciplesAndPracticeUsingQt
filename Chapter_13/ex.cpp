@@ -6,51 +6,158 @@
 
 namespace ch13::exercises {
     long long int fac_recursive(int n) {
-        return n > 1 ? n*fac_recursive(n-1) : 1;
+        return n > 1 ? n * fac_recursive(n - 1) : 1;
     }
 
     long long int fac_loop(int n) {
         long long int res = 1;
 
-        for (int i = 1; i <=n; i++)
+        for (int i = 1; i <= n; i++)
             res *= i;
 
         return res;
     }
 
+    using F1 = std::function<double(double)>;
+    using F2 = function<double(double, double)>;
+    inline F1 get_lamda_one_arg_from_two(const  F2&f,
+                                                               double second_arg) {
+        std::cout << "precision in get_lambda_one_from_two: " << second_arg << endl;
+        return [=](double x) { return f(x, second_arg); };
+    }
+
+    template<class Precision>
+    Fct1<Precision>::Fct1(const F1 &ff,
+                          pair<double, double> rr, Point oo,
+                          pair<double, double> xy, Precision pp) : function_one_arg(ff), r1_2(rr), orig(oo),
+                                                                   count(pp * base_count), xy_scale(xy), precision(pp) {
+        f_shape = make_unique<Function>(ff, rr.first, rr.second, oo, count, xy.first, xy.second);
+    }
+
+    template<class Precision>
+    Fct1<Precision>::Fct1(const F2& ff2,
+                          pair<double, double> rr, Point oo,
+                          pair<double, double> xy,
+                          Precision pp) : function_one_arg(get_lamda_one_arg_from_two(ff2, pp)),
+                                          r1_2(rr), orig(oo), count(pp * base_count), xy_scale(xy), precision(pp) {
+        f_shape = make_unique<Function>(function_one_arg, rr.first, rr.second, oo, count, xy.first, xy.second);
+    }
+
+    template<class Precision>
+    void Fct1<Precision>::reset() {
+        f_shape = make_unique<Function>(function_one_arg, r1_2.first, r1_2.second,
+                                        orig, count, xy_scale.first, xy_scale.second);
+        this->redraw();
+    }
+
+    template<class Precision>
+    [[nodiscard]] F1 Fct1<Precision>::f1() const { return function_one_arg; }
+
+    template<class Precision>
+    void Fct1<Precision>::set_f(const F1 &ff) { this->function_one_arg = ff; }
+
+    template<class Precision>
+    void Fct1<Precision>::set_f(const F2 &ff2) {
+        this->function_one_arg = get_lamda_one_arg_from_two(ff2, precision);
+    }
+
+    template<class Precision>
+    [[nodiscard]] pair<double, double> Fct1<Precision>::r1_3() const { return r1_2; }
+
+    template<class Precision>
+    void Fct1<Precision>::set_r1_2(const pair<double, double> &rr) { this->r1_2 = rr; }
+
+    template<class Precision>
+    [[nodiscard]] Point Fct1<Precision>::orig1() const { return orig; }
+
+    template<class Precision>
+    void Fct1<Precision>::set_orig(const Point &oo) { this->orig = oo; }
+
+    template<class Precision>
+    [[nodiscard]] int Fct1<Precision>::count1() const { return count; }
+
+    //void Fct1<Precision>::set_precision(Precision p) { precision = p; count = p * base_count;}
+
+    template<class Precision>
+    [[nodiscard]] pair<double, double> Fct1<Precision>::xy_scale1() const { return xy_scale; }
+
+    template<class Precision>
+    void Fct1<Precision>::set_xy_scale(const pair<double, double> &xy) { this->xy_scale = xy; }
+
+    template<class Precision>
+    void Fct1<Precision>::draw_specifics(Painter &painter) const { f_shape->draw_specifics(painter); }
+
+    template<class Precision>
+    void Fct1<Precision>::move(int dx, int dy) { f_shape->move(dx, dy); }
+
+
+    Bar_graph::Bar_graph(const vector<double>& data, const Point origin, const pair<int,int>& width_bar_and_spase , const int xy_scale){
+        Point current = origin;
+        const int ww_bar = width_bar_and_spase.first * xy_scale;
+        const int ww_spase = width_bar_and_spase.second * xy_scale;
+
+        for (const auto& el : data) {
+            int high_el = static_cast<int>(lround(el * xy_scale));
+            Point temp_p = current;
+
+            if (high_el < 0)
+                high_el = abs(high_el);
+            else if (high_el == 0)
+                ++high_el;
+            else
+                temp_p.y -= high_el;
+
+
+            this->shape_each_bar.emplace_back(make_unique<Rectangle>(temp_p,ww_bar,high_el));
+            current.x += 2*ww_spase;
+        }
+    }
+
+    void Bar_graph::draw_specifics(Painter &painter) const {
+        for (const auto& el : this->shape_each_bar ) {
+            el->draw_specifics(painter);
+        }
+    }
+
+    void Bar_graph::move(int dx, int dy) {
+        for (const auto& el : this->shape_each_bar ) {
+            el->move(dx,dy);
+        }
+    }
+
     void ex_1() {
         constexpr int n = 1;
         std::cout << fac_recursive(n) << endl;
-        cout <<  fac_loop(n) << endl;
+        cout << fac_loop(n) << endl;
     }
 
     void ex_2() {
-        const std::function<double(double)> one = [](double){return 1;};
-        const std::function<double(double)> slope = [](double x){return x*0.5;};
-        const std::function<double(double)> square = [](double x){return x*x;};
-        const std::function<double(double)> cos = [](double x){return std::cos(x);};
-        const std::function<double(double)> slope_cos = [&](double x){return cos(x)+slope(x);};
-        const std::function<double(double,double)> exp_n = [](double x, double precision) {
+        const F1 one = [](double) { return 1; };
+        const F1 slope = [](double x) { return x * 0.5; };
+        const F1 square = [](double x) { return x * x; };
+        const F1 cos = [](double x) { return std::cos(x); };
+        const F1 slope_cos = [&](double x) { return cos(x) + slope(x); };
+        const F2 exp_n = [](double x, double precision) {
             double result = 1;
             for (int i = 0; i < precision; ++i) {
-                result += pow(x,i) / static_cast<double>(fac_loop(i));
+                result += pow(x, i) / static_cast<double>(fac_loop(i));
             }
             return result;
         };
 
 
-        constexpr pair xy_scale {20,20};
+        constexpr pair xy_scale{20, 20};
 
-        constexpr pair range {-10,30}; //min, max
+        constexpr pair range{-10, 30}; //min, max
 
 
         constexpr string xy_axis_label = "1 == 20 pixels";
-        constexpr Point cross_point {300,300};
+        constexpr Point cross_point{300, 300};
 
         Application app;
-        Simple_window win {zero_point,1300,800,"ch13_ex2. Class Fct"};
+        Simple_window win{zero_point, 1300, 800, "ch13_ex2. Class Fct"};
 
-        Fct1<double> f_one {slope_cos,range,cross_point,xy_scale,10};
+        Fct1<double> f_one{slope_cos, range, cross_point, xy_scale, 10};
         f_one.set_color(Color::dark_green);
         win.attach(f_one);
         win.wait_for_button();
@@ -59,18 +166,19 @@ namespace ch13::exercises {
         f_one.set_f(exp_n);
         //f_one.set_precision(25);
         f_one.reset();
-        f_one.move(0,300);
+        f_one.move(0, 300);
 
 
         win.wait_for_button();
     }
 
     void ex_4() {
-        const std::function<double(double)> cos = [](double x){return std::cos(x);};
-        const std::function<double(double)> sin = [](double x){return std::sin(x);};
-        const std::function<double(double)> sum_sin_cos = [](double x){return std::cos(x) + std::sin(x);};
-        const std::function<double(double)> sum_sin_cos_square = [](double x) {
-            return std::cos(x)*std::cos(x) + std::sin(x)*std::sin(x);
+
+        const F1 cos = [](double x) { return std::cos(x); };
+        const F1 sin = [](double x) { return std::sin(x); };
+        const F1 sum_sin_cos = [](double x) { return std::cos(x) + std::sin(x); };
+        const F1  sum_sin_cos_square = [](double x) {
+            return std::cos(x) * std::cos(x) + std::sin(x) * std::sin(x);
         };
 
 
@@ -79,25 +187,27 @@ namespace ch13::exercises {
         constexpr int xya_length = 400;
         constexpr int xya_scale = 20;
         constexpr int xya_count_notches = xya_length / xya_scale;
-        constexpr pair<int,int> range {-10,11}; //min, max
+        constexpr pair range{-10, 11}; //min, max
         constexpr int count_points = 400;
 
         constexpr string xy_axis_label = "1 == 20 pixels";
-        constexpr Point cross_point {300,300};
-        const Color axes_color {Color::red};
+        constexpr Point cross_point{300, 300};
+        const Color axes_color{Color::red};
 
 
         Application app;
-        Simple_window win {zero_point,1300,800,"ch13_ex4"};
+        Simple_window win{zero_point, 1300, 800, "ch13_ex4"};
 
 
-        Axis xa {Axis::x,{0,cross_point.y},x_max,xya_count_notches,xy_axis_label};
-        Axis ya {Axis::y,{cross_point.x,cross_point.y*2},y_max,xya_count_notches};
+        Axis xa{Axis::x, {0, cross_point.y}, x_max, xya_count_notches, xy_axis_label};
+        Axis ya{Axis::y, {cross_point.x, cross_point.y * 2}, y_max, xya_count_notches};
 
-        Function f_sin {sin,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
-        Function f_cos {cos,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
-        Function f_square {sum_sin_cos_square,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
-        Function f_sum {sum_sin_cos,range.first,range.second,cross_point,count_points,xya_scale,xya_scale};
+        Function f_sin{sin, range.first, range.second, cross_point, count_points, xya_scale, xya_scale};
+        Function f_cos{cos, range.first, range.second, cross_point, count_points, xya_scale, xya_scale};
+        Function f_square{
+            sum_sin_cos_square, range.first, range.second, cross_point, count_points, xya_scale, xya_scale
+        };
+        Function f_sum{sum_sin_cos, range.first, range.second, cross_point, count_points, xya_scale, xya_scale};
 
         f_cos.set_color(Color::cyan);
         f_square.set_color(Color::blue);
@@ -105,8 +215,8 @@ namespace ch13::exercises {
 
         xa.set_color(axes_color);
         ya.set_color(axes_color);
-        ya.label.move(-150,200);
-        xa.label.move(150,0);
+        ya.label.move(-150, 200);
+        xa.label.move(150, 0);
 
 
         win.attach(xa);
@@ -120,33 +230,29 @@ namespace ch13::exercises {
     }
 
     void ex_5() {
-        const std::function<double(double,double)> exp_n = [](double x, double precision) {
+        const F2 exp_n = [](double x, double precision) {
             double result = 1;
             for (int i = 0; i < precision; ++i) {
-                result += pow(x,i) / static_cast<double>(fac_loop(i));
+                result += pow(x, i) / static_cast<double>(fac_loop(i));
             }
             return result;
         };
-
-        const std::function<double(double)> leibniz_n = [](double x) {
+        const F1 leibniz_n = [](double x) {
             double result = 0;
             for (int i = 0; i <= x; ++i) {
-                result += pow(-1,i) / (2*i + 1);
+                result += pow(-1, i) / (2 * i + 1);
             }
             return result;
         };
 
-
-        constexpr pair xy_scale {40,40};
-
-        constexpr pair range {0,15}; //min, max
-
-        constexpr Point cross_point {300,300};
+        constexpr pair xy_scale{40, 40};
+        constexpr pair range{0, 15}; //min, max
+        constexpr Point cross_point{300, 300};
 
         Application app;
-        Simple_window win {zero_point,1300,800,"ch13_ex5"};
+        Simple_window win{zero_point, 1300, 800, "ch13_ex5"};
 
-        Fct1<double> f_one {leibniz_n,range,cross_point,xy_scale,10};
+        Fct1<double> f_one{leibniz_n, range, cross_point, xy_scale, 10};
         f_one.set_color(Color::dark_green);
         win.attach(f_one);
         win.wait_for_button();
@@ -157,6 +263,17 @@ namespace ch13::exercises {
 
 
         win.wait_for_button();
+    }
 
+    void ex_6() {
+        Application app;
+        Simple_window win{zero_point, 1300, 800, "ch13_ex6. Bar graph class"};
+
+        vector<double> data {-1, 12.5, 3, 18, 1 , 0, -10, 30};
+        Bar_graph bar_graph {data,{30,300}};
+        bar_graph.set_fill_color(Color::blue);
+
+        win.attach(bar_graph);
+        win.wait_for_button();
     }
 }
