@@ -91,38 +91,101 @@ namespace ch13::exercises {
     void Fct1<Precision>::move(int dx, int dy) { f_shape->move(dx, dy); }
 
 
-    Bar_graph::Bar_graph(const vector<double>& data, const Point origin, const pair<int,int>& width_bar_and_spase , const int xy_scale){
+    Bar_graph::Bar_graph(const vector<double>& data, const Point origin, const pair<int,int>& width_bar_and_spase ,
+        const int xy_scale, const string& label_graph){
+
         Point current = origin;
-        const int ww_bar = width_bar_and_spase.first * xy_scale;
-        const int ww_spase = width_bar_and_spase.second * xy_scale;
+        const int wide_bar = width_bar_and_spase.first * xy_scale;
+        const int wide_spase = width_bar_and_spase.second * xy_scale;
+        const int count_bars = static_cast<int>(data.size());
+        const int length_xa = (wide_bar + wide_spase) * count_bars;
+        constexpr int length_ya = 800;
+
+        this->xa = make_unique<Axis>(Axis::x,origin,length_xa);
+        this->ya = make_unique<Axis>(Axis::y,origin,length_ya,length_ya/xy_scale);
+        this->graph_label = make_unique<Text>(Point{origin.x,origin.y + 10}, label_graph);
+
 
         for (const auto& el : data) {
             int high_el = static_cast<int>(lround(el * xy_scale));
-            Point temp_p = current;
+            Point temp_point = current;
 
             if (high_el < 0)
                 high_el = abs(high_el);
             else if (high_el == 0)
                 ++high_el;
             else
-                temp_p.y -= high_el;
+                temp_point.y -= high_el;
 
 
-            this->shape_each_bar.emplace_back(make_unique<Rectangle>(temp_p,ww_bar,high_el));
-            current.x += 2*ww_spase;
+            this->shape_each_bar.emplace_back(make_unique<Rectangle>(temp_point,wide_bar,high_el));
+            this->bar_labels.emplace_back(make_unique<Text>(Point{current.x + wide_bar/2, current.y + 2},
+                std::format("{:.2f}",el) ) );
+
+            current.x += 2*wide_spase;
         }
+    }
+
+    void Bar_graph::set_label_to_individual_bar(size_t index, const string &label) {
+        if (index > this->shape_each_bar.size()) error("bad index!");
+        this->bar_labels[index]->set_label(label);
+
+        redraw();
+    }
+
+    void Bar_graph::set_label_to_graph(const string &label) {
+        this->graph_label->set_label(label);
+        redraw();
+    }
+
+    void Bar_graph::set_text_color(Color cc) {
+        for (auto& el : this->bar_labels)
+            el->set_color(cc);
+
+        this->graph_label->set_color(cc);
+
+    }
+
+    void Bar_graph::own_set_color(Color cc) {
+        for (auto& el : this->shape_each_bar)
+            el->set_color(cc);
+
+    }
+
+    void Bar_graph::set_axis_color(Color cc) {
+        this->xa->set_color(cc);
+        this->ya->set_color(cc);
+
+    }
+
+    void Bar_graph::own_set_fill_color(Color cc) {
+        for (auto& el : this->shape_each_bar)
+            el->set_fill_color(cc);
+
     }
 
     void Bar_graph::draw_specifics(Painter &painter) const {
-        for (const auto& el : this->shape_each_bar ) {
-            el->draw_specifics(painter);
-        }
+        for (auto& el : this->shape_each_bar )
+            el->draw(painter);
+
+        for (auto& el : this->bar_labels)
+            el->draw(painter);
+
+        this->xa->draw_specifics(painter);
+        this->ya->draw_specifics(painter);
+        this->graph_label->draw(painter);
     }
 
     void Bar_graph::move(int dx, int dy) {
-        for (const auto& el : this->shape_each_bar ) {
+        for (const auto& el : this->shape_each_bar )
             el->move(dx,dy);
-        }
+
+        for (auto& el : this->bar_labels)
+            el->move(dx,dy);
+
+        this->xa->move(dx,dy);
+        this->ya->move(dx,dy);
+        this->graph_label->move(dx,dy);
     }
 
     void ex_1() {
@@ -265,13 +328,19 @@ namespace ch13::exercises {
         win.wait_for_button();
     }
 
-    void ex_6() {
+    void ex_6_8() {
         Application app;
         Simple_window win{zero_point, 1300, 800, "ch13_ex6. Bar graph class"};
 
         vector<double> data {-1, 12.5, 3, 18, 1 , 0, -10, 30};
         Bar_graph bar_graph {data,{30,300}};
-        bar_graph.set_fill_color(Color::blue);
+        bar_graph.own_set_fill_color(Color::blue);
+        bar_graph.own_set_color(Color::red);
+        bar_graph.set_axis_color(Color::dark_green);
+        bar_graph.set_text_color(Color::dark_yellow);
+        bar_graph.set_label_to_individual_bar(5,"123");
+        bar_graph.set_label_to_graph("JJJJ");
+        bar_graph.move(10,100);
 
         win.attach(bar_graph);
         win.wait_for_button();

@@ -220,6 +220,7 @@ void Axis::move(int dx, int dy)
     Shape::move(dx, dy);
     notches.move(dx, dy);
     label.move(dx, dy);
+    line.move(dx,dy);
     redraw();
 }
 

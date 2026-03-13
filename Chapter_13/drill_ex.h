@@ -74,20 +74,34 @@ namespace ch13::exercises {
     };
 
     struct Bar_graph : Shape {
-        Bar_graph(const vector<double>& data, Point origin,  const pair<int,int>& width_bar_and_spase =  {10,10}, int xy_scale = 5);
+        Bar_graph(const vector<double>& data, Point origin,  const pair<int,int>& width_bar_and_spase =  {10,10},
+            int xy_scale = 5, const string& label_graph = "GG");
+
+        void set_label_to_individual_bar(size_t index, const string& label);
+        void set_label_to_graph(const string& label);
+        void set_text_color(Color cc);
+        void own_set_color(Color cc);
+        void set_axis_color(Color cc);
+        void own_set_fill_color(Color cc);
+
 
         void draw_specifics(Painter &painter) const override;
         void move(int dx, int dy) override;
     private:
-
         vector<unique_ptr<Rectangle>> shape_each_bar;
+
+        unique_ptr<Text> graph_label;
+        vector<unique_ptr<Text>> bar_labels;
+
+        unique_ptr<Axis> xa;
+        unique_ptr<Axis> ya;
     };
 
     void ex_1();
     void ex_2();
     void ex_4();
     void ex_5();
-    void ex_6();
+    void ex_6_8();
 
 }
 #endif // DRILL_EX_H
