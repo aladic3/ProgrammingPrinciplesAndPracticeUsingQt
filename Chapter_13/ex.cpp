@@ -5,6 +5,39 @@
 #include "drill_ex.h"
 
 namespace ch13::exercises {
+    [[nodiscard]] std::ifstream open_input_stream(const std::string& file_name) {
+        std::ifstream ifs {file_name};
+        if (!ifs)
+            error("can't open file");
+
+        return ifs;
+    }
+
+    std::istream& operator>>(std::istream& is, std::vector<pair<int,int>>& vec) {
+        int input1, input2;
+        char separator;
+
+        while (is >> input1 >> separator >> input2)
+            vec.emplace_back(input1,input2);
+
+        if (!is.eof())
+            error("bad input!");
+
+        return is;
+    }
+
+
+
+    std::vector<pair<int,int>> read_pairs_from_file(const std::string& filename) {
+        std::vector<pair<int,int>> result;
+        auto is = open_input_stream(filename);
+        is.exceptions(is.exceptions() | ios::badbit);
+
+        is >> result;
+
+        return result;
+    }
+
     long long int fac_recursive(int n) {
         return n > 1 ? n * fac_recursive(n - 1) : 1;
     }
@@ -103,7 +136,8 @@ namespace ch13::exercises {
 
         this->xa = make_unique<Axis>(Axis::x,origin,length_xa);
         this->ya = make_unique<Axis>(Axis::y,origin,length_ya,length_ya/xy_scale);
-        this->graph_label = make_unique<Text>(Point{origin.x,origin.y + 10}, label_graph);
+        this->graph_label = make_unique<Text>(Point{origin.x,origin.y + 20}, label_graph);
+        this->graph_label->set_font_size(16);
 
 
         for (const auto& el : data) {
@@ -119,7 +153,7 @@ namespace ch13::exercises {
 
 
             this->shape_each_bar.emplace_back(make_unique<Rectangle>(temp_point,wide_bar,high_el));
-            this->bar_labels.emplace_back(make_unique<Text>(Point{current.x + wide_bar/2, current.y + 2},
+            this->bar_labels.emplace_back(make_unique<Text>(current,
                 std::format("{:.2f}",el) ) );
 
             current.x += 2*wide_spase;
@@ -332,14 +366,29 @@ namespace ch13::exercises {
         Application app;
         Simple_window win{zero_point, 1300, 800, "ch13_ex6. Bar graph class"};
 
-        vector<double> data {-1, 12.5, 3, 18, 1 , 0, -10, 30};
-        Bar_graph bar_graph {data,{30,300}};
+        vector<pair<int,int>> data = read_pairs_from_file("heights.txt");
+        vector<string> name_bars;
+        vector<double> count_people;
+        count_people.reserve(data.size());
+        name_bars.reserve(data.size());
+
+        for (auto& el : data)
+                        name_bars.push_back(format("{},{}",el.first,el.second));
+
+        for (auto& el : data)
+                    count_people.push_back(el.second);
+
+        Bar_graph bar_graph {count_people,{30,300}};
+
+        for (size_t i = 0; i < name_bars.size(); ++i)
+            bar_graph.set_label_to_individual_bar(i,name_bars[i]);
+
         bar_graph.own_set_fill_color(Color::blue);
         bar_graph.own_set_color(Color::red);
         bar_graph.set_axis_color(Color::dark_green);
         bar_graph.set_text_color(Color::dark_yellow);
-        bar_graph.set_label_to_individual_bar(5,"123");
-        bar_graph.set_label_to_graph("JJJJ");
+        //bar_graph.set_label_to_individual_bar(5,"123");
+        bar_graph.set_label_to_graph("Heights people");
         bar_graph.move(10,100);
 
         win.attach(bar_graph);
