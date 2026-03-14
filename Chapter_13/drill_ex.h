@@ -101,7 +101,7 @@ namespace ch13::exercises {
     void ex_2();
     void ex_4();
     void ex_5();
-    void ex_6_8();
+    void ex_6_9();
 
 }
 #endif // DRILL_EX_H

@@ -362,21 +362,23 @@ namespace ch13::exercises {
         win.wait_for_button();
     }
 
-    void ex_6_8() {
+    void ex_6_9() {
         Application app;
-        Simple_window win{zero_point, 1300, 800, "ch13_ex6. Bar graph class"};
+        Simple_window win{zero_point, 1300, 800, "ch13_ex6_9. Bar graph class"};
 
-        vector<pair<int,int>> data = read_pairs_from_file("heights.txt");
+        vector<pair<int,int>> data = read_pairs_from_file("heights_usa.txt");
         vector<string> name_bars;
         vector<double> count_people;
+
         count_people.reserve(data.size());
         name_bars.reserve(data.size());
 
-        for (auto& el : data)
-                        name_bars.push_back(format("{},{}",el.first,el.second));
 
-        for (auto& el : data)
-                    count_people.push_back(el.second);
+        for (auto& el : data) {
+            count_people.push_back(el.second);
+            name_bars.push_back(format("{}\",{}%",el.first,el.second));
+        }
+
 
         Bar_graph bar_graph {count_people,{30,300}};
 
@@ -388,7 +390,7 @@ namespace ch13::exercises {
         bar_graph.set_axis_color(Color::dark_green);
         bar_graph.set_text_color(Color::dark_yellow);
         //bar_graph.set_label_to_individual_bar(5,"123");
-        bar_graph.set_label_to_graph("Heights people");
+        bar_graph.set_label_to_graph("Heights people in USA (in,%)");
         bar_graph.move(10,100);
 
         win.attach(bar_graph);
