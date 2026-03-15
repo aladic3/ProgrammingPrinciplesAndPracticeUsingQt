@@ -73,6 +73,36 @@ namespace ch13::exercises {
         Precision precision;
     };
 
+    struct XY_axis : Shape {
+        XY_axis(Point origin, pair<int,int> length_xy_axis,int count_p_ya) {
+            this->xa = make_unique<Axis>(Axis::x,origin,length_xy_axis.first);
+            this->ya = make_unique<Axis>(Axis::y,origin,length_xy_axis.second,count_p_ya);
+
+        }
+        void set_color(Color cc);
+        void draw_specifics(Painter &painter) const override;
+        void move(int dx, int dy) override;
+    private:
+        unique_ptr<Axis> xa;
+        unique_ptr<Axis> ya;
+    };
+
+    struct Graph_labels : Shape {
+        Graph_labels(Point graph_label_point, const std::string& graph_label);
+
+        void set_color(Color cc);
+        void set_label_to_graph(const string &label);
+
+        void set_label_to_individual_bar(size_t index, const string &label);
+        void add_specific_label(Point pp, const std::string& label);
+        void draw_specifics(Painter &painter) const override;
+        void move(int dx, int dy) override;
+
+    private:
+        unique_ptr<Text> graph_label;
+        vector<unique_ptr<Text>> bar_labels;
+    };
+
     struct Bar_graph : Shape {
         Bar_graph(const vector<double>& data, Point origin,  const pair<int,int>& width_bar_and_spase =  {10,10},
             int xy_scale = 5, const string& label_graph = "GG");
@@ -90,11 +120,25 @@ namespace ch13::exercises {
     private:
         vector<unique_ptr<Rectangle>> shape_each_bar;
 
-        unique_ptr<Text> graph_label;
-        vector<unique_ptr<Text>> bar_labels;
+        unique_ptr<Graph_labels> graph_labels;
+        unique_ptr<XY_axis> xy_axis;
+    };
 
-        unique_ptr<Axis> xa;
-        unique_ptr<Axis> ya;
+    struct Point_graph : Shape {
+        Point_graph(const vector<pair<double,double>>& data_xy, Point origin, int width_spase = 10,
+            int xy_scale = 5, const string& label_graph = "GG",const string& marks_char = ".");
+
+        void set_color(Color cc);
+
+        void draw_specifics(Painter &painter) const override;
+        void move(int dx, int dy) override;
+
+    private:
+        Marks data_points;
+
+        unique_ptr<Graph_labels> graph_labels;
+        unique_ptr<XY_axis> xy_axis;
+
     };
 
     void ex_1();
@@ -102,6 +146,7 @@ namespace ch13::exercises {
     void ex_4();
     void ex_5();
     void ex_6_9();
+    void ex_10();
 
 }
 #endif // DRILL_EX_H
