@@ -141,13 +141,17 @@ namespace ch13::exercises {
 
     Graph_labels::Graph_labels(Point graph_label_point, const std::string &graph_label) {
         this->graph_label = make_unique<Text>(Point{graph_label_point.x,graph_label_point.y + 20}, graph_label);
-        this->graph_label->set_font_size(16);
+        this->graph_label->set_font_size(12);
     }
 
     void Graph_labels::set_color(Color cc) {
         for (auto& el : this->bar_labels)
             el->set_color(cc);
 
+        this->graph_label->set_color(cc);
+    }
+
+    void Graph_labels::set_graph_label_color(Color cc) {
         this->graph_label->set_color(cc);
     }
 
@@ -178,6 +182,108 @@ namespace ch13::exercises {
         this->graph_label->move(dx,dy);
     }
 
+    void Graph::set_label_to_individual_bar(size_t index, const string &label) {
+        this->graph_labels->set_label_to_individual_bar(index,label);
+    }
+
+    void Graph::set_label_to_graph(const string &label) {
+        this->graph_labels->set_label_to_graph(label);
+    }
+
+    void Graph::set_text_color(Color cc) {
+        this->graph_labels->set_color(cc);
+    }
+
+    void Graph::set_graph_label_color(Color cc) {
+        this->graph_labels->set_graph_label_color(cc);
+    }
+
+    void Graph::add_specific_label(Point pp, const std::string &label) {
+        this->graph_labels->add_specific_label(pp,label);
+    }
+
+
+    void Graph::draw_specifics(Painter &painter) const {
+        this->graph_labels->draw(painter);
+    }
+
+    void Graph::move(int dx, int dy) {
+        this->graph_labels->move(dx,dy);
+    }
+
+    Graph::Graph(Point label_pos, const string &label_graph) {
+        this->graph_labels = make_unique<Graph_labels>(label_pos,label_graph);
+
+    }
+
+    Line_graph::Line_graph(const vector<double> &data, Point origin, int width_spase, int xy_scale,
+        const string &label_graph) : Graph({origin.x,static_cast<int>(origin.y-xy_scale*data.front())},label_graph) {
+        Point current = origin;
+        const int wide_spase = width_spase * xy_scale;
+
+        for (const auto& el : data) {
+            int y_pos_point = static_cast<int>(lround(el * xy_scale));
+            Point temp_point = current;
+
+            temp_point.y -= y_pos_point;
+            this->data_view.add(temp_point);
+
+            add_specific_label(temp_point,format("{:.1f}",el));
+
+            current.x += 2*wide_spase;
+        }
+
+    }
+
+    void Line_graph::own_set_color(Color cc) {
+        this->data_view.set_color(cc);
+    }
+
+    void Line_graph::own_set_fill_color(Color cc) {
+        own_set_color(cc);
+    }
+
+    void Line_graph::draw_specifics(Painter &painter) const {
+        Graph::draw_specifics(painter);
+        this->data_view.draw(painter);
+    }
+
+    void Line_graph::move(int dx, int dy) {
+        Graph::move(dx, dy);
+        this->data_view.move(dx,dy);
+    }
+
+
+
+    Poly_graph::Poly_graph(Point origin, int width_spase, int xy_scale) :
+            xy_axis(make_unique<XY_axis>(origin,length_xy_axis_default,xy_scale)),
+            width_spase(width_spase), xy_scale(xy_scale), origin(origin){}
+
+    void Poly_graph::add_line_graph(const vector<double> &data, const string &label_graph) {
+        this->graphs.emplace_back(make_unique<Line_graph>(data,origin,width_spase,xy_scale,label_graph));
+        graphs.back()->own_set_color(Color(graphs.size())); // NOLINT(*-narrowing-conversions)
+        graphs.back()->set_graph_label_color(Color(graphs.size())); // NOLINT(*-narrowing-conversions)
+    }
+
+    void Poly_graph::set_axis_color(Color cc) {
+        xy_axis->set_color(cc);
+    }
+
+    void Poly_graph::draw_specifics(Painter &painter) const {
+        xy_axis->draw_specifics(painter);
+        for (auto& el : graphs)
+            el->draw_specifics(painter);
+    }
+
+    void Poly_graph::move(int dx, int dy) {
+        xy_axis->move(dx,dy);
+        for (auto& el : graphs)
+            el->move(dx,dy);
+
+        origin.x += dx;
+        origin.y -= dy;
+    }
+
     Bar_graph::Bar_graph(const vector<double>& data, const Point origin, const pair<int,int>& width_bar_and_spase ,
                          const int xy_scale, const string& label_graph){
 
@@ -187,9 +293,9 @@ namespace ch13::exercises {
         const int count_bars = static_cast<int>(data.size());
         const int length_xa = (wide_bar + wide_spase) * count_bars;
         constexpr int length_ya = 800;
-        const int count_p_ya = length_ya/xy_scale;
 
-        this->xy_axis  = make_unique<XY_axis>(origin,pair{length_xa,length_ya},count_p_ya);
+
+        this->xy_axis  = make_unique<XY_axis>(origin,pair{length_xa,length_ya},xy_scale);
         this->graph_labels = make_unique<Graph_labels>(origin,label_graph);
 
 
@@ -267,9 +373,9 @@ namespace ch13::exercises {
         const int count_bars = static_cast<int>(data_xy.size());
         const int length_xa = (1 + wide_spase) * count_bars;
         constexpr int length_ya = 800;
-        const int count_p_ya = length_ya/xy_scale;
 
-        this->xy_axis  = make_unique<XY_axis>(origin,pair{length_xa,length_ya},count_p_ya);
+
+        this->xy_axis  = make_unique<XY_axis>(origin,pair{length_xa,length_ya},xy_scale);
         this->graph_labels = make_unique<Graph_labels>(origin,label_graph);
 
 
@@ -481,7 +587,7 @@ namespace ch13::exercises {
 
     void ex_10() {
         Application app;
-        Simple_window win{zero_point, 1300, 800, "ch13_ex6_9. Bar graph class"};
+        Simple_window win{zero_point, 1300, 800, "ch13_ex10. Point graph class"};
         vector<pair<double,double>> data_xy = {
             {160,55},
             {162,57},
@@ -501,6 +607,40 @@ namespace ch13::exercises {
         Point_graph point_graph(data_xy,origin);
 
         win.attach(point_graph);
+        win.wait_for_button();
+    }
+
+    void ex11() {
+        Application app;
+        Simple_window win{zero_point, 1300, 800, "ch13_ex11. ...graph them together..."};
+
+        // 0----
+        vector<pair<int,int>> data = read_pairs_from_file("temperatures_test.txt");
+        vector<string> name_bars;
+        vector<double> temperatures;
+
+
+        temperatures.reserve(data.size());
+        name_bars.reserve(data.size());
+
+        for (auto& el : data) {
+            temperatures.push_back(el.second);
+            name_bars.push_back(format("{}\",{}",el.first,el.second));
+        }
+        // 0----
+
+        Poly_graph poly_graph {{30,600}};
+        poly_graph.add_line_graph(temperatures);
+
+        for (auto& el : temperatures)
+            el *= 2;
+
+        poly_graph.add_line_graph(temperatures);
+        /*unique_ptr<Graph> line_graph = make_unique<Line_graph>(temperatures,Point{30,300});
+        line_graph->set_text_color(Color::cyan);
+        line_graph->own_set_fill_color(Color::red);*/
+
+        win.attach(poly_graph);
         win.wait_for_button();
     }
 }

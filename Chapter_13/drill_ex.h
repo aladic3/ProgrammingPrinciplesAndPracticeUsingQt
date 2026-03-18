@@ -37,6 +37,8 @@ namespace ch13::drill{
 
 
 namespace ch13::exercises {
+    constexpr pair length_xy_axis_default {700,700};
+
     template<class Precision>
     struct Fct1 : Shape {
         using F1 = std::function<double(double)>;
@@ -74,10 +76,10 @@ namespace ch13::exercises {
     };
 
     struct XY_axis : Shape {
-        XY_axis(Point origin, pair<int,int> length_xy_axis,int count_p_ya) {
+        XY_axis(Point origin, pair<int,int> length_xy_axis,int xy_scale) {
+            int count_notches = length_xy_axis.second/xy_scale;
             this->xa = make_unique<Axis>(Axis::x,origin,length_xy_axis.first);
-            this->ya = make_unique<Axis>(Axis::y,origin,length_xy_axis.second,count_p_ya);
-
+            this->ya = make_unique<Axis>(Axis::y,origin,length_xy_axis.second,count_notches);
         }
         void set_color(Color cc);
         void draw_specifics(Painter &painter) const override;
@@ -91,16 +93,75 @@ namespace ch13::exercises {
         Graph_labels(Point graph_label_point, const std::string& graph_label);
 
         void set_color(Color cc);
+        void set_graph_label_color(Color cc);
         void set_label_to_graph(const string &label);
 
         void set_label_to_individual_bar(size_t index, const string &label);
         void add_specific_label(Point pp, const std::string& label);
+
         void draw_specifics(Painter &painter) const override;
         void move(int dx, int dy) override;
 
     private:
         unique_ptr<Text> graph_label;
         vector<unique_ptr<Text>> bar_labels;
+    };
+
+
+
+    struct Graph : Shape {
+
+        void set_label_to_graph(const string& label);
+        void set_text_color(Color cc);
+        void set_graph_label_color(Color cc);
+
+        void add_specific_label(Point pp, const std::string& label);
+
+        virtual void own_set_color(Color cc) = 0;
+        virtual void own_set_fill_color(Color cc) = 0;
+
+        void draw_specifics(Painter &painter) const override;
+        void move(int dx, int dy) override;
+
+    protected:
+        void set_label_to_individual_bar(size_t index, const string& label);
+        Graph(Point label_pos, const string& label_graph );
+
+    private:
+        unique_ptr<Graph_labels> graph_labels;
+    };
+
+    struct Line_graph : Graph {
+        Line_graph(const vector<double>& data, Point origin, int width_spase = 10,
+            int xy_scale = 5,const string& label_graph = "Line_graph");
+
+        void own_set_color(Color cc) override;
+        void own_set_fill_color(Color cc) override;
+
+        void draw_specifics(Painter &painter) const override;
+        void move(int dx, int dy) override;
+
+    private:
+        Open_polyline data_view;
+    };
+
+    struct Poly_graph : Shape {
+        explicit Poly_graph(Point origin, int width_spase = 10,
+                            int xy_scale = 5);
+
+        void add_line_graph(const vector<double>& data,const string& label_graph = "Line_graph");
+        void set_axis_color(Color cc);
+
+        void draw_specifics(Painter &painter) const override;
+        void move(int dx, int dy) override;
+    private:
+        unique_ptr<XY_axis> xy_axis;
+
+        const int width_spase;
+        const int xy_scale;
+
+        Point origin;
+        vector<unique_ptr<Graph>> graphs;
     };
 
     struct Bar_graph : Shape {
@@ -147,6 +208,7 @@ namespace ch13::exercises {
     void ex_5();
     void ex_6_9();
     void ex_10();
+    void ex11();
 
 }
 #endif // DRILL_EX_H
