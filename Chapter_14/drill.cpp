@@ -9,7 +9,9 @@ namespace ch14::drill{
             istringstream is(this->in_box.last_string_value());
             int x,y;
             char ch;
-            if (!(is >> x >> ch >> y)) error("Bad input: x,y values");
+
+            if (!(is >> x >> ch >> y))
+                error("Bad input: x,y values");
 
             this->lines.add(Point{x,y});
 

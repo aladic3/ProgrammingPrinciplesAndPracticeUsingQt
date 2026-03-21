@@ -85,7 +85,8 @@ namespace Graph_lib {
 
 //------------------------------------------------------------------------------
 
-    struct Menu : Widget {
+    struct
+    Menu : Widget {
         enum Kind { horizontal, vertical };
         Menu(Point xy, int w, int h, Kind kk, const string& label);
 
