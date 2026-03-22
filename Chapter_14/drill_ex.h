@@ -16,7 +16,8 @@ namespace ch14::drill{
       in_box(Point{origin.x+ww/2,origin.y+50},50,10,"input \"x,y\":",[this]{next();}),
       out_box(origin,"last x,y:"),
       menu_button(Point{quit_button.loc.x,quit_button.loc.y+30},quit_button.width,quit_button.height,"Menu",[this]{show_menu();}),
-      color_menu(Point{menu_button.loc.x,menu_button.loc.y + 30},70,30,Menu::vertical,"Color menu") {
+      color_menu(Point{menu_button.loc.x,menu_button.loc.y + 30},70,30,Menu::vertical,"Color menu"),
+      style_menu(Point{menu_button.loc.x-75,menu_button.loc.y},70,30,Menu::vertical,"Line style"){
          this->attach(lines);
          this->attach(quit_button);
          this->attach(in_box);
@@ -25,15 +26,21 @@ namespace ch14::drill{
          this->attach(out_box);
          this->attach(menu_button);
          this->attach(color_menu);
+         this->attach(style_menu);
 
+         color_menu.attach(make_unique<Button>(origin,0,0,"red",[&]{change_color(Color::red);}));
+         color_menu.attach(make_unique<Button>(origin,0,0,"blue",[&]{change_color(Color::blue);}));
+         color_menu.attach(make_unique<Button>(origin,0,0,"yellow",[&]{change_color(Color::yellow);}));
 
+         style_menu.attach(make_unique<Button>(origin,0,0,"Dash dot",[&]{change_style(Line_style::dashdot);}));
+         style_menu.attach(make_unique<Button>(origin,0,0,"Dash dot dot",[&]{change_style(Line_style::dashdotdot);}));
+         style_menu.attach(make_unique<Button>(origin,0,0,"Dash",[&]{change_style(Line_style::dash);}));
+         style_menu.attach(make_unique<Button>(origin,0,0,"Dot",[&]{change_style(Line_style::dot);}));
+         style_menu.attach(make_unique<Button>(origin,0,0,"Solid",[&]{change_style(Line_style::solid);}));
 
-
-         color_menu.attach(make_unique<Button>(origin,0,0,"red",[&]{change(Color::red);}));
-         color_menu.attach(make_unique<Button>(origin,0,0,"blue",[&]{change(Color::blue);}));
-         color_menu.attach(make_unique<Button>(origin,0,0,"yellow",[&]{change(Color::yellow);}));
-
+         style_menu.hide();
          color_menu.hide();
+         this->lines.set_style(Line_style{Line_style::solid,4});
 
       }
 
@@ -48,14 +55,20 @@ namespace ch14::drill{
       Out_box out_box;
       Button menu_button;
       Menu color_menu;
+      Menu style_menu;
 
-      void show_menu(){menu_button.hide();color_menu.show();}
-      void hide_menu(){menu_button.show();color_menu.hide();}
+      void show_menu(){menu_button.hide();color_menu.show();style_menu.show();}
+      void hide_menu(){menu_button.show();color_menu.hide();style_menu.hide();}
 
       void quit(){ app->quit();}
       void next();
 
-      void change(Color col){lines.set_color(col);hide_menu();}
+      void change_color(Color col){lines.set_color(col);hide_menu();}
+      void change_style(Line_style line_style) {
+         lines.set_style(Line_style{static_cast<Line_style::Line_style_type>(line_style.style()),
+                                 lines.style().width()});
+         hide_menu();
+      }
 
 
    };
