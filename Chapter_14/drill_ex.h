@@ -76,4 +76,28 @@ namespace ch14::drill{
    void drill();
 }
 
+namespace ch14::exercises {
+   struct My_window : Simple_window {
+      My_window(Application& application, Point xy, int w, int h, const string& title );
+
+   private:
+      Application* app;
+      Button quit_button;
+      void quit();
+   };
+
+   struct Checkerboard_window : My_window {
+      Checkerboard_window(Application& application, Point xy, int w, int h, const string& title);
+
+
+   private:
+      Menu checkerboard_menu; // 4x4 buttons
+      Out_box out_box;
+
+      void reset_color();
+   };
+
+
+   void ex1();
+}
 #endif //PROGRAMMING_QT_DRILL_EX_H
