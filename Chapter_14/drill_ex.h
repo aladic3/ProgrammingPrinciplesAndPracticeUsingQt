@@ -89,15 +89,19 @@ namespace ch14::exercises {
    struct Checkerboard_window : My_window {
       Checkerboard_window(Application& application, Point xy, int w, int h, const string& title);
 
-
    private:
-      Menu checkerboard_menu; // 4x4 buttons
       Out_box out_box;
+      vector<unique_ptr<Button>> buttons;
+      int last_index = 0;
 
-      void reset_color();
+      void create_checkerboard_buttons(Point origin);
+      void press_button(int iterator);
+
+      void print_coordinates(Point p);
    };
 
 
    void ex1();
+   void ex2();
 }
 #endif //PROGRAMMING_QT_DRILL_EX_H
