@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "../base.h"
+#include "Chapter_11/try_drill_ex.h"
 
 namespace ch14::drill{
 
@@ -102,10 +103,30 @@ namespace ch14::exercises {
       Checkerboard_window(Application& application, Point xy, int w, int h, const string& title);
 
    private:
-      Out_box out_box;
-      vector<unique_ptr<Button>> buttons;
-      int last_index = 0;
+      Point inputted_xy {-1,-1};
+      pair<int,int> inputted_size {-1,-1};
 
+      Out_box out_box;
+      In_box xy_coordinates_input;
+      In_box wh_input;
+
+      vector<unique_ptr<Button>> checkerboard_buttons;
+      vector<unique_ptr<Button>> make_shapes_buttons;
+
+      int last_index_checkerboard = 0;
+
+      vector<unique_ptr<Shape>> own_shapes;
+
+
+      void input_coordinates();
+      void input_size();
+
+      void create_square();
+      void create_circle();
+      void create_equilateral_triangle();
+      void create_hexagon();
+
+      void create_shapes_buttons(Point origin);
       void create_checkerboard_buttons(Point origin);
       void press_button_ex2(int iterator);
       void press_button_ex3(int iterator);
