@@ -4,6 +4,8 @@
 
 #ifndef PROGRAMMING_QT_DRILL_EX_H
 #define PROGRAMMING_QT_DRILL_EX_H
+#include <utility>
+
 #include "../base.h"
 
 namespace ch14::drill{
@@ -77,6 +79,16 @@ namespace ch14::drill{
 }
 
 namespace ch14::exercises {
+   struct ImageButton : Button {
+      ImageButton(Point xy, int w, int h, const string &label, Callback cb, const string& img_name = "button.PNG");
+
+      void attach(Window &) override;
+      void move(int dx, int dy) override;
+
+   private:
+      Image image;
+   };
+
    struct My_window : Simple_window {
       My_window(Application& application, Point xy, int w, int h, const string& title );
 
@@ -95,10 +107,13 @@ namespace ch14::exercises {
       int last_index = 0;
 
       void create_checkerboard_buttons(Point origin);
-      void press_button(int iterator);
+      void press_button_ex2(int iterator);
+      void press_button_ex3(int iterator);
 
       void print_coordinates(Point p);
    };
+
+
 
 
    void ex1();

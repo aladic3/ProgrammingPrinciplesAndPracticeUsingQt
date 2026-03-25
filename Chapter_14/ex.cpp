@@ -5,6 +5,23 @@
 #include "PPP/GUI_private.h"
 
 namespace ch14::exercises {
+    ImageButton::ImageButton(Point xy, int w, int h, const string &label, Callback cb, const string &img_name)  :
+      Button(xy, w, h,label, std::move(cb)),
+      image(xy,img_name) {
+        //image.set_mask({0,0},w,h);
+        image.scale(w,h,false);
+    }
+
+    void ImageButton::attach(Window &window) {
+        Button::attach(window);
+        window.attach(image);
+    }
+
+    void ImageButton::move(int dx, int dy) {
+        Button::move(dx, dy);
+        image.move(dx,dy);
+    }
+
     My_window::My_window(Application &application, Point xy, int w, int h, const string &title):
     Simple_window(xy,w,h,title),
     app(&application),
@@ -18,17 +35,6 @@ namespace ch14::exercises {
         app->quit();
         delete this;
     }
-
-    /*
-    *  Out_box out_box;
-      vector<Shape*> shapes;
-      vector<unique_ptr<Shape>> internal_shapes;
-
-      Menu checkerboard_menu_1; // 4x4 buttons
-      Menu checkerboard_menu_2;
-      Menu checkerboard_menu_3;
-      Menu checkerboard_menu_4;
-     */
 
     Checkerboard_window::Checkerboard_window(Application &application, Point xy, int w, int h, const string &title) :
                 My_window(application,xy,w,h,title),
@@ -53,8 +59,8 @@ namespace ch14::exercises {
                 name << iterator_2d;
 
                 this->buttons.emplace_back(
-                    make_unique<Button>(current,width_button,height_button,name.str(),[this,iterator_2d]
-                        {press_button(iterator_2d);}));
+                    make_unique<ImageButton>(current,width_button,height_button,name.str(),[this,iterator_2d]
+                        {press_button_ex3(iterator_2d);}));
 
                 attach(*this->buttons.back()); // attach to window
 
@@ -66,7 +72,7 @@ namespace ch14::exercises {
 
     }
 
-    void Checkerboard_window::press_button(int iterator) {
+    void Checkerboard_window::press_button_ex2(int iterator) {
         buttons[last_index]->get_impl().widget->setStyleSheet("background-color: grey;"); // reset last button
 
         auto button = &buttons[iterator];
@@ -75,6 +81,11 @@ namespace ch14::exercises {
         last_index = iterator;
     }
 
+    void Checkerboard_window::press_button_ex3(int iterator) {
+        auto& button = *buttons[iterator];
+        button.move(randint(-100,100),randint(-100,100));
+        print_coordinates(button.loc);
+    }
 
 
     void Checkerboard_window::print_coordinates(Point p) {
