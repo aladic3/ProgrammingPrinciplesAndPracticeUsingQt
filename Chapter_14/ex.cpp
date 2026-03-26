@@ -56,6 +56,17 @@ namespace ch14::exercises {
 
     }
 
+    Point Checkerboard_window::get_inputted_xy() const {
+        return this->inputted_xy;
+    }
+
+    Shape* Checkerboard_window::get_last_shape() const {
+        if (this->own_shapes.empty())
+            return nullptr;
+
+        return own_shapes.back().get();
+    }
+
 
     void Checkerboard_window::input_coordinates() {
         if (this->xy_coordinates_input.last_result() != In_box::accepted) {
@@ -200,6 +211,37 @@ namespace ch14::exercises {
         out_box.data.set_label(os.str());
     }
 
+    Window_ex5::Window_ex5(Application &application, Point xy, int w, int h, const string &title) :
+            next_location_button(Point{300,500},default_ww_button,default_hh_button,"next_loc",
+                [this]{move_last_shape();}),
+            win(application,xy,w,h,title)
+    {
+        win.attach(next_location_button);
+    }
+
+    void Window_ex5::attach(Shape &sh) {
+        this->win.attach(sh);
+    }
+
+    void Window_ex5::wait_for_button() {
+        this->win.wait_for_button();
+    }
+
+    void Window_ex5::move_last_shape() {
+        auto last_sh = win.get_last_shape();
+        Point new_coordinates = win.get_inputted_xy();
+
+        if (last_sh == nullptr || new_coordinates.x == -1)
+            return;
+
+        Point current_coordinates = last_sh->point(0);
+
+        int dx = new_coordinates.x - current_coordinates.x;
+        int dy = new_coordinates.y - current_coordinates.y;
+
+        last_sh->move(dx,dy);
+    }
+
     void ex1() {
         Application app;
         My_window win{app,zero_point,1000,800,"Ex1"};
@@ -213,7 +255,7 @@ namespace ch14::exercises {
 
     }
 
-    void ex2() {
+    void ex2_4() {
         Application app;
         Checkerboard_window win{app,zero_point,1000,800,"Ex2"};
         Circle circle{{50,50},30};
@@ -224,4 +266,17 @@ namespace ch14::exercises {
         win.attach(rect);
         win.wait_for_button();
     }
+
+    void ex5() {
+        Application app;
+        Window_ex5 win{app,zero_point,1000,800,"Ex5"};
+        Circle circle{{50,50},30};
+        Rectangle rect {zero_point,100,200};
+        win.attach(circle);
+        win.wait_for_button();
+
+        win.attach(rect);
+        win.wait_for_button();
+    }
+
 }

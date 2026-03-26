@@ -5,6 +5,9 @@
 #include "PPP/Window.h"
 #include "PPP/Simple_window.h"
 
+constexpr int  default_ww_button = 50;
+constexpr int default_hh_button = 30;
+
 constexpr int default_size_node = 30;
 const double pi = std::acos(-1.0);;
 

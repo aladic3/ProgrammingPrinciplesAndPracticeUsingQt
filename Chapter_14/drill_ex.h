@@ -99,8 +99,12 @@ namespace ch14::exercises {
       void quit();
    };
 
+
    struct Checkerboard_window : My_window {
       Checkerboard_window(Application& application, Point xy, int w, int h, const string& title);
+
+      [[nodiscard]] Point get_inputted_xy() const;
+      [[nodiscard]] Shape* get_last_shape() const;
 
    private:
       Point inputted_xy {-1,-1};
@@ -134,10 +138,23 @@ namespace ch14::exercises {
       void print_coordinates(Point p);
    };
 
+   struct Window_ex5 {
+      Window_ex5(Application& application, Point xy, int w, int h, const string& title);
+
+      void attach(Shape& sh);
+      void wait_for_button();
+
+   private:
+      Button next_location_button;
+      Checkerboard_window win;
+
+      void move_last_shape();
+   };
 
 
 
    void ex1();
-   void ex2();
+   void ex2_4();
+   void ex5();
 }
 #endif //PROGRAMMING_QT_DRILL_EX_H
