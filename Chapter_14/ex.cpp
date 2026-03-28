@@ -211,6 +211,204 @@ namespace ch14::exercises {
         out_box.data.set_label(os.str());
     }
 
+    Watch_face::Watch_face(Point origin, int radius) :
+    properties(origin,radius){
+        createClockFace();
+        createHourHand();
+        createMinuteHand();
+        createSecondHand();
+        createTickMarks();
+
+        calculate_hour_hand_coordinate();
+
+        update_time_from_std();
+
+        set_minute_hand();
+        set_second_hand();
+        set_hour_hand();
+    }
+
+    void Watch_face::draw_specifics(Painter &painter) const {
+        clockFace->draw(painter);
+        hourHand->draw(painter);
+        minuteHand->draw(painter);
+        secondHand->draw(painter);
+
+        for (auto& el : tickMarks)
+            el->draw(painter);
+    }
+
+    void Watch_face::move(int dx, int dy) {
+        clockFace->move(dx,dy);
+        hourHand->move(dx,dy);
+        minuteHand->move(dx,dy);
+        secondHand->move(dx,dy);
+
+        for (auto& el : tickMarks)
+            el->move(dx,dy);
+
+    }
+
+    void Watch_face::increment_seconds_by_one() {
+        ++properties.current_second;
+        if (properties.current_second == 60) {
+            properties.current_second = 0;
+            ++properties.current_minute;
+        }
+
+        if (properties.current_minute == 60) {
+            properties.current_minute = 0;
+            ++properties.current_hour;
+        }
+
+        if (properties.current_hour == 24)
+            properties.current_hour = 0;
+
+        if (properties.current_minute % 5 == 0)
+            update_time_from_std();
+
+        this->set_hour_hand();
+        this->set_minute_hand();
+        this->set_second_hand();
+
+    }
+
+    void Watch_face::set_minute_hand(int minutes) {
+        if (minutes > 59 || minutes < 0) error("Bad minutes value");
+        properties.current_minute = minutes;
+
+        this->minuteHand->set_point(1,tickMarks[minutes]->point(0));
+    }
+
+    void Watch_face::set_second_hand(int second) {
+        if (second > 59 || second < 0) error("Bad seconds value");
+        properties.current_second = second;
+
+        this->secondHand->set_point(1,tickMarks[second]->point(0));
+    }
+
+    void Watch_face::set_hour_hand(int hour) {
+        if (hour > 23 || hour < 0) error("Bad hours value");
+        properties.current_hour = hour;
+
+        hourHand->set_point(1,calculate_hour_hand_coordinate());
+    }
+
+    void Watch_face::update_time_from_std() {
+        auto now = std::chrono::system_clock::now();
+        std::time_t t_c = std::chrono::system_clock::to_time_t(now);
+        std::tm* now_tm = std::localtime(&t_c);
+
+        int h = now_tm->tm_hour;
+        int m = now_tm->tm_min;
+        int s = now_tm->tm_sec;
+
+        properties.current_minute=m;
+        properties.current_second=s;
+        properties.current_hour=h;
+
+        /*for (int i = 0; i < 2; ++i)
+            this->increment_seconds_by_one();*/
+
+
+    }
+
+    Point Watch_face::calculate_hour_hand_coordinate() {
+        int hour = properties.current_hour;
+
+        hour = hour >= 12 ? hour - 12 : hour;
+
+        int tick_position = hour * 5; // 0 ... 60
+        tick_position += properties.current_minute / 12;
+
+        Point edge_point = tickMarks[tick_position]->point(0);
+
+        double t = static_cast<double>(properties.long_hour_hand)/properties.radius;
+
+        return get_segment_coordinate(properties.center,edge_point,t);
+    }
+
+    void Watch_face::createClockFace() {
+        clockFace = make_unique<Circle>(properties.center,properties.radius);
+        clockFace->set_fill_color(properties.face_color);
+    }
+
+    void Watch_face::createHourHand() {
+        hourHand = make_unique<Line>(properties.center, Point{properties.center.x,properties.center.y-properties.long_hour_hand});
+        hourHand->set_color(properties.hour_color);
+        hourHand->set_style(Line_style(Line_style::solid,properties.width_hour));
+    }
+
+    void Watch_face::createMinuteHand() {
+        minuteHand = make_unique<Line>(properties.center, Point{properties.center.x,properties.center.y-properties.long_minute_hand});
+        minuteHand->set_color(properties.minute_color);
+        minuteHand->set_style(Line_style(Line_style::solid,properties.width_minute));
+    }
+
+    void Watch_face::createSecondHand() {
+        secondHand = make_unique<Line>(properties.center, Point{properties.center.x,properties.center.y-properties.long_second_hand});
+        secondHand->set_color(properties.second_color);
+        secondHand->set_style(Line_style(Line_style::solid,properties.width_second));
+    }
+
+    void Watch_face::createTickMarks() {
+
+        const Point center_point = properties.center;
+        const Point start_point {center_point.x,center_point.y-properties.radius};
+
+        for (int i = 0; i < 60; ++i) {
+
+            const int long_tick = i % 5 ? properties.long_tick : properties.long_tick + 4;
+            const int width_tick = i % 5 ? properties.width_tick : properties.width_tick + 2;
+            double t = static_cast<double>(properties.radius-long_tick)/properties.radius;
+
+            const double angle = (pi / 30) * i;
+            Point current_point_A = get_turn_coordinate(center_point,start_point, angle); // edge
+            Point current_point_B = get_segment_coordinate(center_point,current_point_A,t);
+
+            tickMarks.emplace_back(make_unique<Line>(current_point_A,current_point_B));
+            tickMarks.back()->set_color(properties.ticks_color);
+            tickMarks.back()->set_style(Line_style(Line_style::solid,width_tick));
+        }
+
+    }
+
+    void Watch_face::set_minute_hand() {
+        this->minuteHand->set_point(1,tickMarks[properties.current_minute]->point(0));
+    }
+
+    void Watch_face::set_second_hand() {
+        this->secondHand->set_point(1,tickMarks[properties.current_second]->point(0));
+    }
+
+    void Watch_face::set_hour_hand() {
+        hourHand->set_point(1,calculate_hour_hand_coordinate());
+    }
+
+    Point Watch_face::get_turn_coordinate(Point center, Point north, double angle) {
+        double dx = north.x - center.x;
+        double dy = north.y - center.y;
+
+
+        int x_new = static_cast<int>(lround(dx * cos(angle) - dy * sin(angle)));
+        int y_new =static_cast<int>(lround( dx * sin(angle) + dy * cos(angle)));
+
+
+        Point result{};
+        result.x = center.x + x_new;
+        result.y = center.y + y_new;
+
+        return result;
+    }
+
+    Point Watch_face::get_segment_coordinate(Point center, Point edge_point, double t) {
+        return Point(
+            static_cast<int>(lround(center.x + t * (edge_point.x - center.x))),
+            static_cast<int>(lround(center.y + t * (edge_point.y - center.y)))
+        );
+
+    }
+
     Window_ex5::Window_ex5(Application &application, Point xy, int w, int h, const string &title) :
             next_location_button(Point{300,500},default_ww_button,default_hh_button,"next_loc",
                 [this]{move_last_shape();}),
@@ -276,6 +474,25 @@ namespace ch14::exercises {
         win.wait_for_button();
 
         win.attach(rect);
+        win.wait_for_button();
+    }
+
+    void ex6() {
+        Application app;
+        My_window win{app,zero_point,1000,800,"Ex6"};
+
+        Watch_face watch {Point{200,200},100};
+
+        win.attach(watch);
+
+
+
+        while (true) {
+            win.timer_wait(1000);
+            watch.increment_seconds_by_one();
+            win.draw();
+        }
+
         win.wait_for_button();
     }
 

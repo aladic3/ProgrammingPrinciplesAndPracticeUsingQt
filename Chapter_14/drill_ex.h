@@ -138,6 +138,74 @@ namespace ch14::exercises {
       void print_coordinates(Point p);
    };
 
+
+   struct Watch_face : Shape {
+      Watch_face(Point origin, int radius);
+
+      void draw_specifics(Painter &painter) const override;
+      void move(int dx, int dy) override;
+
+      void increment_seconds_by_one();
+
+      void set_minute_hand(int minutes);
+      void set_second_hand(int second);
+      void set_hour_hand(int hour);
+
+      struct Properties {
+         Point center{100,100};
+         int radius = 50;
+
+         int width_hour = 4;
+         int width_minute = 4;
+         int width_second = 2;
+         int width_tick = 1;
+
+         int current_second = 15;
+         int current_minute = 35;
+         int current_hour = 17;
+
+         int long_second_hand = radius;
+         int long_minute_hand = long_second_hand;
+         int long_hour_hand = static_cast<int>(lround(0.6 * long_minute_hand));
+
+         int long_tick = radius/10;
+
+         Color second_color = Color::red;
+         Color minute_color = Color::blue;
+         Color hour_color = Color::cyan;
+         Color ticks_color = Color::white;
+         Color face_color = Color::black;
+      };
+
+   private:
+      Properties properties;
+
+
+      unique_ptr<Shape> clockFace;
+      unique_ptr<Shape> hourHand;
+      unique_ptr<Shape> minuteHand;
+      unique_ptr<Shape> secondHand;
+      std::vector<unique_ptr<Shape>> tickMarks;
+
+      void update_time_from_std();
+
+      //std::vector<Point> hour_hand_coordinates;
+
+      Point calculate_hour_hand_coordinate();
+      void createClockFace();
+      void createHourHand();
+      void createMinuteHand();
+      void createSecondHand();
+      void createTickMarks();
+
+      void set_minute_hand();
+      void set_second_hand();
+      void set_hour_hand();
+
+      static Point get_turn_coordinate(Point center, Point north, double angle);
+      static Point get_segment_coordinate(Point center, Point edge_point, double lambda);
+   };
+
    struct Window_ex5 {
       Window_ex5(Application& application, Point xy, int w, int h, const string& title);
 
@@ -156,5 +224,6 @@ namespace ch14::exercises {
    void ex1();
    void ex2_4();
    void ex5();
+   void ex6();
 }
 #endif //PROGRAMMING_QT_DRILL_EX_H

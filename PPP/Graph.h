@@ -150,6 +150,7 @@ protected:
     Shape(std::initializer_list<Point> points = {}) { for (auto&& x : points) add(x);}
 
     void add(Point p){ points.push_back(p); redraw();}
+public: // edited by Kyrylo Dmytrenko
     void set_point(int i, Point p) { points[i] = p; redraw();}
 public:
     void draw(Painter& painter) const;					// deal with color and draw_lines
