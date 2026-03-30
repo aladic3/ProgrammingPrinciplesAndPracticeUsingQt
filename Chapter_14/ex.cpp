@@ -409,6 +409,44 @@ namespace ch14::exercises {
 
     }
 
+    void Airplane_win::process()  {
+       is_wait_ = !is_wait_;
+    }
+
+    Airplane::Airplane(Point origin, int radius) {
+        const int count_plane_points = 30;
+        const int size_airplane = 10;
+
+        for (int i = 0; i < count_plane_points; ++i)
+            this->fly_positions.push_back(Watch_face::get_turn_coordinate(origin,Point{origin.x,origin.y-radius},i*pi/(count_plane_points/2)));
+
+        this->airplane = make_unique<Circle>(fly_positions.front(),size_airplane);
+        airplane->set_fill_color(Color::blue);
+
+        current_position = fly_positions.begin();
+
+
+    }
+
+    Shape & Airplane::get_airplane_shape() const{
+        return *this->airplane;
+    }
+
+    void Airplane::next_fly_position() {
+        Point current = *current_position;
+        ++current_position;
+
+        if (current_position == fly_positions.end())
+            current_position = fly_positions.begin();
+
+        Point next = *current_position;
+
+        int dx = next.x - current.x;
+        int dy = next.y - current.y;
+
+        airplane->move(dx,dy);
+    }
+
     Window_ex5::Window_ex5(Application &application, Point xy, int w, int h, const string &title) :
             next_location_button(Point{300,500},default_ww_button,default_hh_button,"next_loc",
                 [this]{move_last_shape();}),
@@ -485,15 +523,29 @@ namespace ch14::exercises {
 
         win.attach(watch);
 
-
-
+        // ReSharper disable once CppDFAEndlessLoop
         while (true) {
             win.timer_wait(1000);
             watch.increment_seconds_by_one();
             win.draw();
         }
+    }
 
-        win.wait_for_button();
+      void ex7() {
+        Application app;
+        Airplane_win win{zero_point,1000,800,"Ex7"};
+        Airplane airplane {Point{200,200},100};
+
+        win.attach(airplane.get_airplane_shape());
+
+        // ReSharper disable once CppDFAEndlessLoop
+        while (true) {
+            win.timer_wait(1);
+            if (!win.is_wait())
+                airplane.next_fly_position();
+            //win.draw();
+
+        }
     }
 
 }

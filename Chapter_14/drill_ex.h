@@ -138,6 +138,31 @@ namespace ch14::exercises {
       void print_coordinates(Point p);
    };
 
+   struct Properties {
+      Point center{100,100};
+      int radius = 50;
+
+      int width_hour = 4;
+      int width_minute = 4;
+      int width_second = 2;
+      int width_tick = 1;
+
+      int current_second = 15;
+      int current_minute = 35;
+      int current_hour = 17;
+
+      int long_second_hand = radius;
+      int long_minute_hand = long_second_hand;
+      int long_hour_hand = static_cast<int>(lround(0.6 * long_minute_hand));
+
+      int long_tick = radius/10;
+
+      Color second_color = Color::red;
+      Color minute_color = Color::blue;
+      Color hour_color = Color::cyan;
+      Color ticks_color = Color::white;
+      Color face_color = Color::black;
+   };
 
    struct Watch_face : Shape {
       Watch_face(Point origin, int radius);
@@ -151,31 +176,7 @@ namespace ch14::exercises {
       void set_second_hand(int second);
       void set_hour_hand(int hour);
 
-      struct Properties {
-         Point center{100,100};
-         int radius = 50;
 
-         int width_hour = 4;
-         int width_minute = 4;
-         int width_second = 2;
-         int width_tick = 1;
-
-         int current_second = 15;
-         int current_minute = 35;
-         int current_hour = 17;
-
-         int long_second_hand = radius;
-         int long_minute_hand = long_second_hand;
-         int long_hour_hand = static_cast<int>(lround(0.6 * long_minute_hand));
-
-         int long_tick = radius/10;
-
-         Color second_color = Color::red;
-         Color minute_color = Color::blue;
-         Color hour_color = Color::cyan;
-         Color ticks_color = Color::white;
-         Color face_color = Color::black;
-      };
 
    private:
       Properties properties;
@@ -202,8 +203,39 @@ namespace ch14::exercises {
       void set_second_hand();
       void set_hour_hand();
 
+   public:
       static Point get_turn_coordinate(Point center, Point north, double angle);
       static Point get_segment_coordinate(Point center, Point edge_point, double lambda);
+   };
+
+   struct Airplane_win : Window {
+      Airplane_win(Point origin, int ww, int hh, const string& title) :
+      Window(origin,ww,hh,title),
+      quit_button(Point{origin.x + ww-100,origin.y+5},15,7,"quit",[]{throw;}),
+      process_button(Point{origin.x + ww-100,origin.y+40},15,7,"stop/go",[this]{process();}) {
+         attach(quit_button);
+         attach(process_button);
+      }
+
+      [[nodiscard]] bool is_wait() const {return is_wait_;}
+   private:
+      Button quit_button;
+      Button process_button;
+      bool is_wait_ = false;
+
+
+      void process();
+   };
+
+   struct Airplane {
+      Airplane(Point origin, int radius);
+
+      Shape& get_airplane_shape() const;
+      void next_fly_position();
+   private:
+      unique_ptr<Shape> airplane;
+      vector<Point> fly_positions;
+      vector<Point>::iterator current_position;
    };
 
    struct Window_ex5 {
@@ -225,5 +257,7 @@ namespace ch14::exercises {
    void ex2_4();
    void ex5();
    void ex6();
+   void ex7();
+
 }
 #endif //PROGRAMMING_QT_DRILL_EX_H
