@@ -548,4 +548,8 @@ namespace ch14::exercises {
         }
     }
 
+    void ex8() {
+        ch8::ex14_15::test();
+    }
+
 }

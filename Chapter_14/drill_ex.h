@@ -79,6 +79,38 @@ namespace ch14::drill{
    void drill();
 }
 
+namespace ch8::ex14_15 {
+   [[nodiscard]] std::ifstream open_input_stream(const std::string& file_name);
+   long int round(double d);
+
+   struct Money {
+      Money() = default;
+      double amount = 0;
+      string currency{};
+   };
+
+   struct Converter {
+      Converter(const string& file_name);
+
+      void set_amount(double,const string& currency);
+      void convert_to(const string& currency);
+
+      [[nodiscard]] double get_current_amount() const;
+      [[nodiscard]] const string& get_currency() const;
+      [[nodiscard]] const std::vector<pair<string,double>>& get_conversion_factors() const;
+
+
+   private:
+      Money temp_money;
+      std::vector<pair<string,double>> conversion_factors;
+
+   };
+
+
+   std::ostream& operator<<(std::ostream& os, const Converter& money);
+
+}
+
 namespace ch14::exercises {
    struct ImageButton : Button {
       ImageButton(Point xy, int w, int h, const string &label, Callback cb, const string& img_name = "button.PNG");
@@ -258,6 +290,7 @@ namespace ch14::exercises {
    void ex5();
    void ex6();
    void ex7();
+   void ex8();
 
 }
 #endif //PROGRAMMING_QT_DRILL_EX_H

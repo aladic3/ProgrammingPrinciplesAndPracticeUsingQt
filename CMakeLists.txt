@@ -35,6 +35,7 @@ set(PROJECT_SOURCES
         Chapter_14/drill_ex.h
         Chapter_14/drill.cpp
         Chapter_14/ex.cpp
+        Chapter_14/ch8_ex14_15.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
