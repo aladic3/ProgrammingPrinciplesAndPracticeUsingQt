@@ -36,7 +36,14 @@ namespace ch8::ex14_15 {
     }
 
     void Converter::convert_to(const string &currency) {
+        if (this->temp_money.currency == currency)
+            return;
 
+        double old_factor = find_currency_and_get_factor_conversion(temp_money.currency);
+        double new_factor = find_currency_and_get_factor_conversion(currency);
+
+        temp_money.amount = (old_factor*temp_money.amount)/new_factor;
+        temp_money.currency = currency;
     }
 
     double Converter::get_current_amount() const {
@@ -48,6 +55,18 @@ namespace ch8::ex14_15 {
     }
 
     const std::vector<pair<string, double>> & Converter::get_conversion_factors() const {
+        return this->conversion_factors;
+    }
+
+    double Converter::find_currency_and_get_factor_conversion(const string & currency_name) const {
+        double result = 0;
+        for (const auto& el : this->conversion_factors)
+                if (el.first == currency_name) {
+                    result = el.second;
+                    break;
+                }
+
+        return result;
     }
 
     std::ostream& operator<<(std::ostream& os, const Converter& converter) {

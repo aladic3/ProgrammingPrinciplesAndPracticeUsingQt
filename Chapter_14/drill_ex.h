@@ -104,6 +104,8 @@ namespace ch8::ex14_15 {
       Money temp_money;
       std::vector<pair<string,double>> conversion_factors;
 
+      [[nodiscard]] double find_currency_and_get_factor_conversion(const string&) const;
+
    };
 
 
@@ -222,8 +224,6 @@ namespace ch14::exercises {
 
       void update_time_from_std();
 
-      //std::vector<Point> hour_hand_coordinates;
-
       Point calculate_hour_hand_coordinate();
       void createClockFace();
       void createHourHand();
@@ -238,6 +238,31 @@ namespace ch14::exercises {
    public:
       static Point get_turn_coordinate(Point center, Point north, double angle);
       static Point get_segment_coordinate(Point center, Point edge_point, double lambda);
+   };
+
+   struct Window_parameters {
+      Window_parameters() = delete;
+      Point origin;
+      int ww;
+      int hh;
+      const string& title;
+   };
+
+   struct Converter_win : Window {
+      Converter_win(const Window_parameters &parameters, const string& file_name_rates);
+
+
+   private:
+      unique_ptr<In_box> input_box;
+      Out_box output;
+      unique_ptr<Menu> input_menu;
+      unique_ptr<Menu> convertion_menu;
+
+      ch8::ex14_15::Converter converter;
+
+      void create_input_menu();
+      void create_convertion_menu();
+      void create_input_box();
    };
 
    struct Airplane_win : Window {

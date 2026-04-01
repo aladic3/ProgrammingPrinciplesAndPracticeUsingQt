@@ -409,6 +409,23 @@ namespace ch14::exercises {
 
     }
 
+    Converter_win::Converter_win(const Window_parameters &parameters, const string &file_name_rates) : Window(
+            parameters.origin, parameters.ww, parameters.hh, parameters.title),
+            output({10,50},"Converted:"),
+            converter(file_name_rates) {
+
+    }
+
+    void Converter_win::create_input_menu() {
+    }
+
+    void Converter_win::create_convertion_menu() {
+    }
+
+    void Converter_win::create_input_box() {
+        this->input_box = make_unique<In_box>()
+    }
+
     void Airplane_win::process()  {
        is_wait_ = !is_wait_;
     }
@@ -549,7 +566,7 @@ namespace ch14::exercises {
     }
 
     void ex8() {
-        ch8::ex14_15::test();
+        //ch8::ex14_15::test();
     }
 
 }
