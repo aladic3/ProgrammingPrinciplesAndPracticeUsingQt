@@ -264,6 +264,8 @@ namespace ch14::exercises {
 
       ch8::ex14_15::Converter converter;
 
+
+
       void create_input_menu();
       void create_convertion_menu();
       void create_input_box();
