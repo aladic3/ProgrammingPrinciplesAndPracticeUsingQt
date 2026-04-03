@@ -409,21 +409,80 @@ namespace ch14::exercises {
 
     }
 
-    Converter_win::Converter_win(const Window_parameters &parameters, const string &file_name_rates) : Window(
+    Converter_win::Converter_win(const Window_parameters &parameters, const string &file_name_rates) : Simple_window(
             parameters.origin, parameters.ww, parameters.hh, parameters.title),
-            output({10,50},"Converted:"),
+            output_before_conversion({10,50},"Before conversion: "),
+            output_after_conversion({10,100}, "Converted: "),
             converter(file_name_rates) {
+        create_input_menu();
+        create_convertion_menu();
+        create_input_box();
+        attach(output_after_conversion);
+        attach(output_before_conversion);
+
+
 
     }
 
     void Converter_win::create_input_menu() {
+        input_menu = make_unique<Menu>(Point{10,200},default_ww_button,default_hh_button
+            ,Menu::Kind::vertical,"Inputted currency");
+        this->attach(*input_menu);
+
+        const auto& factors = converter.get_conversion_factors();
+
+        for (auto& el : factors)
+            this->input_menu->attach(make_unique<Button>(zero_point,0,0,el.first,
+                [el,this] {
+                    this->converter.set_currency(el.first);
+                    this->print_current_converter_parameters(this->output_before_conversion);
+                }));
+
+        input_menu->show();
     }
 
     void Converter_win::create_convertion_menu() {
+        convertion_menu = make_unique<Menu>(Point{10+2*default_ww_button,200},default_ww_button,default_hh_button
+            ,Menu::Kind::vertical,"Convert to currency");
+        this->attach(*convertion_menu);
+
+        const auto& factors = converter.get_conversion_factors();
+
+        for (auto& el : factors)
+            this->convertion_menu->attach(make_unique<Button>(zero_point,0,0,el.first,
+                [el,this] {
+                    this->converter.convert_to(el.first);
+                    this->print_current_converter_parameters(this->output_after_conversion);
+                }));
+
+        convertion_menu->show();
     }
 
     void Converter_win::create_input_box() {
-        this->input_box = make_unique<In_box>()
+        this->input_box = make_unique<In_box>(Point{10,150},50,20,"To convert:",
+            [this]{input_callback();});
+        attach(*input_box);
+        input_box->hide_buttons();
+        input_box->show();
+    }
+
+    void Converter_win::input_callback() {
+            if (this->input_box->last_result() == In_box::accepted) {
+                istringstream is(this->input_box->last_string_value());
+                double amount_currency;
+
+                if (!(is >> amount_currency))
+                    error("Bad input: x,y values");
+
+                this->converter.set_amount(amount_currency);
+            }
+            this->input_box->clear_last_result();
+    }
+
+    void Converter_win::print_current_converter_parameters(Out_box& output) const {
+        ostringstream os;
+        os << this->converter.get_current_amount() << " " << converter.get_currency();
+        output.data.set_label(os.str());
     }
 
     void Airplane_win::process()  {
@@ -566,6 +625,11 @@ namespace ch14::exercises {
     }
 
     void ex8() {
+        Application app;
+        Window_parameters window_parameters {zero_point,1000,800,"Ex8"};
+        Converter_win win {window_parameters,"converstions.txt"};
+
+        win.wait_for_button();
         //ch8::ex14_15::test();
     }
 

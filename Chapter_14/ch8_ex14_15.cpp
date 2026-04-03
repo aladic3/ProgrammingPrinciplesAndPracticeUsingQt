@@ -35,6 +35,10 @@ namespace ch8::ex14_15 {
         temp_money.currency = currency;
     }
 
+    void Converter::set_currency(const string &currency) {
+        this->temp_money.currency = currency;
+    }
+
     void Converter::convert_to(const string &currency) {
         if (this->temp_money.currency == currency)
             return;
@@ -42,7 +46,7 @@ namespace ch8::ex14_15 {
         double old_factor = find_currency_and_get_factor_conversion(temp_money.currency);
         double new_factor = find_currency_and_get_factor_conversion(currency);
 
-        temp_money.amount = (old_factor*temp_money.amount)/new_factor;
+        temp_money.amount = (temp_money.amount/old_factor)*new_factor;
         temp_money.currency = currency;
     }
 

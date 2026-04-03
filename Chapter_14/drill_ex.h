@@ -92,7 +92,8 @@ namespace ch8::ex14_15 {
    struct Converter {
       Converter(const string& file_name);
 
-      void set_amount(double,const string& currency);
+      void set_amount(double,const string& currency = "");
+      void set_currency(const string& currency);
       void convert_to(const string& currency);
 
       [[nodiscard]] double get_current_amount() const;
@@ -241,20 +242,23 @@ namespace ch14::exercises {
    };
 
    struct Window_parameters {
+      Window_parameters(Point origin, int ww, int hh, const string& title) : origin(origin),ww(ww),hh(hh),title(title){}
       Window_parameters() = delete;
+
       Point origin;
       int ww;
       int hh;
       const string& title;
    };
 
-   struct Converter_win : Window {
+   struct Converter_win : Simple_window {
       Converter_win(const Window_parameters &parameters, const string& file_name_rates);
 
 
    private:
       unique_ptr<In_box> input_box;
-      Out_box output;
+      Out_box output_before_conversion;
+      Out_box output_after_conversion;
       unique_ptr<Menu> input_menu;
       unique_ptr<Menu> convertion_menu;
 
@@ -263,6 +267,9 @@ namespace ch14::exercises {
       void create_input_menu();
       void create_convertion_menu();
       void create_input_box();
+      void input_callback();
+
+      void print_current_converter_parameters(Out_box& output) const;
    };
 
    struct Airplane_win : Window {
