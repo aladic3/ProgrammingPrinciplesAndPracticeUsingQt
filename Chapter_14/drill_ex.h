@@ -8,6 +8,8 @@
 
 #include "../base.h"
 #include "Chapter_11/try_drill_ex.h"
+#include "chapter9/try_drill.h"
+#include "calculator.h"
 
 namespace ch14::drill{
 
@@ -317,6 +319,22 @@ namespace ch14::exercises {
       void move_last_shape();
    };
 
+   struct Calculator_win : Simple_window {
+      Calculator_win(const Window_parameters &parameters);
+
+
+   private:
+      unique_ptr<In_box> input_box;
+      Out_box result;
+
+
+
+
+      void create_input_box();
+      void input_callback();
+
+   };
+
 
 
    void ex1();
@@ -325,6 +343,8 @@ namespace ch14::exercises {
    void ex6();
    void ex7();
    void ex8();
+   void ex9();
+
 
 }
 #endif //PROGRAMMING_QT_DRILL_EX_H

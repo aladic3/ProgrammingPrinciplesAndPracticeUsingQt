@@ -554,6 +554,34 @@ namespace ch14::exercises {
         last_sh->move(dx,dy);
     }
 
+    Calculator_win::Calculator_win(const Window_parameters &parameters)
+        : Simple_window(parameters.origin, parameters.ww, parameters.hh, parameters.title),
+        result({10,50},"Result: "){
+        create_input_box();
+        attach(result);
+    }
+
+    void Calculator_win::create_input_box() {
+        this->input_box = make_unique<In_box>(Point{10,150},50,20,"Enter expression to calculate:",
+          [this]{input_callback();});
+        attach(*input_box);
+        input_box->hide_buttons();
+        input_box->show();
+    }
+
+    void Calculator_win::input_callback() {
+        if (this->input_box->last_result() == In_box::accepted) {
+            istringstream is(this->input_box->last_string_value());
+            ostringstream os;
+
+            calculate_once(is,os);
+
+            this->result.put(os.str());
+        }
+        this->input_box->clear_last_result();
+    }
+
+
     void ex1() {
         Application app;
         My_window win{app,zero_point,1000,800,"Ex1"};
@@ -628,6 +656,15 @@ namespace ch14::exercises {
         Application app;
         Window_parameters window_parameters {zero_point,1000,800,"Ex8"};
         Converter_win win {window_parameters,"converstions.txt"};
+
+        win.wait_for_button();
+        //ch8::ex14_15::test();
+    }
+
+    void ex9() {
+        Application app;
+        Window_parameters window_parameters {zero_point,1000,800,"Ex8"};
+        Calculator_win win {window_parameters};
 
         win.wait_for_button();
         //ch8::ex14_15::test();
