@@ -298,7 +298,7 @@ namespace ch14::exercises {
    struct Airplane {
       Airplane(Point origin, int radius);
 
-      Shape& get_airplane_shape() const;
+      [[nodiscard]] Shape& get_airplane_shape() const;
       void next_fly_position();
    private:
       unique_ptr<Shape> airplane;
@@ -328,9 +328,29 @@ namespace ch14::exercises {
       Out_box result;
 
 
-
-
       void create_input_box();
+      void input_callback();
+
+   };
+
+
+
+   struct Function_Window : Simple_window {
+      using F1 = std::function<double(double)>;
+
+      Function_Window(Point xy, int w, int h, const string& title);
+
+   private:
+      const Point orig {200,300};
+      pair<double,double> current_func_limits {0,0}; // from input box
+
+      unique_ptr<Function> func_shape;
+      In_box input;
+      Menu function_variants_menu;
+
+      void attach_buttons_to_func_var_menu();
+
+      void menu_callback(F1 function);
       void input_callback();
 
    };

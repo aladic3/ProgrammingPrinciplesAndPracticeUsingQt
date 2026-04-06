@@ -30,10 +30,10 @@ namespace ch14::exercises {
     }
 
     void My_window::quit() {
-        this->get_impl().end_button_wait();
+        end_button_wait();
 
         app->quit();
-        delete this;
+        //delete this;
     }
 
     Checkerboard_window::Checkerboard_window(Application &application, Point xy, int w, int h, const string &title) :
@@ -579,6 +579,42 @@ namespace ch14::exercises {
             this->result.put(os.str());
         }
         this->input_box->clear_last_result();
+    }
+
+    /* menu_button(Point{quit_button.loc.x,quit_button.loc.y+30},quit_button.width,quit_button.height,"Menu",[this]{show_menu();}),
+      color_menu(Point{menu_button.loc.x,menu_button.loc.y + 30},70,30,Menu::vertical,"Color menu"),
+
+    t({100,50},50,15,"Limits exapmle input:'-4.5, 8.3'. Enter:",[this]{input_size();})
+     */
+    Function_Window::Function_Window(Point xy, int w, int h, const string &title) : Simple_window(xy,w,h,title),
+    input({100,50},50,15,"Limits exapmle input:'-4.5, 8.3'. Enter:",[this]{this->input_callback();}),
+    function_variants_menu({100,150},default_ww_button,default_hh_button,Menu::vertical,"Functions"){
+        attach(input);
+        attach(function_variants_menu);
+        input.hide_buttons();
+        input.show();
+    }
+
+    void Function_Window::attach_buttons_to_func_var_menu() {
+    }
+
+    void Function_Window::menu_callback(F1 function) {
+        func_shape.reset();
+        func_shape = make_unique<Function>(function,this->current_func_limits.first,current_func_limits.second,orig);
+        attach(*func_shape);
+    }
+
+    /* if (this->input_box->last_result() == In_box::accepted) {
+            istringstream is(this->input_box->last_string_value());
+            ostringstream os;
+
+            calculate_once(is,os);
+
+            this->result.put(os.str());
+        }
+        this->input_box->clear_last_result();
+     */
+    void Function_Window::input_callback() {
     }
 
 
