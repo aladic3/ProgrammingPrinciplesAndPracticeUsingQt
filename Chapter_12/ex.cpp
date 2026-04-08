@@ -216,6 +216,7 @@ void init_points_and_lines(std::initializer_list<Point>& p, vector<Point>& point
     }
 }
 
+    // TODO refactor
 vector<pair<Point,Point>> calculate_striped_lines_coordinates_poly(std::initializer_list<Point>& p,
                                                                     int margin = 5){
     pair<int,int> min_max_x {0,0};

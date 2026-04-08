@@ -115,6 +115,8 @@ private:
 };
 
 struct Node_shape_factory {
+    virtual ~Node_shape_factory() = default;
+
     virtual unique_ptr<Shape> create_node(Point p, int size) const = 0;
 };
 
@@ -139,7 +141,7 @@ private:
 };
 
 struct Circle_node_factory : Node_shape_factory {
-    unique_ptr<Shape> create_node(Point p, int size) const{ return make_unique<Circle>(p,size); }
+    [[nodiscard]] unique_ptr<Shape> create_node(Point p, int size) const{ return make_unique<Circle>(p,size); }
 };
 
 struct Rectangle_node_factory : Node_shape_factory {

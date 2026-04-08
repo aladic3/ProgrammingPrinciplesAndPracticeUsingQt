@@ -581,40 +581,75 @@ namespace ch14::exercises {
         this->input_box->clear_last_result();
     }
 
-    /* menu_button(Point{quit_button.loc.x,quit_button.loc.y+30},quit_button.width,quit_button.height,"Menu",[this]{show_menu();}),
-      color_menu(Point{menu_button.loc.x,menu_button.loc.y + 30},70,30,Menu::vertical,"Color menu"),
-
-    t({100,50},50,15,"Limits exapmle input:'-4.5, 8.3'. Enter:",[this]{input_size();})
-     */
     Function_Window::Function_Window(Point xy, int w, int h, const string &title) : Simple_window(xy,w,h,title),
     input({100,50},50,15,"Limits exapmle input:'-4.5, 8.3'. Enter:",[this]{this->input_callback();}),
-    function_variants_menu({100,150},default_ww_button,default_hh_button,Menu::vertical,"Functions"){
+    for_debag({100,10},"current limits = "),
+    menu({100,150},default_ww_button+30,default_hh_button,Menu::vertical,"Functions"){
         attach(input);
-        attach(function_variants_menu);
+        attach(menu);
+        attach(for_debag);
         input.hide_buttons();
         input.show();
+        create_buttons();
+        menu.show();
+        update_out_box();
+
     }
 
-    void Function_Window::attach_buttons_to_func_var_menu() {
+    long long int fac_recursive(int n) {
+        return n > 1 ? n * fac_recursive(n - 1) : 1;
     }
 
-    void Function_Window::menu_callback(F1 function) {
+    void Function_Window::create_buttons() {
+        const F1 one = [](double) { return 1; };
+        const F1 slope = [](double x) { return x * 0.5; };
+        const F1 square = [](double x) { return x * x; };
+        const F1 cos_f1 = [](double x) { return std::cos(x); };
+        const F1 sin_f1 = [](double x) { return std::sin(x); };
+        const F1 slope_cos = [=](double x) { return cos(x) + slope(x); };
+        const F1 exp_n = [](double x) {
+            double result = 1;
+            constexpr int precision = 8;
+            for (int i = 0; i < precision; ++i) {
+                result += pow(x, i) / static_cast<double>(fac_recursive(i));
+            }
+            return result;
+        };
+        const F1 log_f1 = [](double x) { return log(x); };
+
+        menu.attach(make_unique<Button>(orig,0,0,"sin",[=,this]{button_callback(sin_f1);}));
+        menu.attach(make_unique<Button>(orig,0,0,"slope",[=,this]{button_callback(slope);}));
+        menu.attach(make_unique<Button>(orig,0,0,"square",[=,this]{button_callback(square);}));
+        menu.attach(make_unique<Button>(orig,0,0,"cos",[=,this]{button_callback(cos_f1);}));
+        menu.attach(make_unique<Button>(orig,0,0,"slope_cos",[=,this]{button_callback(slope_cos);}));
+        menu.attach(make_unique<Button>(orig,0,0,"exp",[=,this]{button_callback(exp_n);}));
+        menu.attach(make_unique<Button>(orig,0,0,"log",[=,this]{button_callback(log_f1);}));
+    }
+
+    void Function_Window::update_out_box() {
+        for_debag.put(format("{},{}",current_func_limits.first,current_func_limits.second));
+    }
+
+    void Function_Window::button_callback(const F1& function) {
         func_shape.reset();
-        func_shape = make_unique<Function>(function,this->current_func_limits.first,current_func_limits.second,orig);
+        func_shape = make_unique<Function>(function,current_func_limits.first,current_func_limits.second,orig);
         attach(*func_shape);
     }
 
-    /* if (this->input_box->last_result() == In_box::accepted) {
-            istringstream is(this->input_box->last_string_value());
-            ostringstream os;
-
-            calculate_once(is,os);
-
-            this->result.put(os.str());
-        }
-        this->input_box->clear_last_result();
-     */
     void Function_Window::input_callback() {
+        if (input.last_result() == In_box::accepted) {
+            istringstream is(input.last_string_value());
+            pair inputted_val {0.,0.};
+
+
+            char separator;
+
+            if (is >> inputted_val.first >> separator >> inputted_val.second)
+                this->current_func_limits = inputted_val;
+        }
+
+        input.clear_last_result();
+        update_out_box();
     }
 
 
@@ -704,6 +739,14 @@ namespace ch14::exercises {
 
         win.wait_for_button();
         //ch8::ex14_15::test();
+    }
+
+    void ex10() {
+        Application app;
+        Function_Window win {zero_point,1000,1000,"ex10"};
+
+        win.wait_for_button();
+
     }
 
 }

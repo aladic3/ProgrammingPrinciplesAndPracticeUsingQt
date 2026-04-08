@@ -341,16 +341,19 @@ namespace ch14::exercises {
       Function_Window(Point xy, int w, int h, const string& title);
 
    private:
-      const Point orig {200,300};
-      pair<double,double> current_func_limits {0,0}; // from input box
+      const Point orig {500,300};
+      pair<double,double> current_func_limits {0,1}; // from input box
 
       unique_ptr<Function> func_shape;
       In_box input;
-      Menu function_variants_menu;
+      Out_box for_debag;
 
-      void attach_buttons_to_func_var_menu();
+      Menu menu;
 
-      void menu_callback(F1 function);
+      void create_buttons();
+      void update_out_box();
+
+      void button_callback(const F1& function);
       void input_callback();
 
    };
@@ -364,6 +367,7 @@ namespace ch14::exercises {
    void ex7();
    void ex8();
    void ex9();
+   void ex10();
 
 
 }
