@@ -11,7 +11,9 @@
 #include <span>
 #include <set>
 
-    struct Room;
+namespace ch18::game
+{
+     struct Room;
 
     struct Enemy;
     struct Mortal;
@@ -121,14 +123,21 @@
 
         [[nodiscard]] std::vector<const Enemy *> get_list_of_alive_enemies() const;
 
+        std::set<std::string> get_next_rooms_info_from_antagonist();
+
+        void shoot_antagonist();
+        void move_antagonist() const;
+        void after_move_antagonist() const; // change loc or die antagonist or nothing (wumpus, bat, pit)
+
+        int get_antagonist_room_number();
+        std::vector<int> get_next_antagonist_rooms();
+
     private:
         void init_bats(std::set<int>& sibel_values, int count = 2);
         void init_pits(std::set<int>& sibel_values, int count = 2);
         void init_wumpus(std::set<int>& sibel_values);
         void init_antagonist(std::set<int>& sibel_values);
         std::vector<Mortal*> get_alive_mobs();
-
-        std::set<std::string> get_next_rooms_info_from_antagonist();
 
 
         std::vector<Room> map{20};
@@ -138,16 +147,12 @@
         Wumpus* wumpus = nullptr;
         Antagonist* antagonist = nullptr;
 
-        void shoot_antagonist();
-        void move_antagonist() const;
-        void after_move_antagonist() const; // change loc or die antagonist or nothing (wumpus, bat, pit)
-
-
-
 
     };
 
 
+
+}
 
 
 

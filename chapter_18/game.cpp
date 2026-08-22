@@ -7,6 +7,8 @@
 #include "./PPP/error.h"
 #include <sstream>
 
+namespace ch18::game
+{
     void print_numbers_of_vector_rooms(std::vector<const Room*>& rooms) {
         for (auto& el : rooms) {
             std::cout << el->number_this << ' ';
@@ -179,20 +181,20 @@
 
         int choise = random_int(1,3);
         switch (choise) {
-            case 1:
-                result = location->next_1;
-                break;
+        case 1:
+            result = location->next_1;
+            break;
 
-            case 2:
-                result = location->next_2;
-                break;
+        case 2:
+            result = location->next_2;
+            break;
 
-            case 3:
-                result = location->next_3;
-                break;
+        case 3:
+            result = location->next_3;
+            break;
 
-                default:
-                error("bad random engine");
+        default:
+            error("bad random engine");
 
         }
 
@@ -328,7 +330,7 @@
                 if (enemy->is_current_location(room))
                     rooms_for_extract.emplace_back(room);
 
-         for (const Room* room : rooms_for_extract) // extract
+        for (const Room* room : rooms_for_extract) // extract
             rooms.extract(room);
     }
 
@@ -420,18 +422,18 @@
             std::cin >> answer;
 
             switch (answer) {
-                case 'm':
-                    move_antagonist();
-                    after_move_antagonist(); // TODO see to Antagonist::bat_move
-                    break;
+            case 'm':
+                move_antagonist();
+                after_move_antagonist(); // TODO see to Antagonist::bat_move
+                break;
 
-                case 's':
-                    shoot_antagonist();
-                    break;
+            case 's':
+                shoot_antagonist();
+                break;
 
-                default:
-                    std::cout << "Bad answer!";
-                    continue;
+            default:
+                std::cout << "Bad answer!";
+                continue;
             }
 
 
@@ -494,4 +496,22 @@
                 break;
             }
     }
+
+    int Game::get_antagonist_room_number()
+    {
+       return  antagonist->location->number_this;
+    }
+
+    std::vector<int> Game::get_next_antagonist_rooms()
+    {
+        std::vector<int> result;
+        result.reserve(3);
+
+        result.push_back(antagonist->location->next_1->number_this);
+        result.push_back(antagonist->location->next_2->number_this);
+        result.push_back(antagonist->location->next_3->number_this);
+
+        return result;
+    }
+}
 
