@@ -5,12 +5,19 @@
 #ifndef PROGRAMMING_QT_GAME_GUI_H
 #define PROGRAMMING_QT_GAME_GUI_H
 #include "Chapter_11/try_drill_ex.h"
-#include "PPP/Simple_window.h"
+#include "base.h"
+//#include "PPP/Simple_window.h"
 
 namespace ch18::game_gui
 {
     inline int dm = 50; // default margin
     inline int ds = 30; // default size
+
+    constexpr int boxes_x = 100;
+    constexpr int boxes_y = 20;
+
+
+
 
     struct Room : Shape
     {
@@ -42,9 +49,12 @@ namespace ch18::game_gui
 
 
     private:
-        In_box input;
-        Out_box game_info;
+        void input_callback();
 
+        string last_input_string;
+
+        Out_box game_info;
+        In_box input;
         Menu action_choice;
 
     };
