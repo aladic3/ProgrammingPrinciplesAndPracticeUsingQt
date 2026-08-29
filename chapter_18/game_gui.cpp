@@ -49,9 +49,12 @@ namespace ch18::game_gui
         r3.set_number(next_rooms[2]);
     }
 
-    Game_window::Game_window() : Simple_window(zero_point,width_display_default,high_display_default,
+    Game_window::Game_window(game::Game& e) : Simple_window(zero_point,width_display_default,high_display_default,
                                  "hunt on wumpus"),
+                                engine(e),
                                  game_info(Point{boxes_x - 100, boxes_y}, "TODO"),
+                                last_input(Point{boxes_x - 100, boxes_y-20}, "TODO2"),
+                                game_msg(Point{boxes_x - 100, boxes_y+20}, "TODO"),
                                  input(Point{boxes_x, boxes_y},
                                        default_ww_button, default_hh_button,
                                        "input and press \"Enter\":", [this]() { input_callback(); }),
@@ -62,9 +65,19 @@ namespace ch18::game_gui
         attach(input);
         input.hide_buttons();
         input.show();
-        /*create_buttons();
-        menu.show();
-        update_out_box();*/
+        create_buttons();
+        action_choice.show();
+
+    }
+
+    void Game_window::create_buttons()
+    {
+        std::function<void()> shooting = [this]()
+        {
+            this ->engine.shoot_antagonist(shooting_input_process());
+        };
+
+        action_choice.attach(make_unique<Button>(Point{100,100},0,0,"shoot",[=]{shooting();}));
     }
 
 
@@ -72,8 +85,56 @@ namespace ch18::game_gui
     {
         if (input.last_result() == In_box::accepted) {
             last_input_string = input.last_string_value();
+            last_input.put(last_input_string);
         }
 
+
+
         input.clear_last_result();
+    }
+
+    std::vector<int> Game_window::shooting_input_process()
+    {
+        if (engine.get_arrow_capacity() == 0) {
+            game_msg.put("You can't shooting, capacity arrows is 0! But you can move)");
+            return std::vector<int>{};
+        }
+
+
+       game_msg.put("Enter how much rooms arrow must reached (less then 5)");
+
+        while (last_input_string.empty())
+        {
+            this->timer_wait(500);
+        }
+
+          int count_rooms_reaching = [&]()
+        {
+                std::istringstream is (last_input_string);
+                int result;
+                is >> count_rooms_reaching;
+                last_input_string.clear();
+                return count_rooms_reaching;
+        }.operator()();
+
+
+
+       std::vector<int> trace(count_rooms_reaching);
+
+        game_msg.put("Inputting trace...");
+        this->timer_wait(500);
+        for (int i = 0; i < count_rooms_reaching; ++i) {
+               game_msg.put(std::format("Enter trace[{}]",i));
+
+                while (last_input_string.empty())
+                    this->timer_wait(500);
+
+                std::istringstream is (last_input_string);
+               is >> trace[i];
+                last_input_string.clear();
+
+         }
+
+        return trace;
     }
 }

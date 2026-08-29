@@ -237,9 +237,12 @@ namespace ch18::game
         }
     }
 
-    void Antagonist::shoot(std::span<int> trajectory, const std::vector<Mortal*>& mobs){
+    void Antagonist::shoot(const std::vector<int>& trajectory, const std::vector<Mortal*>& mobs){
         const Room* current_room = this->location;
         bool is_random = false;
+
+        if (trajectory.empty())
+            return;
 
         for (int room_number : trajectory) {
             const Room* prev = current_room;
@@ -413,7 +416,8 @@ namespace ch18::game
     }
 
     void Game::play() {
-        while (antagonist->is_alive() && wumpus->is_alive()) {
+        // in command line gui
+        /*while (antagonist->is_alive() && wumpus->is_alive()) {
             std::cout << "Current capacity of your arrows: " << antagonist->arrows_capacity << std::endl;
             print_info_about_next_rooms(get_next_rooms_info_from_antagonist());
 
@@ -437,31 +441,12 @@ namespace ch18::game
             }
 
 
-        }
+        }*/
 
 
     }
 
-    void Game::shoot_antagonist() {
-        if (antagonist->arrows_capacity == 0) {
-            std::cout << "You can't shooting, capacity arrows is 0! But you can move)";
-            return;
-        }
-
-        std::cout << "Shooting..." << std::endl
-            << "Enter how much rooms arrow must reached (less then 5): ";
-
-        int count_rooms_reaching;
-        std::cin >> count_rooms_reaching;
-        std::vector<int> trace(count_rooms_reaching);
-
-        std::cout << "Inputting trace...";
-        for (int i = 0; i < count_rooms_reaching; ++i) {
-            std::cout << "Enter trace[" <<  i<< "]: ";
-            std::cin >> trace[i];
-            std::cout << std::endl;
-        }
-
+    void Game::shoot_antagonist(const std::vector<int>& trace) {
         antagonist->shoot(trace,get_alive_mobs());
     }
 
@@ -495,6 +480,11 @@ namespace ch18::game
                 enemy->contact_with_antagonist(antagonist,wumpus->location, this);
                 break;
             }
+    }
+
+    int Game::get_arrow_capacity() const
+    {
+        return antagonist->arrows_capacity;
     }
 
     int Game::get_antagonist_room_number()

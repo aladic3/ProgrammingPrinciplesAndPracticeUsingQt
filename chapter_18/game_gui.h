@@ -6,6 +6,11 @@
 #define PROGRAMMING_QT_GAME_GUI_H
 #include "Chapter_11/try_drill_ex.h"
 #include "base.h"
+#include <vector>
+#include <span>
+#include <set>
+
+#include "game.h"
 //#include "PPP/Simple_window.h"
 
 namespace ch18::game_gui
@@ -32,6 +37,8 @@ namespace ch18::game_gui
         Out_box r_number;
     };
 
+
+
     struct Cave_map : Shape
     {
         Cave_map(Point center, int antagonist_room_number, vector<int> next_rooms);
@@ -45,15 +52,22 @@ namespace ch18::game_gui
     };
 
     struct Game_window : Simple_window {
-        Game_window();
+
+        Game_window(game::Game&);
 
 
     private:
+        void create_buttons();
         void input_callback();
+        std::vector<int> shooting_input_process();
 
+        game::Game& engine;
         string last_input_string;
 
+
         Out_box game_info;
+        Out_box last_input;
+        Out_box game_msg;
         In_box input;
         Menu action_choice;
 
