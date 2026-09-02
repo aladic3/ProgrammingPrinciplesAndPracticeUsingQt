@@ -35,13 +35,13 @@ namespace ch18::game_gui
 
 
 
-    Cave_map::Cave_map(Point center, int antagonist_room_number, vector<int> next_rooms) :
+    Cave_map::Cave_map(Point center, int antagonist_room_number, const vector<int>& next_rooms) :
      r1(Point{center.x + dm,center.y + dm}, next_rooms[0],ds),
      r2(Point{center.x - dm,center.y + dm},next_rooms[1],ds),
      r3(Point{center.x,center.y - dm}, next_rooms[2],ds),
     antagonist_r(center,antagonist_room_number,ds)   {}
 
-    void Cave_map::update(int antagonist_room_number, vector<int> next_rooms)
+    void Cave_map::update(int antagonist_room_number, const vector<int>&  next_rooms)
     {
         antagonist_r.set_number(antagonist_room_number);
         r1.set_number(next_rooms[0]);
@@ -52,9 +52,9 @@ namespace ch18::game_gui
     Game_window::Game_window(game::Game& e) : Simple_window(zero_point,width_display_default,high_display_default,
                                  "hunt on wumpus"),
                                 engine(e),
-                                 game_info(Point{boxes_x - 100, boxes_y}, "TODO"),
-                                last_input(Point{boxes_x - 100, boxes_y-20}, "TODO2"),
-                                game_msg(Point{boxes_x - 100, boxes_y+20}, "TODO"),
+                                 game_info(Point{boxes_x + 200, boxes_y}, "game_info:"),
+                                last_input(Point{boxes_x + 200, boxes_y-20}, "last_input:"),
+                                game_msg(Point{boxes_x + 200, boxes_y+20}, "game_msg:"),
                                  input(Point{boxes_x, boxes_y},
                                        default_ww_button, default_hh_button,
                                        "input and press \"Enter\":", [this]() { input_callback(); }),
@@ -67,6 +67,11 @@ namespace ch18::game_gui
         input.show();
         create_buttons();
         action_choice.show();
+        attach(action_choice);
+        attach(game_info);
+        attach(last_input);
+        attach(game_msg);
+
 
     }
 
@@ -74,6 +79,7 @@ namespace ch18::game_gui
     {
         std::function<void()> shooting = [this]()
         {
+            game_msg.put("shoot?");
             this ->engine.shoot_antagonist(shooting_input_process());
         };
 
@@ -93,7 +99,7 @@ namespace ch18::game_gui
         input.clear_last_result();
     }
 
-    std::vector<int> Game_window::shooting_input_process()
+    std::vector<int> Game_window::shooting_input_process() // TODO test
     {
         if (engine.get_arrow_capacity() == 0) {
             game_msg.put("You can't shooting, capacity arrows is 0! But you can move)");
@@ -104,17 +110,16 @@ namespace ch18::game_gui
        game_msg.put("Enter how much rooms arrow must reached (less then 5)");
 
         while (last_input_string.empty())
-        {
             this->timer_wait(500);
-        }
+
 
           int count_rooms_reaching = [&]()
         {
                 std::istringstream is (last_input_string);
                 int result;
-                is >> count_rooms_reaching;
+                is >> result;
                 last_input_string.clear();
-                return count_rooms_reaching;
+                return result;
         }.operator()();
 
 
@@ -126,6 +131,7 @@ namespace ch18::game_gui
         for (int i = 0; i < count_rooms_reaching; ++i) {
                game_msg.put(std::format("Enter trace[{}]",i));
 
+               // TODO infinity loop... mb "wait for button"
                 while (last_input_string.empty())
                     this->timer_wait(500);
 

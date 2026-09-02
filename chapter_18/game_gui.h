@@ -13,13 +13,18 @@
 #include "game.h"
 //#include "PPP/Simple_window.h"
 
+namespace ch18
+{
+    void play_game();
+}
+
 namespace ch18::game_gui
 {
     inline int dm = 50; // default margin
     inline int ds = 30; // default size
 
-    constexpr int boxes_x = 100;
-    constexpr int boxes_y = 20;
+    constexpr int boxes_x = 200;
+    constexpr int boxes_y = 100;
 
 
 
@@ -41,8 +46,8 @@ namespace ch18::game_gui
 
     struct Cave_map : Shape
     {
-        Cave_map(Point center, int antagonist_room_number, vector<int> next_rooms);
-        void update(int antagonist_room_number, vector<int> next_rooms);
+        Cave_map(Point center, int antagonist_room_number, const vector<int>&  next_rooms);
+        void update(int antagonist_room_number, const vector<int>&  next_rooms);
 
     private:
         Room r1;

@@ -46,6 +46,7 @@ set(PROJECT_SOURCES
         PPP/error.h
         chapter_18/game_gui.h
         chapter_18/game_gui.cpp
+        chapter_18/start.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

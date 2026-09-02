@@ -1,12 +1,13 @@
 
-#include "Chapter_14/drill_ex.h"
+#include "chapter_18/game_gui.h"
 #include <iostream>
+#include <QApplication>
 
 
 int main(int /*argc*/, char * /*argv*/[])
 {
     try{
-        ch14::exercises::ex10();
+        ch18::play_game();
     }catch(std::exception& ex){
         std::cerr << ex.what();
     } catch (...) {
