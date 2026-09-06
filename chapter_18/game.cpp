@@ -446,6 +446,19 @@ namespace ch18::game
 
     }
 
+    std::string Game::get_string_of_alive_mobs() const
+    {
+            std::vector<const Enemy *> alive_enemies = get_list_of_alive_enemies();
+            if (!antagonist->is_alive())
+                return "antagonist is dead";
+
+            std::string result {"Antagonist "};
+            for (const auto* enemy : alive_enemies)
+                result += enemy->get_name() + " ";
+
+            return result;
+    }
+
     void Game::shoot_antagonist(const std::vector<int>& trace) {
         antagonist->shoot(trace,get_alive_mobs());
     }

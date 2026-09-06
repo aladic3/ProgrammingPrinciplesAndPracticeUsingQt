@@ -38,6 +38,7 @@ namespace ch18::game
         [[nodiscard]] virtual bool is_alive() const = 0;
         virtual bool is_current_location(const Room*) const = 0;
         [[nodiscard]] virtual std::string get_message_preview() const = 0;
+        [[nodiscard]] virtual std::string get_name() const = 0;
         virtual void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const = 0;
     };
 
@@ -61,6 +62,7 @@ namespace ch18::game
         [[nodiscard]] bool is_alive() const override {return true;}
         bool is_current_location(const Room* room) const override { return &location == room;};
         [[nodiscard]] std::string get_message_preview() const override {return "I feel a draft!";}
+        [[nodiscard]] std::string get_name() const override {return "Pit";}
         void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const override;
 
 
@@ -77,6 +79,7 @@ namespace ch18::game
         [[nodiscard]] bool is_alive() const override {return location != &hell_room;}
         bool is_current_location(const Room* room) const override {return location == room;}
         [[nodiscard]] std::string get_message_preview() const override {return "Bats nearby!";}
+        [[nodiscard]] std::string get_name() const override {return "Bat";}
         void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const override;
 
         const Room* location;
@@ -94,6 +97,7 @@ namespace ch18::game
         [[nodiscard]] bool is_alive() const override {return location != &hell_room;}
         bool is_current_location(const Room* room) const override {return location == room;};
         [[nodiscard]] std::string get_message_preview() const override {return "I smell a Wumpus!";}
+        [[nodiscard]] std::string get_name() const override {return "Wumpus";}
         void contact_with_antagonist(Antagonist*antagonist, const Room *wumpus_room, const Game *engine) const override;
 
         const Room *location;
@@ -122,6 +126,7 @@ namespace ch18::game
         void play();
 
         [[nodiscard]] std::vector<const Enemy *> get_list_of_alive_enemies() const;
+        [[nodiscard]] std::string get_string_of_alive_mobs() const;
 
         std::set<std::string> get_next_rooms_info_from_antagonist();
 
@@ -134,6 +139,7 @@ namespace ch18::game
         std::vector<int> get_next_antagonist_rooms();
 
     private:
+
         void init_bats(std::set<int>& sibel_values, int count = 2);
         void init_pits(std::set<int>& sibel_values, int count = 2);
         void init_wumpus(std::set<int>& sibel_values);

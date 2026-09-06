@@ -11,8 +11,9 @@ namespace ch18::game_gui
 
 
     Room::Room(Point center, int room_number, int size) :  room_shape(center,size),
-    r_number(center, to_string(room_number))
+    r_number(center, "")
     {
+        r_number.put(room_number);
     }
 
     void Room::move(int dx, int dy)
@@ -41,26 +42,32 @@ namespace ch18::game_gui
      r3(Point{center.x,center.y - dm}, next_rooms[2],ds),
     antagonist_r(center,antagonist_room_number,ds)   {}
 
+    void Cave_map::draw_specifics(Painter& painter) const
+    {
+        this->antagonist_r.draw(painter);
+        this->r1.draw(painter);
+        this->r2.draw(painter);
+        this->r3.draw(painter);
+    }
+
     void Cave_map::update(int antagonist_room_number, const vector<int>&  next_rooms)
     {
         antagonist_r.set_number(antagonist_room_number);
         r1.set_number(next_rooms[0]);
         r2.set_number(next_rooms[1]);
         r3.set_number(next_rooms[2]);
+
     }
 
     Game_window::Game_window(game::Game& e) : Simple_window(zero_point,width_display_default,high_display_default,
                                  "hunt on wumpus"),
-                                engine(e),
-                                 game_info(Point{boxes_x + 200, boxes_y}, "game_info:"),
-                                last_input(Point{boxes_x + 200, boxes_y-20}, "last_input:"),
-                                game_msg(Point{boxes_x + 200, boxes_y+20}, "game_msg:"),
-                                 input(Point{boxes_x, boxes_y},
-                                       default_ww_button, default_hh_button,
-                                       "input and press \"Enter\":", [this]() { input_callback(); }),
-                                 action_choice(Point{boxes_x, boxes_y + default_hh_button * 2},
-                                               default_ww_button, default_hh_button, Menu::Kind::vertical,
-                                               "choice")
+    engine(e),
+    map(Point{500,500},engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms()),
+    game_info(Point{boxes_x + 200, boxes_y}, "game_info:"),
+    last_input(Point{boxes_x + 200, boxes_y-20}, "last_input:"),
+    game_msg(Point{boxes_x + 200, boxes_y+20}, "game_msg:"),
+    input(Point{boxes_x, boxes_y},default_ww_button, default_hh_button,"input and press \"Enter\":", [this]() { input_callback(); }),
+    action_choice(Point{boxes_x, boxes_y + default_hh_button * 2},default_ww_button, default_hh_button, Menu::Kind::vertical,"choice")
     {
         attach(input);
         input.hide_buttons();
@@ -71,7 +78,7 @@ namespace ch18::game_gui
         attach(game_info);
         attach(last_input);
         attach(game_msg);
-
+        attach(map);
 
     }
 
@@ -81,6 +88,10 @@ namespace ch18::game_gui
         {
             game_msg.put("shoot?");
             this ->engine.shoot_antagonist(shooting_input_process());
+            last_input_string.clear();
+            map.update(engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms());
+            game_info.put(engine.get_string_of_alive_mobs());
+
         };
 
         action_choice.attach(make_unique<Button>(Point{100,100},0,0,"shoot",[=]{shooting();}));
@@ -106,40 +117,17 @@ namespace ch18::game_gui
             return std::vector<int>{};
         }
 
-
-       game_msg.put("Enter how much rooms arrow must reached (less then 5)");
-
-        while (last_input_string.empty())
-            this->timer_wait(500);
-
-
-          int count_rooms_reaching = [&]()
+          std::vector<int> trace = [&]()
         {
                 std::istringstream is (last_input_string);
-                int result;
-                is >> result;
+                int trace_count;
+                is >> trace_count;
+                std::vector<int> result(trace_count);
+                for (int& el : trace)
+                    is >> el;
                 last_input_string.clear();
                 return result;
         }.operator()();
-
-
-
-       std::vector<int> trace(count_rooms_reaching);
-
-        game_msg.put("Inputting trace...");
-        this->timer_wait(500);
-        for (int i = 0; i < count_rooms_reaching; ++i) {
-               game_msg.put(std::format("Enter trace[{}]",i));
-
-               // TODO infinity loop... mb "wait for button"
-                while (last_input_string.empty())
-                    this->timer_wait(500);
-
-                std::istringstream is (last_input_string);
-               is >> trace[i];
-                last_input_string.clear();
-
-         }
 
         return trace;
     }

@@ -47,6 +47,7 @@ namespace ch18::game_gui
     struct Cave_map : Shape
     {
         Cave_map(Point center, int antagonist_room_number, const vector<int>&  next_rooms);
+        virtual void draw_specifics(Painter& painter) const override;
         void update(int antagonist_room_number, const vector<int>&  next_rooms);
 
     private:
@@ -69,7 +70,7 @@ namespace ch18::game_gui
         game::Game& engine;
         string last_input_string;
 
-
+        Cave_map map;
         Out_box game_info;
         Out_box last_input;
         Out_box game_msg;
