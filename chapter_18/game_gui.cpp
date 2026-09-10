@@ -28,6 +28,14 @@ namespace ch18::game_gui
         r_number.put(n);
     }
 
+    void Room::set_game_over()
+    {
+        this->r_number.put("hell");
+        this->set_color(Color::dark_red);
+        this->r_number.set_color(Color::dark_yellow);
+        this->set_fill_color(Color::red);
+    }
+
     void Room::draw_specifics(Painter& painter) const
     {
         room_shape.draw_specifics(painter);
@@ -52,7 +60,12 @@ namespace ch18::game_gui
 
     void Cave_map::update(int antagonist_room_number, const vector<int>&  next_rooms)
     {
+        if (antagonist_room_number == game::hell_room.number_this)
+            return antagonist_r.set_game_over();
+
+
         antagonist_r.set_number(antagonist_room_number);
+
         r1.set_number(next_rooms[0]);
         r2.set_number(next_rooms[1]);
         r3.set_number(next_rooms[2]);
@@ -82,16 +95,25 @@ namespace ch18::game_gui
 
     }
 
+    std::string string_from_vector(const std::vector<int>& vec)
+    {
+        std::string result;
+
+        for (int a : vec)
+            result.append(std::format("{} ", a));
+        return result;
+    }
+
     void Game_window::create_buttons()
     {
         std::function<void()> shooting = [this]()
         {
             game_msg.put("shoot?");
-            this ->engine.shoot_antagonist(shooting_input_process());
-            last_input_string.clear();
+            std::vector<int> trace = this->engine.shoot_antagonist(shooting_input_process());
+
             map.update(engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms());
             game_info.put(engine.get_string_of_alive_mobs());
-
+            game_msg.put(std::format("Shot rooms: {}",string_from_vector(trace)));
         };
 
         action_choice.attach(make_unique<Button>(Point{100,100},0,0,"shoot",[=]{shooting();}));
@@ -112,23 +134,32 @@ namespace ch18::game_gui
 
     std::vector<int> Game_window::shooting_input_process() // TODO test
     {
+        std::vector<int> empty_vector{};
         if (engine.get_arrow_capacity() == 0) {
             game_msg.put("You can't shooting, capacity arrows is 0! But you can move)");
-            return std::vector<int>{};
+            return empty_vector;
         }
 
-          std::vector<int> trace = [&]()
-        {
-                std::istringstream is (last_input_string);
-                int trace_count;
-                is >> trace_count;
-                std::vector<int> result(trace_count);
-                for (int& el : trace)
-                    is >> el;
-                last_input_string.clear();
-                return result;
-        }.operator()();
+        std::istringstream is (last_input_string);
+        int temp;
+        is >> temp;
+        const int size_v = temp;
 
-        return trace;
+        if (size_v < 1 || size_v > 5)
+            return empty_vector;
+
+        std::vector<int> result;
+        result.reserve(size_v);
+
+        while (is >> temp)
+            result.push_back(temp);
+
+        if (static_cast<int>(result.size()) != size_v)
+            return empty_vector;
+
+
+        last_input_string.clear();
+        return result;
+
     }
 }

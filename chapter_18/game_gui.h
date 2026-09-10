@@ -34,6 +34,7 @@ namespace ch18::game_gui
         Room(Point center, int room_number, int size);
         void move(int dx, int dy) override;
         void set_number(int n);
+        void set_game_over();
 
     private:
 

@@ -237,12 +237,17 @@ namespace ch18::game
         }
     }
 
-    void Antagonist::shoot(const std::vector<int>& trajectory, const std::vector<Mortal*>& mobs){
+    std::vector<int> Antagonist::shoot(const std::vector<int>& trajectory, const std::vector<Mortal*>& mobs){
+        std::vector<int> empty_vector{};
+
+        std::vector<int> result;
+        result.reserve(trajectory.size());
+
         const Room* current_room = this->location;
         bool is_random = false;
 
         if (trajectory.empty())
-            return;
+            return empty_vector;
 
         for (int room_number : trajectory) {
             const Room* prev = current_room;
@@ -255,9 +260,11 @@ namespace ch18::game
             }
 
             kill_mobs_in_room(mobs,current_room);
+            result.push_back(current_room->number_this);
         }
 
         --arrows_capacity;
+        return result;
     }
 
     bool Antagonist::move(int next_room) {
@@ -459,8 +466,8 @@ namespace ch18::game
             return result;
     }
 
-    void Game::shoot_antagonist(const std::vector<int>& trace) {
-        antagonist->shoot(trace,get_alive_mobs());
+    std::vector<int> Game::shoot_antagonist(const std::vector<int>& trace) {
+        return antagonist->shoot(trace,get_alive_mobs());
     }
 
 
@@ -502,11 +509,13 @@ namespace ch18::game
 
     int Game::get_antagonist_room_number()
     {
-       return  antagonist->location->number_this;
+       return antagonist->location->number_this;
     }
 
     std::vector<int> Game::get_next_antagonist_rooms()
     {
+        if (!antagonist->is_alive())
+            return {};
         std::vector<int> result;
         result.reserve(3);
 

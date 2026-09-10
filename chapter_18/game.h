@@ -112,7 +112,7 @@ namespace ch18::game
         void die() override;
         [[nodiscard]] const Room* get_location() override { return location;}
 
-        void shoot(const std::vector<int>& trajectory,const std::vector<Mortal*>& mobs);
+        std::vector<int> shoot(const std::vector<int>& trajectory,const std::vector<Mortal*>& mobs);
         bool move(int next_room);
         void bat_move(const Room* wumpus_room, const Game* engine, int depth = 1);
 
@@ -130,7 +130,7 @@ namespace ch18::game
 
         std::set<std::string> get_next_rooms_info_from_antagonist();
 
-        void shoot_antagonist(const std::vector<int>& trace);
+        std::vector<int> shoot_antagonist(const std::vector<int>& trace);
         void move_antagonist() const;
         void after_move_antagonist() const; // change loc or die antagonist or nothing (wumpus, bat, pit)
         [[nodiscard]] int get_arrow_capacity() const;
