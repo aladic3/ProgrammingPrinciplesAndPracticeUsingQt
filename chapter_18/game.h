@@ -131,7 +131,7 @@ namespace ch18::game
         std::set<std::string> get_next_rooms_info_from_antagonist();
 
         std::vector<int> shoot_antagonist(const std::vector<int>& trace);
-        void move_antagonist() const;
+        bool move_antagonist(int next_room) const;
         void after_move_antagonist() const; // change loc or die antagonist or nothing (wumpus, bat, pit)
         [[nodiscard]] int get_arrow_capacity() const;
 

@@ -472,24 +472,8 @@ namespace ch18::game
 
 
 
-    void Game::move_antagonist() const {
-        using namespace std;
-        vector<const Room*> available_rooms {antagonist->location->next_1,  antagonist->location->next_2,
-                antagonist->location->next_3};
-        cout << "Next available rooms for moving: ";
-        print_numbers_of_vector_rooms(available_rooms);
-
-        cout << "Enter number of room for move: ";
-
-        int input_number;
-        cin >> input_number;
-        while (!antagonist->move(input_number)){
-            cout << "Bad input number! Please, enter rooms from this list: ";
-            print_numbers_of_vector_rooms(available_rooms);
-            cout << "Enter number of room for move: ";
-            cin >> input_number;
-        }
-
+    bool Game::move_antagonist(int next_room) const {
+        return antagonist->move(next_room);
     }
 
     void Game::after_move_antagonist() const {

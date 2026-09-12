@@ -64,9 +64,13 @@ namespace ch18::game_gui
 
 
     private:
+        void clear_last_input();
         void create_buttons();
         void input_callback();
+        void update_map();
+        void update_info();
         std::vector<int> shooting_input_process();
+        int moving_input_process();
 
         game::Game& engine;
         string last_input_string;

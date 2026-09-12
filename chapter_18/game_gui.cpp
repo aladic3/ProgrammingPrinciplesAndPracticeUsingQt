@@ -92,7 +92,14 @@ namespace ch18::game_gui
         attach(last_input);
         attach(game_msg);
         attach(map);
+        update_info();
 
+    }
+
+    void Game_window::clear_last_input()
+    {
+        last_input_string.clear();
+        last_input.put("");
     }
 
     std::string string_from_vector(const std::vector<int>& vec)
@@ -111,12 +118,23 @@ namespace ch18::game_gui
             game_msg.put("shoot?");
             std::vector<int> trace = this->engine.shoot_antagonist(shooting_input_process());
 
-            map.update(engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms());
-            game_info.put(engine.get_string_of_alive_mobs());
+            update_map();
+            update_info();
             game_msg.put(std::format("Shot rooms: {}",string_from_vector(trace)));
         };
 
+        std::function<void()> moving = [this]()
+        {
+            game_msg.put("moove...");
+            if (!engine.move_antagonist(moving_input_process()))
+                return game_msg.put("Moving to this number impossible");
+
+            update_map();
+            update_info();
+        };
+
         action_choice.attach(make_unique<Button>(Point{100,100},0,0,"shoot",[=]{shooting();}));
+        action_choice.attach(make_unique<Button>(Point{100,100},0,0,"moove",[=]{moving();}));
     }
 
 
@@ -130,6 +148,21 @@ namespace ch18::game_gui
 
 
         input.clear_last_result();
+    }
+
+    void Game_window::update_map()
+    {
+        map.update(engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms());
+    }
+
+    void Game_window::update_info()
+    {
+        std::string feeling;
+        for (const std::string& el : engine.get_next_rooms_info_from_antagonist())
+            feeling += std::format("{} ",el);
+        game_info.put(std::format("{}is alive.",engine.get_string_of_alive_mobs()));
+        game_msg.put(feeling);
+
     }
 
     std::vector<int> Game_window::shooting_input_process() // TODO test
@@ -157,9 +190,19 @@ namespace ch18::game_gui
         if (static_cast<int>(result.size()) != size_v)
             return empty_vector;
 
-
-        last_input_string.clear();
+        clear_last_input();
         return result;
 
+    }
+
+    int Game_window::moving_input_process()
+    {
+        if (last_input_string.empty()) return -1;
+
+        std::istringstream is (last_input_string);
+        int temp;
+        is >> temp;
+        clear_last_input();
+        return temp;
     }
 }
