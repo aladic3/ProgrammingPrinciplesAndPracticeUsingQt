@@ -160,7 +160,7 @@ namespace ch18::game_gui
         std::string feeling;
         for (const std::string& el : engine.get_next_rooms_info_from_antagonist())
             feeling += std::format("{} ",el);
-        game_info.put(std::format("{}is alive.",engine.get_string_of_alive_mobs()));
+        game_info.put(std::format("{}is alive. Arrow cap: {} ",engine.get_string_of_alive_mobs(), engine.get_arrow_capacity()));
         game_msg.put(feeling);
 
     }

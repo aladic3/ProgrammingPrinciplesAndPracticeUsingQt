@@ -400,15 +400,15 @@ namespace ch18::game
                 if (enemy->is_current_location(room))
                     info.insert(enemy->get_message_preview());
 
-        std::ostringstream info_about_locations ;
+        /*std::ostringstream info_about_locations ;
         info_about_locations << "Current location: " << antagonist->location->number_this << ", rooms around: ";
 
         for (auto& room : next_rooms)
             info_about_locations << room->number_this << " ";
 
-        info.insert(info_about_locations.str());
+        info.insert(info_about_locations.str());*/
 
-        return info;
+        return info.empty() ? std::set<std::string>{"No enemy around"} : info;
     }
 
 
@@ -473,7 +473,12 @@ namespace ch18::game
 
 
     bool Game::move_antagonist(int next_room) const {
-        return antagonist->move(next_room);
+        if (antagonist->move(next_room)){
+            after_move_antagonist();
+            return true;
+        }
+
+        return false;
     }
 
     void Game::after_move_antagonist() const {
