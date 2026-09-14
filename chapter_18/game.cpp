@@ -463,6 +463,7 @@ namespace ch18::game
             for (const auto* enemy : alive_enemies)
                 result += enemy->get_name() + " ";
 
+            result += "is alive";
             return result;
     }
 

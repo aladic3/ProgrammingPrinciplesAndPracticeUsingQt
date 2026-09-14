@@ -119,8 +119,7 @@ namespace ch18::game_gui
             std::vector<int> trace = this->engine.shoot_antagonist(shooting_input_process());
 
             update_map();
-            update_info();
-            game_msg.put(std::format("Shot rooms: {}",string_from_vector(trace)));
+            update_info(std::format("Shot rooms: {}",string_from_vector(trace)));
         };
 
         std::function<void()> moving = [this]()
@@ -155,13 +154,13 @@ namespace ch18::game_gui
         map.update(engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms());
     }
 
-    void Game_window::update_info()
+    void Game_window::update_info(const std::string& additional_info)
     {
         std::string feeling;
         for (const std::string& el : engine.get_next_rooms_info_from_antagonist())
             feeling += std::format("{} ",el);
-        game_info.put(std::format("{}is alive. Arrow cap: {} ",engine.get_string_of_alive_mobs(), engine.get_arrow_capacity()));
-        game_msg.put(feeling);
+        game_info.put(std::format("{}. Arrow cap: {} ",engine.get_string_of_alive_mobs(), engine.get_arrow_capacity()));
+        game_msg.put(feeling + " " + additional_info);
 
     }
 

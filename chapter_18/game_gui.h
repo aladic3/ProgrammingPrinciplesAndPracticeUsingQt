@@ -68,7 +68,7 @@ namespace ch18::game_gui
         void create_buttons();
         void input_callback();
         void update_map();
-        void update_info();
+        void update_info(const std::string& additional_info = "");
         std::vector<int> shooting_input_process();
         int moving_input_process();
 
