@@ -26,10 +26,13 @@ namespace ch18::game
 
 
     struct Room {
+        bool set_flag_on_of();
+
         int number_this = -1;
         Room* next_1 = nullptr;
         Room* next_2 = nullptr;
         Room* next_3 = nullptr;
+        bool flag = false;
     };
 
     struct Enemy {
@@ -125,6 +128,7 @@ namespace ch18::game
         Game();
         void play();
 
+        bool mark_room(int room_number);
         [[nodiscard]] std::vector<const Enemy *> get_list_of_alive_enemies() const;
         [[nodiscard]] std::string get_string_of_alive_mobs() const;
 
@@ -137,6 +141,7 @@ namespace ch18::game
 
         int get_antagonist_room_number();
         std::vector<int> get_next_antagonist_rooms();
+        [[nodiscard]] Antagonist* get_antagonist() const;
 
     private:
 

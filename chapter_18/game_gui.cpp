@@ -28,6 +28,16 @@ namespace ch18::game_gui
         r_number.put(n);
     }
 
+    void Room::set_inscription(const Room_meta& info)
+    {
+        std::string inscription = std::format("{} {}",info.number, info.msg);
+        r_number.put(inscription);
+        if (!info.msg.empty())
+            set_fill_color(info.color);
+        else
+            set_fill_color(Color::invisible);
+    }
+
     void Room::set_game_over()
     {
         this->r_number.put("hell");
@@ -44,38 +54,57 @@ namespace ch18::game_gui
 
 
 
-    Cave_map::Cave_map(Point center, int antagonist_room_number, const vector<int>& next_rooms) :
-     r1(Point{center.x + dm,center.y + dm}, next_rooms[0],ds),
-     r2(Point{center.x - dm,center.y + dm},next_rooms[1],ds),
-     r3(Point{center.x,center.y - dm}, next_rooms[2],ds),
-    antagonist_r(center,antagonist_room_number,ds)   {}
+    Cave_map::Cave_map(Point center, game::Antagonist* a) :
+     r1(Point{center.x + dm,center.y + dm}, a->location->next_1->number_this,ds),
+     r2(Point{center.x - dm,center.y + dm},a->location->next_2->number_this,ds),
+     r3(Point{center.x,center.y - dm}, a->location->next_3->number_this,ds),
+    antagonist_shape_room(center,a->location->number_this,ds),
+    antagonist_(a){}
 
     void Cave_map::draw_specifics(Painter& painter) const
     {
-        this->antagonist_r.draw(painter);
+        this->antagonist_shape_room.draw(painter);
         this->r1.draw(painter);
         this->r2.draw(painter);
         this->r3.draw(painter);
     }
 
-    void Cave_map::update(int antagonist_room_number, const vector<int>&  next_rooms)
+
+    Room_meta::Room_meta(game::Room* r)
     {
-        if (antagonist_room_number == game::hell_room.number_this)
-            return antagonist_r.set_game_over();
+        room = r;
+        number = r->number_this;
+        if (r->flag)
+        {
+            color = Color::dark_yellow;
+            msg = "Suspicious";
+        }
+
+    }
+
+    void Cave_map::update()
+    {
+        if (antagonist_->location->number_this == game::hell_room.number_this)
+            return antagonist_shape_room.set_game_over();
 
 
-        antagonist_r.set_number(antagonist_room_number);
+        antagonist_shape_room.set_number(antagonist_->location->number_this);
 
-        r1.set_number(next_rooms[0]);
-        r2.set_number(next_rooms[1]);
-        r3.set_number(next_rooms[2]);
+        std::vector<Room_meta> rooms_meta {antagonist_->location->next_1,
+            antagonist_->location->next_2,
+           antagonist_->location->next_3};
+
+
+        r1.set_inscription(rooms_meta[0]);
+        r2.set_inscription(rooms_meta[1]);
+        r3.set_inscription(rooms_meta[2]);
 
     }
 
     Game_window::Game_window(game::Game& e) : Simple_window(zero_point,width_display_default,high_display_default,
                                  "hunt on wumpus"),
     engine(e),
-    map(Point{500,500},engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms()),
+    map(Point{500,500},engine.get_antagonist()),
     game_info(Point{boxes_x + 200, boxes_y}, "game_info:"),
     last_input(Point{boxes_x + 200, boxes_y-20}, "last_input:"),
     game_msg(Point{boxes_x + 200, boxes_y+20}, "game_msg:"),
@@ -125,8 +154,18 @@ namespace ch18::game_gui
         std::function<void()> moving = [this]()
         {
             game_msg.put("moove...");
-            if (!engine.move_antagonist(moving_input_process()))
+            if (!engine.move_antagonist(solo_number_input_process()))
                 return game_msg.put("Moving to this number impossible");
+
+            update_map();
+            update_info();
+        };
+
+        std::function mark = [this]
+        {
+            game_msg.put("marking...");
+            if (!engine.mark_room(solo_number_input_process()))
+                return game_msg.put("Mark this number impossible");
 
             update_map();
             update_info();
@@ -134,6 +173,8 @@ namespace ch18::game_gui
 
         action_choice.attach(make_unique<Button>(Point{100,100},0,0,"shoot",[=]{shooting();}));
         action_choice.attach(make_unique<Button>(Point{100,100},0,0,"moove",[=]{moving();}));
+        action_choice.attach(make_unique<Button>(Point{100,100},0,0,"mark",[=]{mark();}));
+
     }
 
 
@@ -151,7 +192,7 @@ namespace ch18::game_gui
 
     void Game_window::update_map()
     {
-        map.update(engine.get_antagonist_room_number(),engine.get_next_antagonist_rooms());
+        map.update();
     }
 
     void Game_window::update_info(const std::string& additional_info)
@@ -194,7 +235,7 @@ namespace ch18::game_gui
 
     }
 
-    int Game_window::moving_input_process()
+    int Game_window::solo_number_input_process()
     {
         if (last_input_string.empty()) return -1;
 

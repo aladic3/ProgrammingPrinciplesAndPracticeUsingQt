@@ -70,6 +70,11 @@ namespace ch18::game
     }
 
 
+    bool Room::set_flag_on_of()
+    {
+        flag = !flag;
+        return true;
+    }
 
     void init_map(std::vector<Room>& map) {
         map[0].next_1 = &map[1];    map[0].next_2 = &map[4];    map[0].next_3 = &map[7]; // 1
@@ -95,7 +100,6 @@ namespace ch18::game
 
         init_numbers_of_map(map);
 
-        return;
     }
 
     const Room& get_room_from_map_by_number(const int number, const std::vector<Room>& map) {
@@ -453,6 +457,18 @@ namespace ch18::game
 
     }
 
+    bool Game::mark_room(int room_number)
+    {
+        std::vector rooms {antagonist->location->next_1,
+        antagonist->location->next_2, antagonist->location->next_3};
+
+        for (Room* el : rooms)
+            if (room_number == el->number_this)
+                return el->set_flag_on_of();
+
+        return false;
+    }
+
     std::string Game::get_string_of_alive_mobs() const
     {
             std::vector<const Enemy *> alive_enemies = get_list_of_alive_enemies();
@@ -514,6 +530,11 @@ namespace ch18::game
         result.push_back(antagonist->location->next_3->number_this);
 
         return result;
+    }
+
+    Antagonist* Game::get_antagonist() const
+    {
+        return antagonist;
     }
 }
 

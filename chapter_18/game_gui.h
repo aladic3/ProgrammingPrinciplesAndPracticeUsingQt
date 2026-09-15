@@ -26,7 +26,14 @@ namespace ch18::game_gui
     constexpr int boxes_x = 200;
     constexpr int boxes_y = 100;
 
-
+    struct Room_meta
+    {
+        Room_meta(game::Room* r);
+        game::Room* room;
+        int number;
+        Color color = Color::black;
+        std::string msg;
+    };
 
 
     struct Room : Shape
@@ -34,6 +41,7 @@ namespace ch18::game_gui
         Room(Point center, int room_number, int size);
         void move(int dx, int dy) override;
         void set_number(int n);
+        void set_inscription(const Room_meta&);
         void set_game_over();
 
     private:
@@ -45,17 +53,20 @@ namespace ch18::game_gui
 
 
 
+
+
     struct Cave_map : Shape
     {
-        Cave_map(Point center, int antagonist_room_number, const vector<int>&  next_rooms);
-        virtual void draw_specifics(Painter& painter) const override;
-        void update(int antagonist_room_number, const vector<int>&  next_rooms);
+        Cave_map(Point center, game::Antagonist* a);
+        void draw_specifics(Painter& painter) const override;
+        void update();
 
     private:
         Room r1;
         Room r2;
         Room r3;
-        Room antagonist_r;
+        Room antagonist_shape_room;
+        game::Antagonist* antagonist_;
     };
 
     struct Game_window : Simple_window {
@@ -70,7 +81,7 @@ namespace ch18::game_gui
         void update_map();
         void update_info(const std::string& additional_info = "");
         std::vector<int> shooting_input_process();
-        int moving_input_process();
+        int solo_number_input_process();
 
         game::Game& engine;
         string last_input_string;
